@@ -1,4 +1,4 @@
-import { Home, Compass, Heart, Clock, Settings, LogOut, Zap } from 'lucide-react';
+import { Home, Compass, Heart, Clock, Settings, LogOut, Zap, User } from 'lucide-react'; // <--- Import User
 import { Link, useLocation } from 'react-router-dom';
 
 export function Sidebar() {
@@ -35,6 +35,12 @@ export function Sidebar() {
         <Link to="/catalog" className={getLinkClass('/catalog')}>
           <Compass className="w-5 h-5" />
           <span>Explorar</span>
+        </Link>
+
+        {/* --- NOVO LINK DE PERFIL --- */}
+        <Link to="/profile" className={getLinkClass('/profile')}>
+          <User className="w-5 h-5" />
+          <span>Perfil</span>
         </Link>
 
         <Link to="#" className={getLinkClass('/favorites')}>
