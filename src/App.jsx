@@ -6,7 +6,7 @@ import { Catalog } from './components/pages/Catalog';
 
 function App() {
   return (
-    <BrowserRouter>
+<BrowserRouter basename="/portal-animes-V2">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/catalog" element={<Catalog />} />
