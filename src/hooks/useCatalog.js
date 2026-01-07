@@ -5,68 +5,71 @@ export function useCatalog() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState(null); // Novo estado
 
   useEffect(() => {
-    // AbortController para cancelar requisições ao sair da tela
-    const controller = new AbortController();
+    let isMounted = true; // Evita atualizar estado se o componente desmontar
 
     async function fetchCatalog() {
-      // Se já deu erro antes, não tente buscar mais automaticamente (previne loop)
-      if (error) return; 
-
       try {
         setLoading(true);
-        const response = await fetch(`https://api.jikan.moe/v4/top/anime?page=${page}&limit=24`, {
-            signal: controller.signal
-        });
         
+        // Delay de segurança para evitar erro 429 (Too Many Requests) da API Jikan
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        const response = await fetch(`https://api.jikan.moe/v4/top/anime?page=${page}&limit=24`);
+        
+        // Se der erro na API (ex: 429 ou 500), lançamos erro para cair no catch
         if (!response.ok) {
-            // Se for erro 429 (Muitas requisições), trate diferente se quiser
-            throw new Error(`Erro API: ${response.status}`);
+           throw new Error(`Erro API: ${response.status}`);
         }
 
         const json = await response.json();
         
-        const newAnimes = json.data.map(anime => ({
+        if (!isMounted) return;
+
+        const data = json.data || [];
+        const pagination = json.pagination || {};
+
+        const newAnimes = data.map(anime => ({
           id: anime.mal_id,
           title: anime.title_english || anime.title,
-          image: anime.images.jpg.large_image_url,
+          image: anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url,
           score: anime.score || 'N/A',
-          genres: anime.genres.map(g => g.name).slice(0, 2).join(', ')
+          genres: anime.genres ? anime.genres.map(g => g.name).slice(0, 2).join(', ') : ''
         }));
 
         setAnimes(prev => {
             const combined = [...prev, ...newAnimes];
-            // Remove duplicatas
-            return Array.from(new Map(combined.map(item => [item.id, item])).values());
+            // Remove duplicatas por ID
+            const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+            return unique;
         });
 
-        if (newAnimes.length < 24) setHasMore(false);
-
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-            console.error("Erro ao buscar catálogo:", err);
-            setError(true); // Trava novas requisições automáticas
-            setHasMore(false); // Para o scroll infinito temporariamente
+        if (pagination.has_next_page !== undefined) {
+            setHasMore(pagination.has_next_page);
+        } else {
+            // Fallback: se vier menos itens que o limite, acabou.
+            setHasMore(data.length >= 24);
         }
+
+      } catch (error) {
+        console.error("Erro ao buscar catálogo:", error);
       } finally {
-        if (!controller.signal.aborted) setLoading(false);
+        if (isMounted) setLoading(false);
       }
     }
 
     fetchCatalog();
 
-    return () => controller.abort();
-  }, [page]); // Removemos 'error' da dependência para não loopar
+    return () => { isMounted = false; };
+  }, [page]);
 
   const loadMore = () => {
-      // Função para tentar novamente ou carregar próxima página
+      // Só carrega mais se não estiver carregando e se a API disse que tem mais
       if (!loading && hasMore) {
-          setError(null); // Reseta erro ao tentar carregar mais
           setPage(prev => prev + 1);
       }
   };
 
-  return { animes, loading, loadMore, hasMore, error };
+  return { animes, loading, loadMore, hasMore };
 }
