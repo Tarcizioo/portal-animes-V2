@@ -9,7 +9,7 @@ export function useCatalog() {
   const [filters, setFilters] = useState({
     q: '',
     genres: [],
-    orderBy: 'ranking', 
+    orderBy: 'ranking',
     status: '',
   });
 
@@ -39,11 +39,11 @@ export function useCatalog() {
     async function fetchCatalog() {
       try {
         setLoading(true);
-        
+
         // Delay para evitar bloqueio da API (429)
         await new Promise(resolve => setTimeout(resolve, 600));
 
-        const params = new URLSearchParams({ page: page, limit: 24, sfw: false });
+        const params = new URLSearchParams({ page: page, limit: 24, sfw: true });
         let endpoint = 'https://api.jikan.moe/v4/anime';
 
         const hasTextOrGenre = filters.q !== '' || filters.genres.length > 0;
@@ -51,54 +51,54 @@ export function useCatalog() {
 
         // LÓGICA DE ENDPOINT
         if (!hasTextOrGenre && !filters.status && (isRankingMode || filters.orderBy === 'popularity' || filters.orderBy === 'favorites')) {
-            endpoint = 'https://api.jikan.moe/v4/top/anime';
-            if (filters.orderBy === 'popularity') params.append('filter', 'bypopularity');
-            if (filters.orderBy === 'favorites') params.append('filter', 'favorite');
+          endpoint = 'https://api.jikan.moe/v4/top/anime';
+          if (filters.orderBy === 'popularity') params.append('filter', 'bypopularity');
+          if (filters.orderBy === 'favorites') params.append('filter', 'favorite');
         } else {
-            endpoint = 'https://api.jikan.moe/v4/anime';
-            if (filters.q) params.append('q', filters.q);
-            if (filters.status) params.append('status', filters.status);
-            if (filters.genres.length > 0) params.append('genres', filters.genres.join(','));
+          endpoint = 'https://api.jikan.moe/v4/anime';
+          if (filters.q) params.append('q', filters.q);
+          if (filters.status) params.append('status', filters.status);
+          if (filters.genres.length > 0) params.append('genres', filters.genres.join(','));
 
-            switch (filters.orderBy) {
-                case 'ranking': 
-                case 'score':
-                    params.append('order_by', 'score');
-                    params.append('sort', 'desc');
-                    break;
-                case 'popularity':
-                    params.append('order_by', 'members');
-                    params.append('sort', 'desc');
-                    break;
-                case 'favorites':
-                    params.append('order_by', 'favorites');
-                    params.append('sort', 'desc');
-                    break;
-                case 'newest':
-                    params.append('order_by', 'start_date');
-                    params.append('sort', 'desc');
-                    break;
-                case 'oldest':
-                    params.append('order_by', 'start_date');
-                    params.append('sort', 'asc');
-                    break;
-                case 'az':
-                    params.append('order_by', 'title');
-                    params.append('sort', 'asc');
-                    break;
-                case 'za':
-                    params.append('order_by', 'title');
-                    params.append('sort', 'desc');
-                    break;
-                default:
-                    params.append('order_by', 'score');
-                    params.append('sort', 'desc');
-            }
+          switch (filters.orderBy) {
+            case 'ranking':
+            case 'score':
+              params.append('order_by', 'score');
+              params.append('sort', 'desc');
+              break;
+            case 'popularity':
+              params.append('order_by', 'members');
+              params.append('sort', 'desc');
+              break;
+            case 'favorites':
+              params.append('order_by', 'favorites');
+              params.append('sort', 'desc');
+              break;
+            case 'newest':
+              params.append('order_by', 'start_date');
+              params.append('sort', 'desc');
+              break;
+            case 'oldest':
+              params.append('order_by', 'start_date');
+              params.append('sort', 'asc');
+              break;
+            case 'az':
+              params.append('order_by', 'title');
+              params.append('sort', 'asc');
+              break;
+            case 'za':
+              params.append('order_by', 'title');
+              params.append('sort', 'desc');
+              break;
+            default:
+              params.append('order_by', 'score');
+              params.append('sort', 'desc');
+          }
         }
 
         const response = await fetch(`${endpoint}?${params.toString()}`, { signal: controller.signal });
         if (!response.ok) throw new Error(`Status: ${response.status}`);
-        
+
         const json = await response.json();
         if (!isMounted) return;
 
@@ -114,13 +114,13 @@ export function useCatalog() {
         }));
 
         setAnimes(prev => {
-            // Se for página 1, substitui tudo. Se for scroll infinito, adiciona.
-            if (page === 1) return newAnimes;
-            
-            // Filtro extra de segurança para evitar duplicatas visuais
-            const combined = [...prev, ...newAnimes];
-            const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
-            return unique;
+          // Se for página 1, substitui tudo. Se for scroll infinito, adiciona.
+          if (page === 1) return newAnimes;
+
+          // Filtro extra de segurança para evitar duplicatas visuais
+          const combined = [...prev, ...newAnimes];
+          const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+          return unique;
         });
 
         setHasMore(pagination.has_next_page || (data.length > 0 && data.length >= 24));
@@ -135,10 +135,10 @@ export function useCatalog() {
     fetchCatalog();
 
     return () => { isMounted = false; controller.abort(); };
-  }, [page, filters]); 
+  }, [page, filters]);
 
   const loadMore = useCallback(() => {
-      if (!loading && hasMore) setPage(prev => prev + 1);
+    if (!loading && hasMore) setPage(prev => prev + 1);
   }, [loading, hasMore]);
 
   return { animes, loading, loadMore, hasMore, filters, updateFilter, clearFilters };
