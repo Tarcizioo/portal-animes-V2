@@ -5,13 +5,27 @@ export function useCatalog() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState(null); // Novo estado
 
   useEffect(() => {
+    // AbortController para cancelar requisições ao sair da tela
+    const controller = new AbortController();
+
     async function fetchCatalog() {
+      // Se já deu erro antes, não tente buscar mais automaticamente (previne loop)
+      if (error) return; 
+
       try {
         setLoading(true);
-        // Busca os animes mais populares (paginados)
-        const response = await fetch(`https://api.jikan.moe/v4/top/anime?page=${page}&limit=24`);
+        const response = await fetch(`https://api.jikan.moe/v4/top/anime?page=${page}&limit=24`, {
+            signal: controller.signal
+        });
+        
+        if (!response.ok) {
+            // Se for erro 429 (Muitas requisições), trate diferente se quiser
+            throw new Error(`Erro API: ${response.status}`);
+        }
+
         const json = await response.json();
         
         const newAnimes = json.data.map(anime => ({
@@ -22,28 +36,37 @@ export function useCatalog() {
           genres: anime.genres.map(g => g.name).slice(0, 2).join(', ')
         }));
 
-        // Adiciona os novos animes à lista antiga (evitando duplicatas)
         setAnimes(prev => {
             const combined = [...prev, ...newAnimes];
-            // Truque do Set para remover duplicatas por ID
-            const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
-            return unique;
+            // Remove duplicatas
+            return Array.from(new Map(combined.map(item => [item.id, item])).values());
         });
 
-        // Se vier menos que 24 itens, acabou a lista
         if (newAnimes.length < 24) setHasMore(false);
 
-      } catch (error) {
-        console.error("Erro ao buscar catálogo:", error);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+            console.error("Erro ao buscar catálogo:", err);
+            setError(true); // Trava novas requisições automáticas
+            setHasMore(false); // Para o scroll infinito temporariamente
+        }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     fetchCatalog();
-  }, [page]); // Roda toda vez que a 'page' muda
 
-  const loadMore = () => setPage(prev => prev + 1);
+    return () => controller.abort();
+  }, [page]); // Removemos 'error' da dependência para não loopar
 
-  return { animes, loading, loadMore, hasMore };
+  const loadMore = () => {
+      // Função para tentar novamente ou carregar próxima página
+      if (!loading && hasMore) {
+          setError(null); // Reseta erro ao tentar carregar mais
+          setPage(prev => prev + 1);
+      }
+  };
+
+  return { animes, loading, loadMore, hasMore, error };
 }

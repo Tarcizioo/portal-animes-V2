@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Play, Star, Share2, Heart, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Play, Star, Share2, Heart, ChevronDown, ChevronUp, X } from 'lucide-react'; // <--- Adicionado X
 import { Sidebar } from '../layout/Sidebar';
 import { Header } from '../layout/Header';
 import { useAnimeInfo } from '../../hooks/useAnimeInfo';
@@ -11,6 +11,9 @@ export function AnimeDetails() {
   
   // Estado para controlar a sinopse
   const [showFullSynopsis, setShowFullSynopsis] = useState(false);
+  
+  // NOVO: Estado para o Modal do Trailer
+  const [showTrailer, setShowTrailer] = useState(false);
 
   if (loading) {
     return (
@@ -30,7 +33,6 @@ export function AnimeDetails() {
         <Header />
 
         {/* --- HERO SECTION --- */}
-        {/* pt-32 lg:pt-48 garante que o conteúdo comece na altura certa sem pular */}
         <section className="relative w-full min-h-[75vh] overflow-hidden">
           
           {/* Background Image & Gradient */}
@@ -71,7 +73,7 @@ export function AnimeDetails() {
                   <p className="text-xl text-white/50">{anime.title_jp}</p>
                 </div>
 
-                {/* --- SINOPSE COM BOTÃO E ANIMAÇÃO --- */}
+                {/* --- SINOPSE --- */}
                 <div className="relative max-w-2xl">
                     <div 
                         className={`text-white/80 text-lg leading-relaxed overflow-hidden transition-all duration-1000 ease-in-out ${
@@ -81,7 +83,6 @@ export function AnimeDetails() {
                         {anime.synopsis || "Sinopse não disponível."}
                     </div>
 
-                    {/* Gradiente Condicional (só aparece se estiver fechado) */}
                     {!showFullSynopsis && (
                         <div className="absolute bottom-12 left-0 w-full h-24 bg-gradient-to-t from-background-dark/95 to-transparent pointer-events-none"></div>
                     )}
@@ -98,11 +99,15 @@ export function AnimeDetails() {
                     </button>
                 </div>
 
-                {/* Trailer Button */}
-                {anime.trailer && (
-                   <a href={anime.trailer} target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-xl font-bold w-fit transition-all shadow-lg shadow-primary/20 mt-2">
+                {/* --- BOTÃO "ASSISTIR TRAILER" (MODO CINEMA) --- */}
+                {/* Alterado para Button com onClick */}
+                {anime.trailerEmbed && (
+                   <button 
+                      onClick={() => setShowTrailer(true)}
+                      className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-xl font-bold w-fit transition-all shadow-lg shadow-primary/20 mt-2 hover:scale-105 active:scale-95 cursor-pointer"
+                   >
                       <Play className="w-5 h-5 fill-current" /> Assistir Trailer
-                   </a>
+                   </button>
                 )}
               </div>
 
@@ -121,7 +126,6 @@ export function AnimeDetails() {
                     </div>
                   </div>
                   
-                  {/* Dropdown Customizado */}
                   <div className="relative mb-4">
                     <select className="appearance-none w-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10 text-white text-sm rounded-xl py-3 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
                       <option className="bg-surface-dark text-white">Adicionar à Lista</option>
@@ -179,22 +183,11 @@ export function AnimeDetails() {
                   </div>
                </div>
 
-               {/* Trailer Embutido */}
-               {anime.trailer && (
-                 <section>
-                    <h3 className="text-2xl font-bold text-white mb-6">Trailer Oficial</h3>
-                    <div className="aspect-video w-full rounded-2xl overflow-hidden border border-white/5 bg-black">
-                        <iframe 
-                            src={anime.trailer.replace("autoplay=1", "autoplay=0")} 
-                            title="Trailer"
-                            className="w-full h-full"
-                            allowFullScreen
-                        ></iframe>
-                    </div>
-                 </section>
-               )}
+               {/* REMOVIDO: Blocos antigos de trailer que estavam duplicados/feios.
+                  O trailer agora abre apenas no Modal (Modo Cinema).
+               */}
 
-               {/* Lista de Episódios (Placeholder) */}
+               {/* Lista de Episódios */}
                <section>
                  <div className="flex items-center justify-between mb-6">
                     <h3 className="text-2xl font-bold text-white">Guia de Episódios</h3>
@@ -279,8 +272,38 @@ export function AnimeDetails() {
 
           </div>
         </div>
-
       </main>
+
+      {/* --- MODAL "CINEMA MODE" (NOVO) --- */}
+      {showTrailer && anime.trailerEmbed && (
+        <div 
+           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+           onClick={() => setShowTrailer(false)}
+        >
+          <div 
+             className="relative w-full max-w-6xl aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 ring-1 ring-white/10"
+             onClick={(e) => e.stopPropagation()}
+          >
+             {/* Botão Fechar */}
+             <button 
+                onClick={() => setShowTrailer(false)}
+                className="absolute top-4 right-4 bg-black/50 hover:bg-primary text-white p-2 rounded-full backdrop-blur-md transition-colors z-20"
+             >
+                <X className="w-6 h-6" />
+             </button>
+
+             <iframe 
+                src={`${anime.trailerEmbed}?autoplay=1&mute=0`} 
+                title="Trailer Oficial"
+                className="w-full h-full"
+                allowFullScreen
+                allow="autoplay; encrypted-media; picture-in-picture"
+                sandbox="allow-scripts allow-same-origin allow-presentation"
+             ></iframe>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
