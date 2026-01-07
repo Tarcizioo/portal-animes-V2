@@ -2,7 +2,7 @@ import { useState } from 'react'; // Importamos o useState para gerenciar os bot
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { AnimeCard } from './AnimeCard';
+import { AnimeCard } from '@/components/ui/AnimeCard';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -23,21 +23,21 @@ export function AnimeCarousel({ animes, title, icon: Icon }) {
           {Icon && <Icon className="text-primary" />}
           {title}
         </h3>
-        
+
         <div className="flex gap-2">
-           {/* O atributo 'ref' salva o botão dentro da nossa variável de estado */}
-           <button 
-             ref={(node) => setPrevEl(node)}
-             className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-200 dark:bg-surface-dark hover:bg-primary hover:text-white transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-           >
-             <ChevronLeft className="w-5 h-5" />
-           </button>
-           <button 
-             ref={(node) => setNextEl(node)}
-             className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-200 dark:bg-surface-dark hover:bg-primary hover:text-white transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-           >
-             <ChevronRight className="w-5 h-5" />
-           </button>
+          {/* O atributo 'ref' salva o botão dentro da nossa variável de estado */}
+          <button
+            ref={(node) => setPrevEl(node)}
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-200 dark:bg-surface-dark hover:bg-primary hover:text-white transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            ref={(node) => setNextEl(node)}
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-200 dark:bg-surface-dark hover:bg-primary hover:text-white transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
@@ -47,8 +47,8 @@ export function AnimeCarousel({ animes, title, icon: Icon }) {
         spaceBetween={20}
         slidesPerView={2}
         navigation={{
-            prevEl, // Passamos o botão direto (não o nome da classe)
-            nextEl, // Passamos o botão direto
+          prevEl, // Passamos o botão direto (não o nome da classe)
+          nextEl, // Passamos o botão direto
         }}
         breakpoints={{
           640: { slidesPerView: 3 },
