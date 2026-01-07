@@ -77,7 +77,6 @@ export function useCatalog() {
                 case 'newest':
                     params.append('order_by', 'start_date');
                     params.append('sort', 'desc');
-                    if (!filters.status) params.append('status', 'airing'); 
                     break;
                 case 'oldest':
                     params.append('order_by', 'start_date');
