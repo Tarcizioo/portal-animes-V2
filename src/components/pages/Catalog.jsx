@@ -1,29 +1,29 @@
-import { useEffect, useRef } from 'react'; // Adicionado useEffect e useRef
+import { useEffect, useRef } from 'react';
 import { Sidebar } from '../layout/Sidebar';
 import { Header } from '../layout/Header';
 import { AnimeCard } from '../ui/AnimeCard';
+import { SkeletonCard } from '../ui/SkeletonCard';
 import { useCatalog } from '../../hooks/useCatalog';
-import { Loader2 } from 'lucide-react';
 
 export function Catalog() {
   const { animes, loading, loadMore, hasMore } = useCatalog();
-  const sentinelRef = useRef(null); // Referência para o elemento "sentinela"
+  const sentinelRef = useRef(null);
 
-  // Configura o "Observador" para o Scroll Infinito
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
-      // Se o elemento sentinela aparecer na tela (isIntersecting)
       if (entries[0].isIntersecting && hasMore && !loading) {
         loadMore();
       }
-    }, { rootMargin: "100px" }); // Carrega quando estiver a 100px do fim
+    }, { rootMargin: "100px" });
 
     if (sentinelRef.current) {
       observer.observe(sentinelRef.current);
     }
 
-    return () => observer.disconnect(); // Limpeza quando sair da página
+    return () => observer.disconnect();
   }, [hasMore, loading, loadMore]);
+
+  const skeletonCount = animes.length === 0 ? 24 : 12;
 
   return (
     <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark dark text-white font-sans">
@@ -50,21 +50,17 @@ export function Catalog() {
                 score={anime.score}
               />
             ))}
+
+            {loading && Array.from({ length: skeletonCount }).map((_, i) => (
+              <SkeletonCard key={`skeleton-${i}`} />
+            ))}
           </div>
 
-          {/* Área de Carregamento Automático (O Sentinela) */}
           <div 
             ref={sentinelRef} 
             className="mt-12 flex justify-center pb-10 h-20 items-center"
           >
-            {loading && hasMore && (
-              <div className="flex items-center gap-2 text-primary">
-                 <Loader2 className="w-6 h-6 animate-spin" />
-                 <span className="font-bold">Carregando mais animes...</span>
-              </div>
-            )}
-            
-            {!hasMore && (
+            {!hasMore && !loading && (
               <p className="text-gray-500 italic">Você chegou ao fim da lista!</p>
             )}
           </div>
