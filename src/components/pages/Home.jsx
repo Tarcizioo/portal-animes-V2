@@ -3,23 +3,17 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { Hero } from "@/components/home/Hero";
 import { AnimeCarousel } from '@/components/ui/AnimeCarousel';
-import { useJikan } from '@/hooks/useJikan';
+import { AnimeCarousel } from '@/components/ui/AnimeCarousel';
+import { useJikan, useGenreAnime } from '@/hooks/useJikan';
 import { SkeletonHero } from '@/components/ui/SkeletonHero';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
+import { useState, useRef, useEffect } from 'react';
 
 export function Home() {
   const {
     heroAnime,
     popularAnimes,
     seasonalAnimes,
-    actionAnimes,
-    romanceAnimes,
-    dramaAnimes,
-    horrorAnimes,
-    comedyAnimes,
-    fantasyAnimes,
-    scifiAnimes,
-    sportsAnimes,
     loading
   } = useJikan();
 
@@ -68,65 +62,126 @@ export function Home() {
                 animes={seasonalAnimes}
               />
 
-              <AnimeCarousel
+              {/* --- CAROUSEIS (Lazy Loaded) --- */}
+              {/* Action = 1 */}
+              <LazyAnimeCarousel
                 id="action"
-                title="Melhores de Ação"
+                title="Ação e Adrenalina"
                 icon={Zap}
-                animes={actionAnimes}
+                genreId={1}
               />
 
-              <AnimeCarousel
+              {/* Romance = 22 */}
+              <LazyAnimeCarousel
                 id="romance"
-                title="Melhores de Romance"
+                title="Romance e Amor"
                 icon={Heart}
-                animes={romanceAnimes}
+                genreId={22}
               />
 
-              <AnimeCarousel
+              {/* Drama = 8 */}
+              <LazyAnimeCarousel
                 id="drama"
-                title="Melhores de Drama"
+                title="Drama e Emoção"
                 icon={Theater}
-                animes={dramaAnimes}
+                genreId={8}
               />
 
-              <AnimeCarousel
+              {/* Horror = 14 */}
+              <LazyAnimeCarousel
                 id="horror"
-                title="Melhores de Terror"
+                title="Terror e Suspense"
                 icon={Skull}
-                animes={horrorAnimes}
+                genreId={14}
               />
 
-              <AnimeCarousel
+              {/* Comedy = 4 */}
+              <LazyAnimeCarousel
                 id="comedy"
-                title="Melhores de Comédia"
+                title="Comédia e Diversão"
                 icon={Smile}
-                animes={comedyAnimes}
+                genreId={4}
               />
 
-              <AnimeCarousel
+              {/* Fantasy = 10 */}
+              <LazyAnimeCarousel
                 id="fantasy"
                 title="Mundo da Fantasia"
                 icon={Wand2}
-                animes={fantasyAnimes}
+                genreId={10}
               />
 
-              <AnimeCarousel
+              {/* Sci-Fi = 24 */}
+              <LazyAnimeCarousel
                 id="scifi"
                 title="Ficção Científica"
                 icon={Rocket}
-                animes={scifiAnimes}
+                genreId={24}
               />
 
-              <AnimeCarousel
+              {/* Sports = 30 */}
+              <LazyAnimeCarousel
                 id="sports"
                 title="Esportes & Competição"
                 icon={Trophy}
-                animes={sportsAnimes}
+                genreId={30}
               />
             </>
           )}
         </div>
       </main>
+    </div>
+  );
+}
+
+function LazyAnimeCarousel({ id, title, icon: Icon, genreId }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef(null);
+
+  // Fetch data only when visible
+  const { data: animes, isLoading } = useGenreAnime(genreId, isVisible);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect(); // Stop observing once visible
+        }
+      },
+      { rootMargin: '100px' } // Load slightly before it comes into view
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} className="min-h-[300px]">
+      {(isVisible && !isLoading && animes) ? (
+        <AnimeCarousel
+          id={id}
+          title={title}
+          icon={Icon}
+          animes={animes}
+        />
+      ) : (
+        /* Loading Skeleton State */
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4 px-1">
+            {Icon && <Icon className="w-8 h-8 text-primary/50 animate-pulse" />}
+            <div className="h-8 w-48 bg-gray-200 dark:bg-surface-dark rounded-lg animate-pulse" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
