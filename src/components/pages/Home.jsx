@@ -3,7 +3,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { Hero } from "@/components/home/Hero";
 import { AnimeCarousel } from '@/components/ui/AnimeCarousel';
-import { AnimeCarousel } from '@/components/ui/AnimeCarousel';
+
 import { useJikan, useGenreAnime } from '@/hooks/useJikan';
 import { SkeletonHero } from '@/components/ui/SkeletonHero';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
