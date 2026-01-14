@@ -1,16 +1,40 @@
-# React + Vite
+# Portal Animes V2
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Portal Animes V2 is a web project developed to facilitate anime discovery and tracking. The project utilizes a modern component-based architecture, ensuring high performance and a responsive user interface.
 
-Currently, two official plugins are available:
+The application consumes data from the Jikan API, providing up-to-date information on current seasons, top animes, and real-time search results.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+* **Dynamic Catalog:** Anime listing organized by popularity and recent releases.
+* **Search System:** Real-time search integrated with the MyAnimeList database.
+* **In-Depth Details:** Dedicated pages for each anime containing synopsis, studio information, scores, and statistics.
+* **Responsive Interface:** Fluid layout developed with Tailwind CSS, adaptable to mobile devices, tablets, and desktops.
+* **Componentization:** Modular architecture facilitating code maintenance and scalability.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+This project was developed using the following technologies and libraries:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* **Core:** React (v18+)
+* **Build Tool:** Vite
+* **Language:** JavaScript (ES6+)
+* **Styling:** Tailwind CSS & PostCSS
+* **Routing:** React Router DOM
+* **API Consumption:** Fetch API / Custom Hooks
+* **Icons:** Lucide React / Heroicons (depending on implementation)
+
+## Prerequisites
+
+Before starting, ensure you have the following tools installed on your machine:
+
+* Node.js (version 18 or higher recommended)
+* NPM or Yarn
+
+## Installation and Execution
+
+Follow the steps below to set up the local development environment:
+
+1. Clone the repository:
+   ```bash
+   git clone [https://github.com/Tarcizioo/portal-animes-V2.git](https://github.com/Tarcizioo/portal-animes-V2.git)
