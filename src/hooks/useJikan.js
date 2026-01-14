@@ -28,6 +28,13 @@ const fetchPopular = async () => {
   return json.data ? removeDuplicates(json.data.map(transformData)) : [];
 };
 
+const fetchByGenre = async (genreId) => {
+  const response = await fetch(`https://api.jikan.moe/v4/anime?genres=${genreId}&limit=25&order_by=score&sort=desc`);
+  if (!response.ok) throw new Error(`Erro na API Genre ${genreId}`);
+  const json = await response.json();
+  return json.data ? removeDuplicates(json.data.map(transformData)) : [];
+};
+
 const fetchSeasonal = async () => {
   const response = await fetch("https://api.jikan.moe/v4/seasons/now?limit=25");
   if (!response.ok) throw new Error("Erro na API Seasonal");
@@ -48,11 +55,41 @@ export function useJikan() {
     staleTime: 1000 * 60 * 60, // 1 hora
   });
 
+  const actionQuery = useQuery({ queryKey: ['genre-1'], queryFn: () => fetchByGenre(1), staleTime: 1000 * 60 * 60 });
+  const romanceQuery = useQuery({ queryKey: ['genre-22'], queryFn: () => fetchByGenre(22), staleTime: 1000 * 60 * 60 });
+  const dramaQuery = useQuery({ queryKey: ['genre-8'], queryFn: () => fetchByGenre(8), staleTime: 1000 * 60 * 60 });
+  const horrorQuery = useQuery({ queryKey: ['genre-14'], queryFn: () => fetchByGenre(14), staleTime: 1000 * 60 * 60 });
+  const comedyQuery = useQuery({ queryKey: ['genre-4'], queryFn: () => fetchByGenre(4), staleTime: 1000 * 60 * 60 });
+  const fantasyQuery = useQuery({ queryKey: ['genre-10'], queryFn: () => fetchByGenre(10), staleTime: 1000 * 60 * 60 });
+  const scifiQuery = useQuery({ queryKey: ['genre-24'], queryFn: () => fetchByGenre(24), staleTime: 1000 * 60 * 60 });
+  const sportsQuery = useQuery({ queryKey: ['genre-30'], queryFn: () => fetchByGenre(30), staleTime: 1000 * 60 * 60 });
+
   const heroAnime = popularQuery.data ? popularQuery.data[0] : null;
   const popularAnimes = popularQuery.data ? popularQuery.data.slice(1) : [];
   const seasonalAnimes = seasonalQuery.data || [];
+  const actionAnimes = actionQuery.data || [];
+  const romanceAnimes = romanceQuery.data || [];
+  const dramaAnimes = dramaQuery.data || [];
+  const horrorAnimes = horrorQuery.data || [];
+  const comedyAnimes = comedyQuery.data || [];
+  const fantasyAnimes = fantasyQuery.data || [];
+  const scifiAnimes = scifiQuery.data || [];
+  const sportsAnimes = sportsQuery.data || [];
 
-  const loading = popularQuery.isLoading || seasonalQuery.isLoading;
+  const loading = popularQuery.isLoading || seasonalQuery.isLoading || actionQuery.isLoading || comedyQuery.isLoading || fantasyQuery.isLoading || scifiQuery.isLoading || sportsQuery.isLoading;
 
-  return { heroAnime, popularAnimes, seasonalAnimes, loading };
+  return {
+    heroAnime,
+    popularAnimes,
+    seasonalAnimes,
+    actionAnimes,
+    romanceAnimes,
+    dramaAnimes,
+    horrorAnimes,
+    comedyAnimes,
+    fantasyAnimes,
+    scifiAnimes,
+    sportsAnimes,
+    loading
+  };
 }

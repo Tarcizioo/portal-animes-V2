@@ -1,4 +1,4 @@
-import { BarChart2, Calendar } from 'lucide-react';
+import { BarChart2, Calendar, Zap, Heart, Theater, Skull, Smile, Wand2, Rocket, Trophy } from 'lucide-react';
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { Hero } from "@/components/home/Hero";
@@ -8,7 +8,20 @@ import { SkeletonHero } from '@/components/ui/SkeletonHero';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
 
 export function Home() {
-  const { heroAnime, popularAnimes, seasonalAnimes, loading } = useJikan();
+  const {
+    heroAnime,
+    popularAnimes,
+    seasonalAnimes,
+    actionAnimes,
+    romanceAnimes,
+    dramaAnimes,
+    horrorAnimes,
+    comedyAnimes,
+    fantasyAnimes,
+    scifiAnimes,
+    sportsAnimes,
+    loading
+  } = useJikan();
 
   return (
     <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-text-primary font-sans">
@@ -53,6 +66,62 @@ export function Home() {
                 title="Lançamentos da Temporada"
                 icon={Calendar}
                 animes={seasonalAnimes}
+              />
+
+              <AnimeCarousel
+                id="action"
+                title="Melhores de Ação"
+                icon={Zap}
+                animes={actionAnimes}
+              />
+
+              <AnimeCarousel
+                id="romance"
+                title="Melhores de Romance"
+                icon={Heart}
+                animes={romanceAnimes}
+              />
+
+              <AnimeCarousel
+                id="drama"
+                title="Melhores de Drama"
+                icon={Theater}
+                animes={dramaAnimes}
+              />
+
+              <AnimeCarousel
+                id="horror"
+                title="Melhores de Terror"
+                icon={Skull}
+                animes={horrorAnimes}
+              />
+
+              <AnimeCarousel
+                id="comedy"
+                title="Melhores de Comédia"
+                icon={Smile}
+                animes={comedyAnimes}
+              />
+
+              <AnimeCarousel
+                id="fantasy"
+                title="Mundo da Fantasia"
+                icon={Wand2}
+                animes={fantasyAnimes}
+              />
+
+              <AnimeCarousel
+                id="scifi"
+                title="Ficção Científica"
+                icon={Rocket}
+                animes={scifiAnimes}
+              />
+
+              <AnimeCarousel
+                id="sports"
+                title="Esportes & Competição"
+                icon={Trophy}
+                animes={sportsAnimes}
               />
             </>
           )}
