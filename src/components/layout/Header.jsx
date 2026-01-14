@@ -1,13 +1,14 @@
+
 import { useState } from 'react';
-import { Search, Loader2, Star, Menu, X, Home, Compass, Heart, Clock } from 'lucide-react'; // Ícones adicionados
+import { Search, Menu, X, Home, Compass } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSearch } from '@/hooks/useSearch';
 
 export function Header() {
-    const { query, setQuery, results, isSearching, setResults } = useSearch();
+    const { query, setQuery, results, setResults } = useSearch();
     const navigate = useNavigate();
     const [showMobileSearch, setShowMobileSearch] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false); // Novo estado do Menu
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const handleResultClick = (animeId) => {
         navigate(`/anime/${animeId}`);
@@ -18,63 +19,66 @@ export function Header() {
 
     return (
         <>
-            <header className="sticky top-0 z-40 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-4 md:px-8 py-4 flex items-center justify-between border-b border-gray-200 dark:border-white/5">
+            <header className="sticky top-0 z-40 bg-bg-primary/80 backdrop-blur-md px-4 md:px-8 py-4 flex items-center justify-between border-b border-border-color transition-colors duration-300">
 
                 <div className="flex items-center gap-4">
-                    {/* BOTÃO HAMBURGUER (Só mobile) */}
+                    {/* MOBILE HAMBURGER */}
                     <button
                         onClick={() => setIsMenuOpen(true)}
-                        className="md:hidden p-1 text-gray-800 dark:text-white hover:bg-white/10 rounded-lg"
+                        className="md:hidden p-1 text-text-primary hover:bg-bg-tertiary rounded-lg"
                     >
                         <Menu className="w-6 h-6" />
                     </button>
 
                     <div className={`${showMobileSearch ? 'hidden md:block' : 'block'}`}>
-                        <h1 className="text-xl font-bold text-gray-800 dark:text-white">Olá, Visitante!! 👋</h1>
-                        <p className="text-sm text-gray-500 dark:text-text-secondary hidden sm:block">Descubra novos animes.</p>
+                        <h1 className="text-xl font-bold text-text-primary">Olá, Visitante!! 👋</h1>
+                        <p className="text-sm text-text-secondary hidden sm:block">Descubra novos animes.</p>
                     </div>
                 </div>
 
-                {/* ... (Lógica da Busca mantém a mesma da resposta anterior) ... */}
+                {/* SEARCH LOGIC */}
                 {!showMobileSearch && (
-                    <button onClick={() => setShowMobileSearch(true)} className="md:hidden p-2 text-gray-500 dark:text-white">
-                        <Search className="w-6 h-6" />
-                    </button>
+                    <div className="flex items-center gap-2 md:hidden ml-auto">
+                        <button onClick={() => setShowMobileSearch(true)} className="p-2 text-text-secondary hover:text-primary">
+                            <Search className="w-6 h-6" />
+                        </button>
+                    </div>
                 )}
 
-                {/* Input de Busca (código abreviado pois já foi feito na V1) */}
-                <div className={`relative group w-full max-w-md ml-auto transition-all duration-300 ${showMobileSearch ? 'block absolute left-0 top-2 px-4 z-50' : 'hidden md:block'}`}>
-                    {/* ... Input e Resultados ... */}
-                    <div className="absolute inset-y-0 left-0 pl-3 md:pl-3 flex items-center pointer-events-none">
-                        <Search className={`w-5 h-5 text-gray-400 ${showMobileSearch ? 'ml-4' : ''}`} />
-                    </div>
-                    <input
-                        type="text"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Pesquisar..."
-                        className="block w-full pl-10 pr-3 py-2.5 border-none rounded-xl bg-gray-100 dark:bg-surface-dark text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                    {/* Botão fechar busca mobile */}
-                    {showMobileSearch && (
-                        <button onClick={() => setShowMobileSearch(false)} className="absolute inset-y-0 right-4 flex items-center text-gray-500"><X className="w-5 h-5" /></button>
-                    )}
-                    {/* Dropdown de Resultados (mantém código anterior) */}
-                    {results.length > 0 && (
-                        <div className="absolute top-full mt-2 left-0 w-full bg-surface-dark rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto">
-                            {results.map(anime => (
-                                <div key={anime.id} onClick={() => handleResultClick(anime.id)} className="flex gap-3 p-3 hover:bg-primary/10 cursor-pointer border-b border-white/5">
-                                    <img src={anime.image} className="w-8 h-12 object-cover rounded" />
-                                    <div className="text-sm text-white">{anime.title}</div>
-                                </div>
-                            ))}
+                {/* DESKTOP SEARCH */}
+                <div className={`relative group w-full max-w-md ml-auto transition-all duration-300 ${showMobileSearch ? 'block absolute left-0 top-2 px-4 z-50' : 'hidden md:flex items-center gap-4'}`}>
+
+                    <div className={`relative w-full ${showMobileSearch ? '' : 'max-w-md'}`}>
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Search className="w-5 h-5 text-text-secondary" />
                         </div>
-                    )}
+                        <input
+                            type="text"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder="Pesquisar..."
+                            className="block w-full pl-10 pr-3 py-2.5 border-none rounded-xl bg-bg-tertiary text-text-primary focus:outline-none focus:ring-2 focus:ring-primary placeholder-text-secondary/50"
+                        />
+                        {/* Mobile Close Button */}
+                        {showMobileSearch && (
+                            <button onClick={() => setShowMobileSearch(false)} className="absolute inset-y-0 right-4 flex items-center text-text-secondary"><X className="w-5 h-5" /></button>
+                        )}
+                        {/* Results Dropdown */}
+                        {results.length > 0 && (
+                            <div className="absolute top-full mt-2 left-0 w-full bg-bg-secondary rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto border border-border-color">
+                                {results.map(anime => (
+                                    <div key={anime.id} onClick={() => handleResultClick(anime.id)} className="flex gap-3 p-3 hover:bg-primary/10 cursor-pointer border-b border-border-color last:border-0">
+                                        <img src={anime.image} className="w-8 h-12 object-cover rounded" alt={anime.title} />
+                                        <div className="text-sm text-text-primary">{anime.title}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </header>
 
-            {/* --- MENU DRAWER MOBILE --- */}
-            {/* Fundo escuro */}
+            {/* MOBILE DRAWER */}
             {isMenuOpen && (
                 <div
                     className="fixed inset-0 bg-black/60 z-50 md:hidden backdrop-blur-sm"
@@ -82,31 +86,24 @@ export function Header() {
                 />
             )}
 
-            {/* O Menu em si */}
             <aside className={`
-          fixed top-0 left-0 h-full w-64 bg-background-dark border-r border-white/10 z-50 transform transition-transform duration-300 ease-in-out p-6 flex flex-col gap-6
-          ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-          md:hidden
-      `}>
+                fixed top-0 left-0 h-full w-64 bg-bg-secondary border-r border-border-color z-50 transform transition-transform duration-300 ease-in-out p-6 flex flex-col gap-6
+                ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+                md:hidden shadow-2xl
+            `}>
                 <div className="flex items-center justify-between mb-4">
-                    <span className="text-xl font-bold text-white">Menu</span>
-                    <button onClick={() => setIsMenuOpen(false)} className="text-white/50 hover:text-white">
+                    <span className="text-xl font-bold text-text-primary">Menu</span>
+                    <button onClick={() => setIsMenuOpen(false)} className="text-text-secondary hover:text-primary">
                         <X className="w-6 h-6" />
                     </button>
                 </div>
 
                 <nav className="flex flex-col gap-4">
-                    <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-gray-300 hover:text-primary">
+                    <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-text-secondary hover:text-primary p-2 rounded-lg hover:bg-bg-tertiary">
                         <Home className="w-5 h-5" /> Início
                     </Link>
-                    <Link to="/catalog" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-gray-300 hover:text-primary">
+                    <Link to="/catalog" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-text-secondary hover:text-primary p-2 rounded-lg hover:bg-bg-tertiary">
                         <Compass className="w-5 h-5" /> Explorar
-                    </Link>
-                    <Link to="#" className="flex items-center gap-4 text-gray-300 hover:text-primary">
-                        <Heart className="w-5 h-5" /> Favoritos
-                    </Link>
-                    <Link to="#" className="flex items-center gap-4 text-gray-300 hover:text-primary">
-                        <Clock className="w-5 h-5" /> Histórico
                     </Link>
                 </nav>
             </aside>

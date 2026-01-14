@@ -37,10 +37,10 @@ export function AnimeDetails() {
     const bannerImage = anime.banner || anime.image;
 
     return (
-        <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-text-primary font-sans selection:bg-primary selection:text-white">
+        <div className="flex h-screen overflow-hidden bg-bg-primary text-text-primary font-sans selection:bg-primary selection:text-white">
             <Sidebar />
 
-            <main className="flex-1 h-full overflow-y-auto relative scrollbar-thin scrollbar-thumb-surface-dark scrollbar-track-background-dark">
+            <main className="flex-1 h-full overflow-y-auto relative scrollbar-thin scrollbar-thumb-bg-secondary scrollbar-track-bg-primary">
                 <Header />
 
                 {/* --- HERO SECTION --- */}
@@ -53,8 +53,8 @@ export function AnimeDetails() {
                             style={{ backgroundImage: `url('${bannerImage}')` }}
                         />
                         {/* Gradientes */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent z-10"></div>
-                        <div className="absolute inset-0 bg-gradient-to-r from-background-dark via-background-dark/30 to-transparent z-10"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/40 to-transparent z-10"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-primary/30 to-transparent z-10"></div>
                     </div>
 
                     <div className="relative z-20 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-end pb-12">
@@ -68,7 +68,7 @@ export function AnimeDetails() {
                                         <span className="px-3 py-1 rounded-full bg-primary text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary/40">
                                             {anime.type || 'TV'}
                                         </span>
-                                        <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 text-xs font-bold uppercase tracking-wider">
+                                        <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-text-primary border border-white/20 text-xs font-bold uppercase tracking-wider">
                                             {anime.year || 'Unknown'}
                                         </span>
                                         <span className={clsx(
@@ -81,15 +81,15 @@ export function AnimeDetails() {
                                         </span>
                                     </div>
 
-                                    <h1 className="text-5xl md:text-7xl font-bold leading-none tracking-tight text-white drop-shadow-2xl">
+                                    <h1 className="text-5xl md:text-7xl font-bold leading-none tracking-tight text-text-primary drop-shadow-2xl">
                                         {anime.title}
                                     </h1>
                                     {anime.title_english && (
-                                        <h2 className="text-xl text-white/70 font-medium drop-shadow-md">{anime.title_english}</h2>
+                                        <h2 className="text-xl text-text-secondary font-medium drop-shadow-md">{anime.title_english}</h2>
                                     )}
                                 </div>
 
-                                <p className="text-white/90 text-lg leading-relaxed max-w-2xl line-clamp-3 drop-shadow-md">
+                                <p className="text-text-primary/90 text-lg leading-relaxed max-w-2xl line-clamp-3 drop-shadow-md">
                                     {anime.synopsis}
                                 </p>
 
@@ -98,13 +98,13 @@ export function AnimeDetails() {
 
                             {/* Card Flutuante com Efeito Glass e Glow */}
                             <div className="lg:col-span-1 flex flex-col justify-end">
-                                <div className="relative bg-surface-dark/80 backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-2xl overflow-hidden group/card">
+                                <div className="relative bg-bg-secondary/80 backdrop-blur-xl rounded-2xl p-6 border border-border-color shadow-2xl overflow-hidden group/card">
                                     {/* Glow Effect no fundo do card */}
                                     <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/30 rounded-full blur-3xl group-hover/card:bg-primary/50 transition-all duration-700"></div>
 
                                     <div className="relative z-10">
                                         <div className="flex items-center justify-between mb-5">
-                                            <h3 className="font-bold text-white text-lg flex items-center gap-2">
+                                            <h3 className="font-bold text-text-primary text-lg flex items-center gap-2">
                                                 <Layers className="w-5 h-5 text-primary" /> Meu Progresso
                                             </h3>
                                             <div className="flex gap-2">
@@ -115,7 +115,7 @@ export function AnimeDetails() {
 
                                         <div className="relative mb-5 group/select">
                                             <select
-                                                className="block w-full rounded-xl border border-white/10 bg-background-dark/50 text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent p-3.5 appearance-none cursor-pointer outline-none transition-all hover:bg-background-dark/80"
+                                                className="block w-full rounded-xl border border-border-color bg-bg-tertiary/50 text-text-primary text-sm focus:ring-2 focus:ring-primary focus:border-transparent p-3.5 appearance-none cursor-pointer outline-none transition-all hover:bg-bg-tertiary/80"
                                                 value={status}
                                                 onChange={(e) => setStatus(e.target.value)}
                                             >
@@ -124,15 +124,15 @@ export function AnimeDetails() {
                                                 <option value="plan_to_watch">Planejo Assistir</option>
                                                 <option value="dropped">Dropado</option>
                                             </select>
-                                            <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50 group-hover/select:text-primary transition-colors pointer-events-none" />
+                                            <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary group-hover/select:text-primary transition-colors pointer-events-none" />
                                         </div>
 
-                                        <div className="flex items-center justify-between mb-5 bg-black/20 rounded-xl p-4 border border-white/5">
+                                        <div className="flex items-center justify-between mb-5 bg-black/5 dark:bg-black/20 rounded-xl p-4 border border-border-color">
                                             <span className="text-sm text-text-secondary font-medium">Episódios</span>
                                             <div className="flex items-center gap-3">
-                                                <span className="text-white font-mono font-bold text-lg">{anime.episodes || '?'}</span>
-                                                <span className="text-white/30">/</span>
-                                                <span className="text-white/50 text-sm">{anime.episodes || '?'}</span>
+                                                <span className="text-text-primary font-mono font-bold text-lg">{anime.episodes || '?'}</span>
+                                                <span className="text-text-secondary/50">/</span>
+                                                <span className="text-text-secondary text-sm">{anime.episodes || '?'}</span>
                                                 <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-white hover:bg-primary-hover transition-all shadow-lg shadow-primary/20 hover:scale-110 active:scale-95">
                                                     <Plus className="w-5 h-5" />
                                                 </button>
@@ -141,11 +141,11 @@ export function AnimeDetails() {
 
                                         <div className="flex flex-col gap-2">
                                             <span className="text-sm text-text-secondary font-medium">Sua Nota</span>
-                                            <div className="flex items-center justify-between bg-black/20 p-3 rounded-xl border border-white/5">
+                                            <div className="flex items-center justify-between bg-black/5 dark:bg-black/20 p-3 rounded-xl border border-border-color">
                                                 <div className="flex text-yellow-400 gap-1">
                                                     {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-current hover:scale-110 transition-transform cursor-pointer" />)}
                                                 </div>
-                                                <span className="font-bold text-white text-lg">{anime.score || 'N/A'}</span>
+                                                <span className="font-bold text-text-primary text-lg">{anime.score || 'N/A'}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -174,7 +174,7 @@ export function AnimeDetails() {
                             {anime.trailer && (
                                 <section className="space-y-6">
                                     <SectionTitle icon={Film} title="Trailer Oficial" />
-                                    <div className="aspect-video w-full rounded-2xl overflow-hidden border border-white/10 bg-black shadow-2xl relative group">
+                                    <div className="aspect-video w-full rounded-2xl overflow-hidden border border-border-color bg-black shadow-2xl relative group">
                                         <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10"></div>
                                         <iframe
                                             src={anime.trailer.replace("autoplay=1", "autoplay=0")}
@@ -190,31 +190,31 @@ export function AnimeDetails() {
                             <section className="space-y-6">
                                 <div className="flex items-center justify-between">
                                     <SectionTitle icon={List} title="Lista de Episódios" />
-                                    <div className="text-sm text-text-secondary bg-surface-dark px-3 py-1 rounded-full border border-white/5">
+                                    <div className="text-sm text-text-secondary bg-bg-secondary px-3 py-1 rounded-full border border-border-color">
                                         {anime.episodes || '?'} episódios
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3">
                                     {[1, 2, 3].map((ep) => (
-                                        <div key={ep} className="flex items-center justify-between p-4 rounded-xl bg-surface-dark border border-white/5 hover:border-primary/50 hover:bg-surface-dark/80 transition-all group cursor-pointer hover:shadow-lg hover:shadow-black/20">
+                                        <div key={ep} className="flex items-center justify-between p-4 rounded-xl bg-bg-secondary border border-border-color hover:border-primary/50 hover:bg-bg-tertiary transition-all group cursor-pointer hover:shadow-lg hover:shadow-black/5">
                                             <div className="flex items-center gap-5">
-                                                <div className="relative flex items-center justify-center size-12 rounded-lg bg-background-dark text-text-secondary font-bold text-lg group-hover:text-primary transition-colors overflow-hidden">
+                                                <div className="relative flex items-center justify-center size-12 rounded-lg bg-bg-tertiary text-text-secondary font-bold text-lg group-hover:text-primary transition-colors overflow-hidden">
                                                     <span className="group-hover:opacity-0 transition-opacity duration-300">{ep}</span>
                                                     <Play className="absolute w-5 h-5 text-primary opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-50 group-hover:scale-100 fill-current" />
                                                 </div>
                                                 <div className="flex flex-col gap-1">
-                                                    <h4 className="font-bold text-white text-lg group-hover:text-primary transition-colors">Episódio {ep}</h4>
+                                                    <h4 className="font-bold text-text-primary text-lg group-hover:text-primary transition-colors">Episódio {ep}</h4>
                                                     <span className="text-xs text-text-secondary flex items-center gap-1">
                                                         <Calendar className="w-3 h-3" /> Exibido recentemente
                                                     </span>
                                                 </div>
                                             </div>
-                                            <button className="px-4 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2">
+                                            <button className="px-4 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-white hover:bg-primary transition-colors flex items-center gap-2">
                                                 <CheckCircle className="w-4 h-4" /> <span className="hidden sm:inline">Marcar Visto</span>
                                             </button>
                                         </div>
                                     ))}
-                                    <button className="w-full py-4 rounded-xl border border-dashed border-white/10 text-text-secondary hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all text-sm font-bold uppercase tracking-wider">
+                                    <button className="w-full py-4 rounded-xl border border-dashed border-border-color text-text-secondary hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all text-sm font-bold uppercase tracking-wider">
                                         Ver todos os episódios
                                     </button>
                                 </div>
@@ -226,25 +226,25 @@ export function AnimeDetails() {
                                     <SectionTitle icon={MessageSquare} title="Comentários" />
                                     <a className="text-sm font-medium text-primary hover:underline hover:text-primary-hover transition-colors" href="#">Ver todos</a>
                                 </div>
-                                <div className="bg-surface-dark rounded-2xl p-6 border border-white/5 hover:border-white/10 transition-colors">
+                                <div className="bg-bg-secondary rounded-2xl p-6 border border-border-color hover:border-primary/20 transition-colors">
                                     <div className="flex items-start gap-4">
                                         <div className="size-12 rounded-full bg-gradient-to-br from-primary to-indigo-900 flex items-center justify-center text-white font-bold text-lg shadow-lg">JD</div>
                                         <div className="flex-1 space-y-2">
                                             <div className="flex justify-between items-center">
                                                 <div>
-                                                    <h5 className="text-white font-bold">Otaku_Master</h5>
+                                                    <h5 className="text-text-primary font-bold">Otaku_Master</h5>
                                                     <div className="flex text-yellow-400 gap-0.5 text-xs mt-0.5">
                                                         {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-current" />)}
                                                     </div>
                                                 </div>
-                                                <span className="text-text-secondary text-xs bg-background-dark px-2 py-1 rounded">2 dias atrás</span>
+                                                <span className="text-text-secondary text-xs bg-bg-tertiary px-2 py-1 rounded">2 dias atrás</span>
                                             </div>
                                             <p className="text-text-secondary leading-relaxed text-sm">
                                                 Visuais absolutamente incríveis e uma história que te acerta em cheio. A Trigger fez um trabalho sensacional com essa adaptação. Recomendo fortemente para quem gosta do gênero cyberpunk!
                                             </p>
                                             <div className="pt-2 flex gap-4 text-xs text-text-secondary font-medium">
                                                 <button className="hover:text-primary flex items-center gap-1.5 transition-colors"><ThumbsUp className="w-4 h-4" /> 423 Útil</button>
-                                                <button className="hover:text-white flex items-center gap-1.5 transition-colors"><Reply className="w-4 h-4" /> Responder</button>
+                                                <button className="hover:text-primary flex items-center gap-1.5 transition-colors"><Reply className="w-4 h-4" /> Responder</button>
                                             </div>
                                         </div>
                                     </div>
@@ -256,8 +256,8 @@ export function AnimeDetails() {
                         <aside className="lg:col-span-4 flex flex-col gap-8">
 
                             {/* Info Card - AGORA SEM STICKY PARA NÃO SOBREPOR */}
-                            <div className="bg-surface-dark rounded-2xl p-6 border border-white/5 space-y-6">
-                                <h4 className="text-white font-bold text-lg flex items-center gap-2 border-b border-white/5 pb-4">
+                            <div className="bg-bg-secondary rounded-2xl p-6 border border-border-color space-y-6">
+                                <h4 className="text-text-primary font-bold text-lg flex items-center gap-2 border-b border-border-color pb-4">
                                     <Info className="w-5 h-5 text-primary" /> Informações
                                 </h4>
                                 <div className="flex flex-col gap-4">
@@ -274,10 +274,10 @@ export function AnimeDetails() {
 
                             {/* Gêneros */}
                             <div className="space-y-4">
-                                <h4 className="text-white font-bold text-lg">Gêneros</h4>
+                                <h4 className="text-text-primary font-bold text-lg">Gêneros</h4>
                                 <div className="flex flex-wrap gap-2">
                                     {anime.genres?.map(g => (
-                                        <span key={g.mal_id} className="px-3 py-1.5 rounded-lg bg-surface-dark hover:bg-primary hover:text-white border border-white/5 text-xs font-medium text-text-secondary transition-all cursor-pointer shadow-sm hover:shadow-primary/25">
+                                        <span key={g.mal_id} className="px-3 py-1.5 rounded-lg bg-bg-secondary hover:bg-primary hover:text-white border border-border-color text-xs font-medium text-text-secondary transition-all cursor-pointer shadow-sm hover:shadow-primary/25">
                                             {g.name}
                                         </span>
                                     ))}
@@ -287,23 +287,23 @@ export function AnimeDetails() {
                             {/* Personagens */}
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <h4 className="text-white font-bold text-lg">Elenco</h4>
+                                    <h4 className="text-text-primary font-bold text-lg">Elenco</h4>
                                     <a className="text-xs text-primary font-bold hover:underline" href="#">Ver Todos</a>
                                 </div>
                                 <div className="flex flex-col gap-3">
                                     {characters && characters.slice(0, 4).map(char => (
-                                        <div key={char.character.mal_id} className="flex items-center justify-between p-2 rounded-xl bg-surface-dark hover:bg-white/5 transition-colors border border-white/5 group">
+                                        <div key={char.character.mal_id} className="flex items-center justify-between p-2 rounded-xl bg-bg-secondary hover:bg-bg-tertiary transition-colors border border-border-color group">
                                             <div className="flex items-center gap-3">
                                                 <div
                                                     className="size-12 rounded-full bg-cover bg-center border-2 border-transparent group-hover:border-primary transition-all"
                                                     style={{ backgroundImage: `url('${char.character.images?.jpg?.image_url}')` }}
                                                 ></div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-white line-clamp-1 group-hover:text-primary transition-colors">{char.character.name}</span>
+                                                    <span className="text-sm font-bold text-text-primary line-clamp-1 group-hover:text-primary transition-colors">{char.character.name}</span>
                                                     <span className="text-xs text-text-secondary">{char.role}</span>
                                                 </div>
                                             </div>
-                                            <Mic2 className="w-4 h-4 text-white/20 group-hover:text-primary transition-colors" />
+                                            <Mic2 className="w-4 h-4 text-text-secondary group-hover:text-primary transition-colors" />
                                         </div>
                                     ))}
                                 </div>
@@ -312,7 +312,7 @@ export function AnimeDetails() {
                     </div>
 
                     {/* Recomendações */}
-                    <section className="mt-24 border-t border-white/5 pt-12">
+                    <section className="mt-24 border-t border-border-color pt-12">
                         <div className="flex items-center justify-between mb-8">
                             <SectionTitle icon={Heart} title="Recomendações para você" />
                             <a className="text-sm font-bold text-primary hover:text-primary-hover flex items-center gap-1 transition-transform hover:translate-x-1" href="#">
@@ -322,16 +322,16 @@ export function AnimeDetails() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                             {recommendations && recommendations.slice(0, 5).map(rec => (
                                 <Link to={`/anime/${rec.entry.mal_id}`} key={rec.entry.mal_id} className="group flex flex-col gap-3" onClick={() => window.scrollTo(0, 0)}>
-                                    <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-surface-dark border border-white/5 shadow-lg group-hover:shadow-primary/20 transition-all duration-300">
+                                    <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-bg-secondary border border-border-color shadow-lg group-hover:shadow-primary/20 transition-all duration-300">
                                         <div className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-700" style={{ backgroundImage: `url('${rec.entry.images?.jpg?.large_image_url}')` }}></div>
-                                        <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity"></div>
                                         <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                                             <div className="flex items-center gap-1 text-xs font-bold text-white mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
                                                 <ThumbsUp className="w-3 h-3 text-primary" /> {rec.votes}
                                             </div>
                                         </div>
                                     </div>
-                                    <h5 className="text-white font-bold group-hover:text-primary transition-colors truncate px-1">{rec.entry.title}</h5>
+                                    <h5 className="text-text-primary font-bold group-hover:text-primary transition-colors truncate px-1">{rec.entry.title}</h5>
                                 </Link>
                             ))}
                         </div>
@@ -346,7 +346,7 @@ export function AnimeDetails() {
 
 function SectionTitle({ icon: Icon, title }) {
     return (
-        <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+        <h3 className="text-2xl font-bold text-text-primary flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-lg">
                 <Icon className="w-6 h-6 text-primary" />
             </div>
@@ -357,7 +357,7 @@ function SectionTitle({ icon: Icon, title }) {
 
 function ActionButton({ icon: Icon }) {
     return (
-        <button className="p-2.5 rounded-xl bg-white/5 hover:bg-primary hover:text-white text-text-secondary transition-all transform hover:scale-110 shadow-sm">
+        <button className="p-2.5 rounded-xl bg-bg-tertiary hover:bg-primary hover:text-white text-text-primary transition-all transform hover:scale-110 shadow-sm">
             <Icon className="w-5 h-5" />
         </button>
     )
@@ -366,21 +366,21 @@ function ActionButton({ icon: Icon }) {
 function StatsCard({ value, label, icon: Icon, color, delay }) {
     return (
         <div
-            className="bg-surface-dark p-5 rounded-2xl border border-white/5 flex flex-col items-center justify-center gap-2 hover:border-white/10 hover:-translate-y-1 transition-all duration-300 shadow-lg group"
+            className="bg-bg-secondary p-5 rounded-2xl border border-border-color flex flex-col items-center justify-center gap-2 hover:border-primary/50 hover:-translate-y-1 transition-all duration-300 shadow-lg group"
             style={{ animationDelay: `${delay}ms` }}
         >
             <Icon className={`w-8 h-8 ${color} opacity-80 group-hover:scale-110 transition-transform`} />
-            <span className="block text-2xl font-bold text-white mt-1">{value}</span>
+            <span className="block text-2xl font-bold text-text-primary mt-1">{value}</span>
             <span className="text-xs font-bold uppercase tracking-widest text-text-secondary">{label}</span>
         </div>
     );
 }
 
-function InfoRow({ label, value, icon: Icon, color = "text-white", highlight = false }) {
+function InfoRow({ label, value, icon: Icon, color = "text-text-primary", highlight = false }) {
     return (
         <div className="flex justify-between items-center py-2 group">
             <div className="flex items-center gap-3 text-text-secondary text-sm font-medium">
-                <Icon className="w-4 h-4 text-white/20 group-hover:text-primary transition-colors" />
+                <Icon className="w-4 h-4 text-text-secondary group-hover:text-primary transition-colors" />
                 <span>{label}</span>
             </div>
             <span className={clsx("text-sm font-medium text-right truncate max-w-[50%]", color, highlight && "text-primary font-bold")}>

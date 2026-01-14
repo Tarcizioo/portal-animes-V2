@@ -13,21 +13,21 @@ export function Hero({ anime }) {
   return (
     <section className="relative w-full h-[500px] rounded-3xl overflow-hidden shadow-2xl group">
       {/* Imagem de Fundo */}
-      <img 
-        src={anime.image} 
-        alt={anime.title} 
+      <img
+        src={anime.image}
+        alt={anime.title}
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         onError={(e) => {
           e.target.src = "https://placehold.co/1200x600/1a1a1a/666?text=Imagem+Indisponível";
         }}
       />
-      
+
       {/* Gradiente */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#121214] via-[#121214]/60 to-transparent lg:bg-gradient-to-r lg:from-[#121214] lg:via-[#121214]/80 lg:to-transparent"></div>
-      
+
       {/* Conteúdo */}
       <div className="relative z-10 h-full flex flex-col justify-end lg:justify-center p-8 lg:p-12 max-w-4xl">
-        
+
         <div className="flex items-center gap-3 mb-4">
           <span className="bg-primary text-white text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
             {anime.isNew ? 'TOP #1' : 'Destaque'}
@@ -36,39 +36,37 @@ export function Hero({ anime }) {
             <Star className="w-4 h-4 fill-current" /> {anime.score}
           </span>
           <span className="text-gray-300 text-sm flex items-center gap-1">
-             {anime.year}
+            {anime.year}
           </span>
         </div>
-        
+
         <h2 className="text-4xl lg:text-6xl font-black text-white mb-4 leading-tight">
           {anime.title}
         </h2>
-        
+
         <div className="flex flex-wrap gap-2 mb-6">
           {anime.genres && anime.genres.map((genre, index) => (
-            <span 
-              key={`${genre}-${index}`} 
-              className="text-accent-purple font-medium text-sm bg-accent-purple/10 border border-accent-purple/20 px-3 py-1 rounded-full backdrop-blur-sm"
+            <span
+              key={`${genre}-${index}`}
+              className="text-text-accent font-medium text-sm bg-text-accent/10 border border-text-accent/20 px-3 py-1 rounded-full backdrop-blur-sm"
             >
               {genre}
             </span>
           ))}
         </div>
-        
+
         <p className="text-gray-300 mb-8 line-clamp-3 max-w-2xl text-lg leading-relaxed">
           {anime.synopsis}
         </p>
-        
+
         <div className="flex items-center gap-4">
-          {/* --- AQUI ESTÁ A MUDANÇA --- */}
-          {/* Trocamos o button pelo Link direto para a página de detalhes */}
-          <Link 
+          <Link
             to={`/anime/${anime.id}`}
-            className="bg-primary hover:bg-primary-hover text-white px-8 py-3.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/30 transform hover:-translate-y-1 cursor-pointer"
+            className="bg-button-accent hover:bg-button-accent/90 text-text-on-primary px-8 py-3.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-button-accent/30 transform hover:-translate-y-1 cursor-pointer"
           >
             <Info className="w-5 h-5" /> Ver Detalhes
           </Link>
-          
+
           <button className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-6 py-3.5 rounded-xl font-semibold flex items-center gap-2 transition-all border border-white/10 cursor-pointer">
             <Plus className="w-5 h-5" /> Minha Lista
           </button>

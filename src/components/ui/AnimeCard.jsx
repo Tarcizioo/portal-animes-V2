@@ -2,18 +2,18 @@ import { Star, Play } from 'lucide-react';
 import { Link } from 'react-router-dom'; // <--- Importante: Importar o Link
 
 // Adicione o "id" nas propriedades que o card recebe
-export function AnimeCard({ id, title, genre, image, score }) { 
+export function AnimeCard({ id, title, genre, image, score }) {
   return (
     // Envolvemos tudo no Link para tornar clicável
     <Link to={`/anime/${id}`} className="block group relative cursor-pointer">
       <div className="relative aspect-[2/3] rounded-xl overflow-hidden mb-3">
         {/* Imagem */}
-        <img 
-          src={image} 
-          alt={title} 
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+        <img
+          src={image}
+          alt={title}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
-        
+
         {/* Overlay Escuro (aparece no hover) */}
         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
         </div>
@@ -24,13 +24,13 @@ export function AnimeCard({ id, title, genre, image, score }) {
           <span className="text-white text-xs font-bold">{score}</span>
         </div>
       </div>
-      
+
       {/* Título e Gênero */}
       <div>
-        <h3 className="text-gray-800 dark:text-white font-bold truncate group-hover:text-primary transition-colors">
+        <h3 className="text-text-primary font-bold truncate group-hover:text-button-accent transition-colors">
           {title}
         </h3>
-        <p className="text-gray-500 dark:text-gray-400 text-xs truncate">
+        <p className="text-text-secondary text-xs truncate">
           {genre}
         </p>
       </div>
