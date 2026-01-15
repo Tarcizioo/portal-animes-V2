@@ -1,8 +1,9 @@
 import { Heart } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function CharacterCard({ character, rank }) {
     return (
-        <div className="group relative bg-bg-secondary rounded-2xl overflow-hidden shadow-sm border border-border-color hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+        <Link to={`/character/${character.mal_id}`} className="block group relative bg-bg-secondary rounded-2xl overflow-hidden shadow-sm border border-border-color hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             {/* Imagem */}
             <div className="aspect-[3/4] overflow-hidden relative">
                 <img
@@ -41,6 +42,6 @@ export function CharacterCard({ character, rank }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }

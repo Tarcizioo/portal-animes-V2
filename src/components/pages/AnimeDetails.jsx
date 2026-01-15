@@ -8,6 +8,7 @@ import {
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { useAnimeInfo } from '@/hooks/useAnimeInfo';
+import { Loader } from '@/components/ui/Loader';
 import clsx from 'clsx';
 
 export function AnimeDetails() {
@@ -25,12 +26,7 @@ export function AnimeDetails() {
     if (loading) {
         return (
             <div className="flex h-screen bg-background-dark text-white items-center justify-center">
-                <div className="relative">
-                    <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <Play className="w-5 h-5 text-primary fill-current" />
-                    </div>
-                </div>
+                <Loader />
             </div>
         );
     }
@@ -295,7 +291,7 @@ export function AnimeDetails() {
                                 </div>
                                 <div className="flex flex-col gap-3">
                                     {characters && characters.slice(0, 4).map(char => (
-                                        <div key={char.character.mal_id} className="flex items-center justify-between p-2 rounded-xl bg-bg-secondary hover:bg-bg-tertiary transition-colors border border-border-color group">
+                                        <Link to={`/character/${char.character.mal_id}`} key={char.character.mal_id} className="flex items-center justify-between p-2 rounded-xl bg-bg-secondary hover:bg-bg-tertiary transition-colors border border-border-color group">
                                             <div className="flex items-center gap-3">
                                                 <div
                                                     className="size-12 rounded-full bg-cover bg-center border-2 border-transparent group-hover:border-primary transition-all"
@@ -307,7 +303,7 @@ export function AnimeDetails() {
                                                 </div>
                                             </div>
                                             <Mic2 className="w-4 h-4 text-text-secondary group-hover:text-primary transition-colors" />
-                                        </div>
+                                        </Link>
                                     ))}
                                 </div>
                             </div>
