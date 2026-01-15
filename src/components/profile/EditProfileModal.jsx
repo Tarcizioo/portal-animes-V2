@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
-import { X, Save, Upload, Link as LinkIcon, Hash } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Save, Upload, Link as LinkIcon, Hash, Camera } from 'lucide-react';
+import { useImageUpload } from '@/hooks/useImageUpload';
+import { useAuth } from '@/context/AuthContext';
 
 // Lista de Gêneros Comuns
 const ANIME_GENRES = [
@@ -14,6 +16,9 @@ const ANIME_GENRES = [
 export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
     if (!isOpen) return null;
 
+    const { user } = useAuth();
+    const { uploadImage, uploading } = useImageUpload();
+
     const [formData, setFormData] = useState({
         displayName: '',
         photoURL: '',
@@ -26,6 +31,15 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
             instagram: ''
         }
     });
+
+    // Estados para arquivos locais (preview/upload)
+    const [bannerFile, setBannerFile] = useState(null);
+    const [photoFile, setPhotoFile] = useState(null);
+    const [bannerPreview, setBannerPreview] = useState('');
+    const [photoPreview, setPhotoPreview] = useState('');
+
+    const bannerInputRef = useRef(null);
+    const photoInputRef = useRef(null);
 
     const [tempGenre, setTempGenre] = useState('');
     const [suggestions, setSuggestions] = useState([]);
@@ -44,6 +58,11 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
                     instagram: profile.connections?.instagram || ''
                 }
             });
+            // Reset files
+            setBannerFile(null);
+            setPhotoFile(null);
+            setBannerPreview('');
+            setPhotoPreview('');
         }
     }, [profile]);
 
@@ -60,6 +79,20 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
             }));
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
+        }
+    };
+
+    const handleFileChange = (e, type) => {
+        const file = e.target.files[0];
+        if (file) {
+            const previewUrl = URL.createObjectURL(file);
+            if (type === 'banner') {
+                setBannerFile(file);
+                setBannerPreview(previewUrl);
+            } else if (type === 'photo') {
+                setPhotoFile(file);
+                setPhotoPreview(previewUrl);
+            }
         }
     };
 
@@ -124,8 +157,37 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await onSave(formData);
-        onClose();
+
+        let updatedData = { ...formData };
+
+        try {
+            // Upload Banner if changed
+            if (bannerFile) {
+                const bannerUrl = await uploadImage(bannerFile, `users/${user.uid}/banner_${Date.now()}`);
+                if (bannerUrl) updatedData.bannerURL = bannerUrl;
+            }
+
+            // Upload Photo if changed
+            if (photoFile) {
+                const photoUrl = await uploadImage(photoFile, `users/${user.uid}/avatar_${Date.now()}`);
+                if (photoUrl) updatedData.photoURL = photoUrl;
+            }
+
+            await onSave(updatedData);
+            onClose();
+        } catch (error) {
+            console.error("Erro ao salvar perfil:", error);
+            // Mostrar mensagem de erro mais específica
+            if (error.code === 'storage/unauthorized') {
+                alert("Erro de permissão: Verifique as regras do Firebase Storage.");
+            } else if (error.code === 'storage/canceled') {
+                alert("Upload cancelado.");
+            } else if (error.code === 'storage/unknown') {
+                alert("Erro desconhecido no servidor de armazenamento.");
+            } else {
+                alert(`Erro ao salvar: ${error.message}`);
+            }
+        }
     };
 
     return (
@@ -150,27 +212,78 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
                         <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
                             <Upload className="w-4 h-4" /> Aparência
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-sm text-gray-300">URL do Banner</label>
-                                <input
-                                    type="text"
-                                    name="bannerURL"
-                                    value={formData.bannerURL}
-                                    onChange={handleChange}
-                                    placeholder="https://..."
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all text-sm"
-                                />
+
+                        {/* Banner Preview & Input */}
+                        <div className="space-y-2">
+                            <label className="text-sm text-gray-300">Banner do Perfil</label>
+                            <div
+                                className="relative h-32 w-full rounded-xl overflow-hidden bg-black/40 border-2 border-dashed border-white/10 group hover:border-primary/50 transition-colors cursor-pointer"
+                                onClick={() => bannerInputRef.current.click()}
+                            >
+                                {(bannerPreview || formData.bannerURL) ? (
+                                    <img
+                                        src={bannerPreview || formData.bannerURL}
+                                        alt="Banner Preview"
+                                        className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity"
+                                    />
+                                ) : (
+                                    <div className="flex items-center justify-center h-full text-gray-500">
+                                        Clique para enviar
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <Camera className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-sm text-gray-300">URL do Avatar</label>
+                            <input
+                                type="file"
+                                ref={bannerInputRef}
+                                onChange={(e) => handleFileChange(e, 'banner')}
+                                accept="image/png, image/jpeg, image/jpg, image/webp"
+                                className="hidden"
+                            />
+                        </div>
+
+                        {/* Avatar Preview & Input */}
+                        <div className="space-y-2">
+                            <label className="text-sm text-gray-300">Foto de Perfil</label>
+                            <div className="flex items-center gap-4">
+                                <div
+                                    className="relative w-20 h-20 rounded-full overflow-hidden bg-black/40 border-2 border-dashed border-white/10 group hover:border-primary/50 transition-colors cursor-pointer"
+                                    onClick={() => photoInputRef.current.click()}
+                                >
+                                    {(photoPreview || formData.photoURL) ? (
+                                        <img
+                                            src={photoPreview || formData.photoURL}
+                                            alt="Avatar Preview"
+                                            className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity"
+                                        />
+                                    ) : (
+                                        <div className="flex items-center justify-center h-full">
+                                            <Camera className="w-6 h-6 text-gray-500" />
+                                        </div>
+                                    )}
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+                                    </div>
+                                </div>
+                                <div className="text-xs text-gray-400">
+                                    <p>Recomendado: 400x400px</p>
+                                    <p>JPG e PNG suportados</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => photoInputRef.current.click()}
+                                        className="text-primary hover:text-primary-hover mt-1 font-bold"
+                                    >
+                                        Selecionar arquivo
+                                    </button>
+                                </div>
                                 <input
-                                    type="text"
-                                    name="photoURL"
-                                    value={formData.photoURL}
-                                    onChange={handleChange}
-                                    placeholder="https://..."
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all text-sm"
+                                    type="file"
+                                    ref={photoInputRef}
+                                    onChange={(e) => handleFileChange(e, 'photo')}
+                                    accept="image/png, image/jpeg, image/jpg, image/webp"
+                                    className="hidden"
                                 />
                             </div>
                         </div>
@@ -278,8 +391,14 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
                     <button onClick={onClose} className="px-6 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 hover:text-white transition-all font-medium">
                         Cancelar
                     </button>
-                    <button onClick={handleSubmit} className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold hover:bg-primary-hover shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
-                        <Save className="w-4 h-4" /> Salvar Alterações
+                    <button disabled={uploading} onClick={handleSubmit} className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold hover:bg-primary-hover shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        {uploading ? (
+                            <>Uploading...</>
+                        ) : (
+                            <>
+                                <Save className="w-4 h-4" /> Salvar Alterações
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
