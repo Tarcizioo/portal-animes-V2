@@ -53,34 +53,43 @@ export function Header() {
                 )}
 
                 {/* DESKTOP SEARCH */}
-                <div className={`relative group w-full max-w-md ml-auto transition-all duration-300 ${showMobileSearch ? 'block absolute left-0 top-2 px-4 z-50' : 'hidden md:flex items-center gap-4'}`}>
+                <div className={`relative group w-full max-w-md ml-auto transition-all duration-300 ${showMobileSearch ? 'block' : 'hidden md:flex items-center gap-4'}`}>
 
-                    <div className={`relative w-full ${showMobileSearch ? '' : 'max-w-md'}`}>
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search className="w-5 h-5 text-text-secondary" />
-                        </div>
-                        <input
-                            type="text"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Pesquisar..."
-                            className="block w-full pl-10 pr-3 py-2.5 border-none rounded-xl bg-bg-tertiary text-text-primary focus:outline-none focus:ring-2 focus:ring-primary placeholder-text-secondary/50"
-                        />
-                        {/* Mobile Close Button */}
-                        {showMobileSearch && (
-                            <button onClick={() => setShowMobileSearch(false)} className="absolute inset-y-0 right-4 flex items-center text-text-secondary"><X className="w-5 h-5" /></button>
-                        )}
-                        {/* Results Dropdown */}
-                        {results.length > 0 && (
-                            <div className="absolute top-full mt-2 left-0 w-full bg-bg-secondary rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto border border-border-color">
-                                {results.map(anime => (
-                                    <div key={anime.id} onClick={() => handleResultClick(anime.id)} className="flex gap-3 p-3 hover:bg-primary/10 cursor-pointer border-b border-border-color last:border-0">
-                                        <img src={anime.image} className="w-8 h-12 object-cover rounded" alt={anime.title} />
-                                        <div className="text-sm text-text-primary">{anime.title}</div>
-                                    </div>
-                                ))}
+                    {/* Mobile Search Overlay */}
+                    <div className={`${showMobileSearch ? 'fixed inset-0 z-50 bg-bg-primary px-4 flex items-center' : 'relative w-full'}`}>
+                        {/* Mobile Close Button (Left side now for better UX?) No, keep explicit close */}
+
+                        <div className={`relative w-full ${showMobileSearch ? 'max-w-full' : 'max-w-md'}`}>
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Search className="w-5 h-5 text-text-secondary" />
                             </div>
-                        )}
+                            <input
+                                type="text"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                placeholder="Pesquisar..."
+                                autoFocus={showMobileSearch}
+                                className="block w-full pl-10 pr-10 py-2.5 border-none rounded-xl bg-bg-tertiary text-text-primary focus:outline-none focus:ring-2 focus:ring-primary placeholder-text-secondary/50"
+                            />
+                            {/* Mobile Close Button (Inside Input) */}
+                            {showMobileSearch && (
+                                <button onClick={() => setShowMobileSearch(false)} className="absolute inset-y-0 right-2 flex items-center p-2 text-text-secondary hover:text-primary">
+                                    <X className="w-5 h-5" />
+                                </button>
+                            )}
+
+                            {/* Results Dropdown */}
+                            {results.length > 0 && (
+                                <div className="absolute top-full mt-2 left-0 w-full bg-bg-secondary rounded-xl shadow-2xl z-50 max-h-[60vh] overflow-y-auto border border-border-color">
+                                    {results.map(anime => (
+                                        <div key={anime.id} onClick={() => handleResultClick(anime.id)} className="flex gap-3 p-3 hover:bg-primary/10 cursor-pointer border-b border-border-color last:border-0">
+                                            <img src={anime.image} className="w-8 h-12 object-cover rounded" alt={anime.title} />
+                                            <div className="text-sm text-text-primary">{anime.title}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </header>

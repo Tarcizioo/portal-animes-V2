@@ -99,8 +99,8 @@ export function AnimeDetails() {
                             style={{ backgroundImage: `url('${bannerImage}')` }}
                         />
                         {/* Gradientes */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/40 to-transparent z-10"></div>
-                        <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-primary/30 to-transparent z-10"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/60 to-transparent z-10"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-primary/40 to-transparent z-10"></div>
                     </div>
 
                     <div className="relative z-20 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-end pb-12">
@@ -127,7 +127,7 @@ export function AnimeDetails() {
                                         </span>
                                     </div>
 
-                                    <h1 className="text-5xl md:text-7xl font-bold leading-none tracking-tight text-text-primary drop-shadow-2xl">
+                                    <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold leading-none tracking-tight text-text-primary drop-shadow-2xl">
                                         {anime.title}
                                     </h1>
                                     {anime.title_english && (
