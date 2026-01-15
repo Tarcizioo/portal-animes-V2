@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { NavLink, Link } from 'react-router-dom';
-import { Home, Compass, Heart, Settings, ChevronLeft, ChevronRight, LogOut, X, Users, Tv, Menu, Zap } from 'lucide-react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { Home, Compass, Heart, Settings, ChevronLeft, ChevronRight, LogOut, X, Users, Tv, Menu, Zap, LogIn } from 'lucide-react';
 import clsx from 'clsx';
 import { SettingsModal } from '@/components/settings/SettingsModal';
+import { useAuth } from '@/context/AuthContext';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,16 +14,35 @@ export function Sidebar() {
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  const { user, logout } = useAuth();
+  const { profile } = useUserProfile();
+  const navigate = useNavigate();
+
   useEffect(() => {
     localStorage.setItem('sidebar_collapsed', isCollapsed);
   }, [isCollapsed]);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error("Erro ao sair:", error);
+    }
+  };
+
   // Link Base Styles
   const linkBase = `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ease-in-out font-medium w-full whitespace-nowrap overflow-hidden ${isCollapsed ? 'justify-center px-2' : 'text-left'}`;
   const linkActive = "bg-button-accent text-text-on-primary shadow-lg shadow-button-accent/25";
   const linkInactive = "text-text-secondary hover:bg-bg-tertiary hover:text-primary transition-colors";
+
+  // Determinar Nome e Foto
+  const displayName = profile?.displayName || user?.displayName || 'Visitante';
+  const photoURL = profile?.photoURL || user?.photoURL;
 
   return (
     <>
@@ -44,7 +65,6 @@ export function Sidebar() {
         />
       )}
 
-      {/* --- SIDEBAR CONTAINER --- */}
       {/* --- SIDEBAR CONTAINER --- */}
       <aside className={clsx(
         "fixed md:static inset-y-0 left-0 z-50 bg-bg-secondary border-r border-border-color flex flex-col transition-all duration-300 ease-in-out will-change-[width]",
@@ -109,40 +129,49 @@ export function Sidebar() {
           </button>
         </nav>
 
-        {/* 3. PERFIL AGORA É CLICÁVEL (Link) */}
+        {/* 3. PERFIL DINÂMICO */}
         <div className="p-4 border-t border-border-color bg-bg-tertiary">
           <Link
             to="/profile"
             onClick={() => setIsOpen(false)}
-            className={`flex items-center gap-3 p-3 rounded-xl bg-bg-secondary border border-border-color shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden ${isCollapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-3 p-3 rounded-xl bg-bg-secondary border border-border-color shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden ${isCollapsed ? 'justify-center w-12 h-12 p-0' : ''}`}
+            title={!isCollapsed ? "Ver Perfil" : displayName}
           >
             {/* Efeito Hover suave no fundo */}
             <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors" />
 
             {/* Avatar */}
-            <div className="relative z-10">
+            <div className="relative z-10 shrink-0">
               <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-button-accent flex items-center justify-center text-white font-bold text-sm overflow-hidden ring-2 ring-transparent group-hover:ring-primary/20 transition-all">
-
+                {photoURL ? (
+                  <img src={photoURL} alt={displayName} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="uppercase">{displayName.slice(0, 2)}</span>
+                )}
               </div>
-              <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-bg-secondary rounded-full"></span>
+              <span className={`absolute bottom-0 right-0 w-3 h-3 border-2 border-bg-secondary rounded-full ${user ? 'bg-green-500' : 'bg-gray-500'}`}></span>
             </div>
 
             {/* Texto */}
             {!isCollapsed && (
-              <div className="flex-1 min-w-0 z-10">
+              <div className="flex-1 min-w-0 z-10 ml-1">
                 <h4 className="text-sm font-bold text-text-primary truncate group-hover:text-primary transition-colors">
-                  Visitante
+                  {displayName}
                 </h4>
                 <p className="text-xs text-text-secondary truncate">
-                  Visualizar perfil
+                  {user ? 'Visualizar perfil' : 'Fazer Login'}
                 </p>
               </div>
             )}
 
-            {/* Ícone de Sair */}
+            {/* Ícone de Sair / Entrar */}
             {!isCollapsed && (
-              <div className="z-10 p-1.5 text-text-secondary group-hover:text-primary transition-colors">
-                <LogOut className="w-4 h-4" />
+              <div
+                className="z-10 p-1.5 text-text-secondary group-hover:text-primary transition-colors"
+                onClick={user ? handleLogout : undefined} // Se não tiver user, o Link pai já leva para profile/login
+                title={user ? "Sair" : "Entrar"}
+              >
+                {user ? <LogOut className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
               </div>
             )}
           </Link>
