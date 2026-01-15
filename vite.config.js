@@ -7,12 +7,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: "/portal-animes-V2/",
-})
+  base: mode === 'production' ? "/portal-animes-V2/" : "/",
+}))

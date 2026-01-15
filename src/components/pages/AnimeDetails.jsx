@@ -95,7 +95,7 @@ export function AnimeDetails() {
                     {/* Imagem de Fundo (ESTÁTICA) */}
                     <div className="absolute inset-0 z-0 overflow-hidden">
                         <div
-                            className="absolute inset-0 bg-cover bg-center"
+                            className="absolute inset-0 bg-cover bg-center blur-sm scale-105"
                             style={{ backgroundImage: `url('${bannerImage}')` }}
                         />
                         {/* Gradientes */}

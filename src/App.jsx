@@ -23,7 +23,7 @@ const PageLoader = () => (
 
 function App() {
   return (
-    <BrowserRouter basename="/portal-animes-V2">
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ScrollToTop />
       <Suspense fallback={<PageLoader />}>
         <Routes>

@@ -16,7 +16,7 @@ export function Hero({ anime }) {
       <img
         src={anime.image}
         alt={anime.title}
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 blur-sm"
         onError={(e) => {
           e.target.src = "https://placehold.co/1200x600/1a1a1a/666?text=Imagem+Indisponível";
         }}
