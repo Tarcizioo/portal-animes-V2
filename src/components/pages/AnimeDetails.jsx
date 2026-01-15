@@ -17,7 +17,10 @@ export function AnimeDetails() {
 
     // Estado para controlar a animação de entrada (apenas opacidade e slide, sem zoom no fundo)
     const [isVisible, setIsVisible] = useState(false);
-    useEffect(() => { setIsVisible(true) }, []);
+    useEffect(() => {
+        const timer = setTimeout(() => setIsVisible(true), 100);
+        return () => clearTimeout(timer);
+    }, []);
 
     if (loading) {
         return (
@@ -344,6 +347,7 @@ export function AnimeDetails() {
 
 // --- Componentes Auxiliares ---
 
+// eslint-disable-next-line no-unused-vars
 function SectionTitle({ icon: Icon, title }) {
     return (
         <h3 className="text-2xl font-bold text-text-primary flex items-center gap-3">
@@ -355,6 +359,7 @@ function SectionTitle({ icon: Icon, title }) {
     );
 }
 
+// eslint-disable-next-line no-unused-vars
 function ActionButton({ icon: Icon }) {
     return (
         <button className="p-2.5 rounded-xl bg-bg-tertiary hover:bg-primary hover:text-white text-text-primary transition-all transform hover:scale-110 shadow-sm">
@@ -363,6 +368,7 @@ function ActionButton({ icon: Icon }) {
     )
 }
 
+// eslint-disable-next-line no-unused-vars
 function StatsCard({ value, label, icon: Icon, color, delay }) {
     return (
         <div
@@ -376,6 +382,7 @@ function StatsCard({ value, label, icon: Icon, color, delay }) {
     );
 }
 
+// eslint-disable-next-line no-unused-vars
 function InfoRow({ label, value, icon: Icon, color = "text-text-primary", highlight = false }) {
     return (
         <div className="flex justify-between items-center py-2 group">
