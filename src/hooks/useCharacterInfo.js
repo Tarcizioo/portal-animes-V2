@@ -40,6 +40,7 @@ export function useCharacterInfo(id) {
                     about: data.about,
                     favorites: data.favorites,
                     image: data.images?.jpg?.image_url,
+                    large_image: data.images?.jpg?.large_image_url || data.images?.jpg?.image_url,
                     url: data.url,
                     nicknames: data.nicknames || []
                 };
