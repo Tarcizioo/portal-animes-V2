@@ -44,11 +44,11 @@ export function ProfileStats() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {stats.map((stat, index) => (
-        <div key={index} className="bg-white/60 dark:bg-white/5 backdrop-blur-md border border-gray-200 dark:border-white/10 p-5 rounded-2xl flex flex-col gap-1 relative overflow-hidden group hover:bg-white/80 dark:hover:bg-white/10 transition-all">
+        <div key={index} className="bg-[var(--bg-secondary)] backdrop-blur-md border border-[var(--border-color)] p-5 rounded-2xl flex flex-col gap-1 relative overflow-hidden group hover:bg-[var(--bg-tertiary)] transition-all">
           <div className={`absolute -right-4 -top-4 w-20 h-20 rounded-full blur-2xl group-hover:bg-opacity-50 transition-all ${stat.bgGlow}`}></div>
-          <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">{stat.label}</span>
+          <span className="text-[var(--text-secondary)] text-sm font-medium">{stat.label}</span>
           <div className="flex items-end gap-2">
-            <span className="text-3xl font-bold text-gray-900 dark:text-white">{stat.value}</span>
+            <span className="text-3xl font-bold text-[var(--text-primary)]">{stat.value}</span>
             {stat.change && (
               <span className={`text-xs font-bold mb-1.5 flex items-center ${stat.color}`}>
                 {stat.icon} {stat.change}

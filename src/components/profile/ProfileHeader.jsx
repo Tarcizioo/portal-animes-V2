@@ -47,7 +47,7 @@ export function ProfileHeader({ user, profile, onEdit }) {
 
         {/* Nome e Info (Novo) */}
         <div className="mb-4 space-y-1">
-          <h1 className="text-3xl font-bold text-white">{name}</h1>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)]">{name}</h1>
           <p className="text-gray-400 text-sm">Membro desde {new Date().getFullYear()}</p>
         </div>
       </div>

@@ -1,55 +1,112 @@
-import { Award, Film, Heart, MessageSquare, Lock } from 'lucide-react';
+import { useState } from 'react';
+import { useAchievements } from '@/hooks/useAchievements';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { Lock, Edit2, PlusCircle } from 'lucide-react';
+import { BadgesModal } from './BadgesModal';
+import clsx from 'clsx';
+import { BADGES } from '@/constants/badges';
 
 export function AchievementBadges() {
-  const badges = [
-    { icon: Award, color: "orange", title: "Maratonista", level: "Nível 5", unlocked: true },
-    { icon: Film, color: "indigo", title: "Cinéfilo", level: "Nível 3", unlocked: true },
-    { icon: Heart, color: "pink", title: "Apoiador", level: "VIP", unlocked: true },
-    { icon: MessageSquare, color: "teal", title: "Crítico", level: "Nível 8", unlocked: true },
-    { icon: Lock, color: "red", title: "Lendário", level: "Bloqueado", unlocked: false },
-  ];
+  const { unlockedBadges, lockedBadges } = useAchievements();
+  const { profile } = useUserProfile();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const colorClasses = {
-    orange: "text-orange-500 bg-orange-500/10 border-orange-500/20 group-hover:text-orange-400 hover:border-orange-500/50 shadow-orange-500/30",
-    indigo: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20 group-hover:text-indigo-400 hover:border-indigo-500/50 shadow-indigo-500/30",
-    pink: "text-pink-500 bg-pink-500/10 border-pink-500/20 group-hover:text-pink-400 hover:border-pink-500/50 shadow-pink-500/30",
-    teal: "text-teal-500 bg-teal-500/10 border-teal-500/20 group-hover:text-teal-400 hover:border-teal-500/50 shadow-teal-500/30",
-    red: "text-red-500 bg-red-500/10 border-red-500/20 group-hover:shadow-red-500/30",
-  };
+  // Calcular progresso total
+  const totalUnlocked = unlockedBadges.length;
+  const totalBadges = BADGES.length;
+  const progressPercentage = Math.round((totalUnlocked / totalBadges) * 100);
+
+  // Determinar quais badges exibir (Featured ou Default 3 unlocked)
+  let displayBadges = [];
+
+  if (profile?.featuredBadges && profile.featuredBadges.length > 0) {
+    // Mapear IDs salvos para objetos badge completos
+    displayBadges = profile.featuredBadges
+      .map(id => BADGES.find(b => b.id === id))
+      .filter(Boolean); // Remover nulls se badge não existir mais
+  } else {
+    // Default: 3 primeiras unlocked
+    displayBadges = unlockedBadges.slice(0, 3);
+  }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white">Conquistas</h3>
-        <a href="#" className="text-primary text-sm font-medium hover:underline">Ver todas</a>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-5 gap-4">
-        {badges.map((badge, index) => {
-          const Icon = badge.icon;
-          const isLocked = !badge.unlocked;
-          const baseClasses = "group relative bg-white dark:bg-[#16161a] border border-gray-200 dark:border-white/5 rounded-2xl p-4 flex flex-col items-center justify-center gap-3 overflow-hidden transition-all shadow-sm";
-          const lockedClasses = "opacity-50 hover:opacity-100 grayscale hover:grayscale-0";
-          const hoverBorder = !isLocked ? `hover:border-${badge.color}-500/50` : '';
+    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">🏆</span>
+          <div>
+            <h3 className="font-bold text-[var(--text-primary)] text-lg leading-none">Conquistas</h3>
+            <span className="text-xs text-[var(--text-secondary)] font-medium">{totalUnlocked} de {totalBadges} desbloqueadas</span>
+          </div>
+        </div>
 
-          return (
-            <div key={index} className={`${baseClasses} ${isLocked ? lockedClasses : hoverBorder}`}>
-              {/* Background Glow (só aparece no hover se desbloqueado) */}
-              {!isLocked && (
-                 <div className={`absolute inset-0 bg-gradient-to-br from-${badge.color}-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity`}></div>
-              )}
-              
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center border transition-all ${colorClasses[badge.color]} ${!isLocked ? 'group-hover:shadow-[0_0_15px_rgba(var(--tw-shadow-color))]' : ''}`}>
-                <Icon className="w-6 h-6" />
-              </div>
-              
-              <div className="text-center z-10">
-                <span className="block text-sm font-bold text-gray-800 dark:text-gray-200">{badge.title}</span>
-                <span className="text-[10px] text-gray-500 uppercase tracking-wider">{badge.level}</span>
-              </div>
-            </div>
-          );
-        })}
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--bg-primary)] hover:bg-primary/20 hover:text-primary text-[var(--text-secondary)] transition-all group border border-transparent hover:border-primary/30"
+          title="Gerenciar Conquistas"
+        >
+          <span className="text-xs font-bold uppercase tracking-wider">Editar</span>
+          <Edit2 className="w-4 h-4" />
+        </button>
       </div>
+
+      {/* Barra de Progresso Total (Compacta) */}
+      <div className="w-full bg-[var(--bg-primary)]/50 rounded-full h-1.5 overflow-hidden">
+        <div
+          className="bg-gradient-to-r from-primary to-purple-500 h-full rounded-full transition-all duration-1000"
+          style={{ width: `${progressPercentage}%` }}
+        ></div>
+      </div>
+
+      {/* Grid de Badges (Visualização Pinned - Max 3) */}
+      <div className="grid grid-cols-3 gap-3">
+        {displayBadges.length > 0 ? (
+          displayBadges.map((badge) => {
+            const Icon = badge.icon;
+            return (
+              <div
+                key={badge.id}
+                className={clsx(
+                  "relative group flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-300 bg-black/20 hover:bg-[var(--bg-primary)]/10",
+                  badge.border
+                )}
+              >
+                <div className={clsx(
+                  "w-10 h-10 rounded-full flex items-center justify-center mb-2",
+                  badge.bg
+                )}>
+                  <Icon className={clsx("w-5 h-5", badge.color)} />
+                </div>
+
+                <h4 className="text-[10px] font-bold text-center text-[var(--text-primary)] leading-tight line-clamp-1">
+                  {badge.name}
+                </h4>
+              </div>
+            );
+          })
+        ) : (
+          // Estado Vazio (Sem conquistas ainda)
+          <div className="col-span-3 py-4 text-center text-sm text-[var(--text-secondary)] italic bg-black/20 rounded-xl border border-[var(--border-color)] border-dashed">
+            Ainda sem conquistas desbloqueadas.
+          </div>
+        )}
+
+        {/* Slot "Adicionar" se tiver menos de 3 */}
+        {displayBadges.length < 3 && unlockedBadges.length > displayBadges.length && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex flex-col items-center justify-center p-3 rounded-xl border border-[var(--border-color)] border-dashed hover:border-primary/50 hover:bg-primary/5 transition-all group"
+          >
+            <PlusCircle className="w-8 h-8 text-[var(--text-secondary)] group-hover:text-primary mb-1 transition-colors" />
+            <span className="text-[10px] font-medium text-[var(--text-secondary)] group-hover:text-primary">Fixar</span>
+          </button>
+        )}
+      </div>
+
+      <BadgesModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

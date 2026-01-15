@@ -53,7 +53,7 @@ export function AnimeTrackerList() {
 
       {/* CABEÇALHO COM TÍTULO E BUSCA */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <h3 className="text-xl font-bold text-white flex items-center gap-2">
+        <h3 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
           <span className="w-2 h-6 bg-primary rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]"></span>
           Biblioteca Pessoal
         </h3>
@@ -66,7 +66,7 @@ export function AnimeTrackerList() {
             placeholder="Filtrar animes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#16161a] border border-white/5 rounded-xl py-2 pl-9 pr-4 text-sm text-gray-200 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-gray-600"
+            className="w-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl py-2 pl-9 pr-4 text-sm text-[var(--text-primary)] focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-[var(--text-secondary)]"
           />
         </div>
       </div>
@@ -111,7 +111,7 @@ export function AnimeTrackerList() {
               <div
                 key={anime.id}
                 onClick={() => navigate(`/anime/${anime.id}`)}
-                className="group flex gap-4 bg-[#16161a] border border-white/5 rounded-2xl p-3 overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:bg-[#1c1c21] cursor-pointer"
+                className="group flex gap-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-3 overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:bg-[var(--bg-tertiary)] cursor-pointer"
               >
                 {/* Imagem */}
                 <div className="relative w-20 h-28 shrink-0 rounded-xl overflow-hidden bg-gray-900 shadow-md">
@@ -134,7 +134,7 @@ export function AnimeTrackerList() {
 
                   <div>
                     <div className="flex justify-between items-start gap-2">
-                      <h4 className="font-bold text-gray-100 truncate text-sm md:text-base leading-snug group-hover:text-primary transition-colors">
+                      <h4 className="font-bold text-[var(--text-primary)] truncate text-sm md:text-base leading-snug group-hover:text-primary transition-colors">
                         {anime.title}
                       </h4>
                       <button
@@ -156,9 +156,9 @@ export function AnimeTrackerList() {
 
                   <div className="mt-2">
                     <div className="flex items-end justify-between text-xs font-mono mb-1.5">
-                      <span className="text-gray-500">Progresso</span>
-                      <span className="text-gray-200 font-bold">
-                        {anime.currentEp} <span className="text-gray-600">/ {anime.totalEp || '?'}</span>
+                      <span className="text-[var(--text-secondary)]">Progresso</span>
+                      <span className="text-[var(--text-primary)] font-bold">
+                        {anime.currentEp} <span className="text-[var(--text-secondary)]">/ {anime.totalEp || '?'}</span>
                       </span>
                     </div>
 

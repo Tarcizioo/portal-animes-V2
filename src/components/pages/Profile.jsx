@@ -20,7 +20,7 @@ export function Profile() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background-dark text-white">
+      <div className="flex h-screen items-center justify-center bg-[var(--bg-primary)] text-[var(--text-primary)]">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -28,7 +28,7 @@ export function Profile() {
 
   if (!user) {
     return (
-      <div className="flex h-screen overflow-hidden bg-background-dark text-text-primary font-sans">
+      <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <Header />
@@ -57,7 +57,7 @@ export function Profile() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background-dark text-text-primary font-sans">
+    <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
 
       <Sidebar />
 
@@ -85,8 +85,8 @@ export function Profile() {
               <div className="space-y-6">
 
                 {/* Gêneros Favoritos */}
-                <div className="bg-surface-dark border border-white/5 rounded-2xl p-6">
-                  <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
+                  <h3 className="font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                     <Hash className="w-4 h-4 text-primary" /> Gêneros Favoritos
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -103,8 +103,8 @@ export function Profile() {
                 </div>
 
                 {/* Conexões */}
-                <div className="bg-surface-dark border border-white/5 rounded-2xl p-6">
-                  <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
+                  <h3 className="font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                     <LinkIcon className="w-4 h-4 text-primary" /> Conexões
                   </h3>
                   <ul className="space-y-3 text-sm text-gray-400">

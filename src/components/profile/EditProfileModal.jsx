@@ -194,14 +194,14 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-            <div className="bg-[#1a1a20] w-full max-w-2xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="bg-[var(--bg-secondary)] w-full max-w-2xl rounded-2xl border border-[var(--border-color)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
 
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-white/5 bg-[#202028]">
-                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <div className="flex items-center justify-between p-6 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
+                    <h2 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
                         <Edit2 className="w-5 h-5 text-primary" /> Editar Perfil
                     </h2>
-                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
+                    <button onClick={onClose} className="p-2 hover:bg-[var(--bg-primary)]/10 rounded-full transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -211,13 +211,13 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
 
                     {/* 1. Imagens */}
                     <section className="space-y-4">
-                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                        <h3 className="text-sm font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center gap-2">
                             <Upload className="w-4 h-4" /> Aparência
                         </h3>
 
                         {/* Banner Preview & Input */}
                         <div className="space-y-2">
-                            <label className="text-sm text-gray-300">Banner do Perfil</label>
+                            <label className="text-sm text-[var(--text-secondary)]">Banner do Perfil</label>
                             <div
                                 className="relative h-32 w-full rounded-xl overflow-hidden bg-black/40 border-2 border-dashed border-white/10 group hover:border-primary/50 transition-colors cursor-pointer"
                                 onClick={() => bannerInputRef.current.click()}
@@ -293,23 +293,23 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
 
                     {/* 2. Básico */}
                     <section className="space-y-4">
-                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                        <h3 className="text-sm font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center gap-2">
                             <Hash className="w-4 h-4" /> Informações Básicas
                         </h3>
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <label className="text-sm text-gray-300">Nome de Exibição</label>
+                                <label className="text-sm text-[var(--text-secondary)]">Nome de Exibição</label>
                                 <input
                                     type="text"
                                     name="displayName"
                                     value={formData.displayName}
                                     onChange={handleChange}
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all font-bold"
+                                    className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border-color)] rounded-xl px-4 py-2 text-[var(--text-primary)] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all font-bold"
                                 />
                             </div>
                             {/* Tags de Gênero com Autocomplete */}
                             <div className="space-y-2 relative">
-                                <label className="text-sm text-gray-300">Gêneros Favoritos</label>
+                                <label className="text-sm text-[var(--text-secondary)]">Gêneros Favoritos</label>
                                 <div className="flex flex-wrap gap-2 mb-2">
                                     {formData.favoriteGenres.map(g => (
                                         <span key={g} className="px-3 py-1 bg-primary/20 text-primary border border-primary/30 rounded-full text-xs font-bold flex items-center gap-1 group cursor-pointer hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/30 transition-all" onClick={() => removeGenre(g)}>
@@ -323,7 +323,7 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
                                     onChange={(e) => setTempGenre(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                     placeholder="Digite um gênero..."
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all text-sm"
+                                    className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border-color)] rounded-xl px-4 py-2 text-[var(--text-primary)] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all text-sm"
                                 />
 
                                 {/* Sugestões Dropdown */}
@@ -351,36 +351,36 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm text-gray-300">Discord</label>
+                                <label className="text-sm text-[var(--text-secondary)]">Discord</label>
                                 <input
                                     type="text"
                                     name="social_discord"
                                     value={formData.connections.discord}
                                     onChange={handleChange}
                                     placeholder="User#0000"
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-[#5865F2] focus:outline-none focus:ring-1 focus:ring-[#5865F2] transition-all text-sm"
+                                    className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border-color)] rounded-xl px-4 py-2 text-[var(--text-primary)] focus:border-[#5865F2] focus:outline-none focus:ring-1 focus:ring-[#5865F2] transition-all text-sm"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm text-gray-300">Twitter / X</label>
+                                <label className="text-sm text-[var(--text-secondary)]">Twitter / X</label>
                                 <input
                                     type="text"
                                     name="social_twitter"
                                     value={formData.connections.twitter}
                                     onChange={handleChange}
                                     placeholder="@usuario"
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-[#1DA1F2] focus:outline-none focus:ring-1 focus:ring-[#1DA1F2] transition-all text-sm"
+                                    className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border-color)] rounded-xl px-4 py-2 text-[var(--text-primary)] focus:border-[#1DA1F2] focus:outline-none focus:ring-1 focus:ring-[#1DA1F2] transition-all text-sm"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm text-gray-300">Instagram</label>
+                                <label className="text-sm text-[var(--text-secondary)]">Instagram</label>
                                 <input
                                     type="text"
                                     name="social_instagram"
                                     value={formData.connections.instagram}
                                     onChange={handleChange}
                                     placeholder="@usuario"
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2 text-white focus:border-[#E1306C] focus:outline-none focus:ring-1 focus:ring-[#E1306C] transition-all text-sm"
+                                    className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border-color)] rounded-xl px-4 py-2 text-[var(--text-primary)] focus:border-[#E1306C] focus:outline-none focus:ring-1 focus:ring-[#E1306C] transition-all text-sm"
                                 />
                             </div>
                         </div>
@@ -389,8 +389,8 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-white/5 bg-[#202028] flex justify-end gap-3">
-                    <button onClick={onClose} className="px-6 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 hover:text-white transition-all font-medium">
+                <div className="p-6 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)] flex justify-end gap-3">
+                    <button onClick={onClose} className="px-6 py-2.5 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-primary)]/10 hover:text-[var(--text-primary)] transition-all font-medium">
                         Cancelar
                     </button>
                     <button disabled={uploading} onClick={handleSubmit} className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold hover:bg-primary-hover shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
