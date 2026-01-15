@@ -11,6 +11,7 @@ import { Footer } from '@/components/layout/Footer';
 import { useAnimeInfo } from '@/hooks/useAnimeInfo';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import { Loader } from '@/components/ui/Loader';
 import clsx from 'clsx';
 
@@ -18,6 +19,7 @@ export function AnimeDetails() {
     const { id } = useParams();
     const { anime, characters, recommendations, loading } = useAnimeInfo(id);
     const { user } = useAuth();
+    const { toast } = useToast();
     const { library, addToLibrary, incrementProgress, updateProgress, updateStatus, updateRating } = useAnimeLibrary();
 
     // Encontrar anime na biblioteca para setar estado inicial
@@ -49,7 +51,7 @@ export function AnimeDetails() {
                 addToLibrary(anime, newStatus);
             }
         } else {
-            alert("Faça login para salvar animes na sua lista!");
+            toast.warning("Faça login para salvar animes na sua lista!");
         }
     };
 

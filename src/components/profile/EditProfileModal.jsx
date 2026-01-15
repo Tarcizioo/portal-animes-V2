@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Save, Upload, Link as LinkIcon, Hash, Camera } from 'lucide-react';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 
 // Lista de Gêneros Comuns
 const ANIME_GENRES = [
@@ -17,6 +18,7 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
     if (!isOpen) return null;
 
     const { user } = useAuth();
+    const { toast } = useToast();
     const { uploadImage, uploading } = useImageUpload();
 
     const [formData, setFormData] = useState({
@@ -142,7 +144,7 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
                     addGenre(match);
                 } else {
                     // Opcional: Feedback visual de erro, por enquanto apenas não adiciona
-                    alert("Por favor, selecione um gênero válido da lista.");
+                    toast.warning("Por favor, selecione um gênero válido da lista.");
                 }
             }
         }
@@ -179,13 +181,13 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
             console.error("Erro ao salvar perfil:", error);
             // Mostrar mensagem de erro mais específica
             if (error.code === 'storage/unauthorized') {
-                alert("Erro de permissão: Verifique as regras do Firebase Storage.");
+                toast.error("Erro de permissão: Verifique as regras do Firebase Storage.");
             } else if (error.code === 'storage/canceled') {
-                alert("Upload cancelado.");
+                toast.warning("Upload cancelado.");
             } else if (error.code === 'storage/unknown') {
-                alert("Erro desconhecido no servidor de armazenamento.");
+                toast.error("Erro desconhecido no servidor de armazenamento.");
             } else {
-                alert(`Erro ao salvar: ${error.message}`);
+                toast.error(`Erro ao salvar: ${error.message}`);
             }
         }
     };

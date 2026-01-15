@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { useToast } from '@/context/ToastContext';
 import { auth, googleProvider, db } from '@/services/firebase';
 import {
     signInWithPopup,
@@ -12,6 +13,7 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const { toast } = useToast();
 
     // Login com Google
     const signInGoogle = async () => {
@@ -42,7 +44,8 @@ export function AuthProvider({ children }) {
             console.error("Erro no login Google:", error);
             console.error("Error Code:", error.code);
             console.error("Error Message:", error.message);
-            alert(`Erro ao fazer login: ${error.message}`);
+            console.error("Error Message:", error.message);
+            toast.error(`Erro ao fazer login: ${error.message}`);
             throw error;
         }
     };

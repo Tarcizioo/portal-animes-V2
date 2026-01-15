@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import { Moon, Sun, Palette, Monitor, Trash2, AlertTriangle } from 'lucide-react';
 
 const themes = [
