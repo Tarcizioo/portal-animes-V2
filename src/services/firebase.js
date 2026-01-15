@@ -3,13 +3,13 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyADXyTXrVCp-bOrSyw_GBjnnxU8DnLKSgM",
-    authDomain: "portal-anime-v2.firebaseapp.com",
-    projectId: "portal-anime-v2",
-    storageBucket: "portal-anime-v2.firebasestorage.app",
-    messagingSenderId: "140656859074",
-    appId: "1:140656859074:web:8a1dd0431f4b4647c3285b",
-    measurementId: "G-M1VZV0GBF2"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
