@@ -5,7 +5,7 @@ import {
     signOut as firebaseSignOut,
     onAuthStateChanged
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, getDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -52,6 +52,27 @@ export function AuthProvider({ children }) {
         return firebaseSignOut(auth);
     };
 
+    // Deletar Conta
+    const deleteAccount = async () => {
+        if (!auth.currentUser) return;
+
+        try {
+            const uid = auth.currentUser.uid;
+
+            // 1. Deletar documento do Firestore
+            await deleteDoc(doc(db, 'users', uid));
+
+            // 2. Deletar usuário da Autenticação
+            await auth.currentUser.delete();
+
+        } catch (error) {
+            console.error("Erro ao deletar conta:", error);
+            // Se falhar porque o login é antigo, o firebase pede re-autenticação
+            // error.code 'auth/requires-recent-login'
+            throw error;
+        }
+    };
+
     // Monitorar Estado
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -65,6 +86,7 @@ export function AuthProvider({ children }) {
         user,
         signInGoogle,
         signOut,
+        deleteAccount,
         loading
     };
 

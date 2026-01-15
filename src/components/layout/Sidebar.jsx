@@ -14,7 +14,7 @@ export function Sidebar() {
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const { profile } = useUserProfile();
   const navigate = useNavigate();
 
@@ -28,7 +28,7 @@ export function Sidebar() {
     e.preventDefault();
     e.stopPropagation();
     try {
-      await logout();
+      await signOut();
       navigate('/');
     } catch (error) {
       console.error("Erro ao sair:", error);
