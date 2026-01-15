@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import { useAnimeInfo } from '@/hooks/useAnimeInfo';
 import { Loader } from '@/components/ui/Loader';
 import clsx from 'clsx';
@@ -336,6 +337,7 @@ export function AnimeDetails() {
                         </div>
                     </section>
                 </div>
+                <Footer />
             </main>
         </div>
     );

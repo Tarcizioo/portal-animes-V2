@@ -1,5 +1,6 @@
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileStats } from '@/components/profile/ProfileStats';
 import { AchievementBadges } from '@/components/profile/AchievementBadges';
@@ -56,6 +57,7 @@ export function Profile() {
             </div>
 
           </div>
+          <Footer />
         </main>
       </div>
     </div>

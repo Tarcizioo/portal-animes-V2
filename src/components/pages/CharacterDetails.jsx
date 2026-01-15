@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import { useCharacterInfo } from '@/hooks/useCharacterInfo';
 import { Heart, Mic2, Tv, Film, User, Image as ImageIcon, X, ChevronRight, ArrowLeft } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -303,6 +304,8 @@ export function CharacterDetails() {
                         </button>
                     </div>
                 )}
+
+                <Footer />
             </main>
         </div>
     );

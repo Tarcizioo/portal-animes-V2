@@ -1,6 +1,7 @@
 import { BarChart2, Calendar, Zap, Heart, Theater, Skull, Smile, Wand2, Rocket, Trophy } from 'lucide-react';
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/home/Hero";
 import { AnimeCarousel } from '@/components/ui/AnimeCarousel';
 import { LazyAnimeCarousel } from '@/components/home/LazyAnimeCarousel';
@@ -84,9 +85,11 @@ export function Home() {
                 />
               ))}
             </>
+
           )}
         </div>
-      </main>
-    </div>
+        <Footer />
+      </main >
+    </div >
   );
 }
