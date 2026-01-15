@@ -3,12 +3,19 @@ import { useState } from 'react';
 import { Search, Menu, X, Home, Compass } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSearch } from '@/hooks/useSearch';
+import { useAuth } from '@/context/AuthContext';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 export function Header() {
     const { query, setQuery, results, setResults } = useSearch();
     const navigate = useNavigate();
     const [showMobileSearch, setShowMobileSearch] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const { user } = useAuth();
+    const { profile } = useUserProfile();
+
+    const displayName = profile?.displayName || user?.displayName || 'Visitante';
 
     const handleResultClick = (animeId) => {
         navigate(`/anime/${animeId}`);
@@ -31,7 +38,7 @@ export function Header() {
                     </button>
 
                     <div className={`${showMobileSearch ? 'hidden md:block' : 'block'}`}>
-                        <h1 className="text-xl font-bold text-text-primary">Olá, Visitante!! 👋</h1>
+                        <h1 className="text-xl font-bold text-text-primary">Olá, {displayName}!! 👋</h1>
                         <p className="text-sm text-text-secondary hidden sm:block">Descubra novos animes.</p>
                     </div>
                 </div>
