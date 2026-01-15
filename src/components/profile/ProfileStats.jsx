@@ -1,28 +1,41 @@
 import { TrendingUp, Clock, Star } from 'lucide-react';
+import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 
 export function ProfileStats() {
+  const { library } = useAnimeLibrary();
+
+  // Calcular Estatísticas Reais
+  const completedAnimes = library.filter(a => a.status === 'completed').length;
+  const totalEpisodes = library.reduce((acc, curr) => acc + (curr.currentEp || 0), 0);
+
+  // Média de Notas (Assumindo que temos um campo 'score', por enquanto pode ser 0 ou mockado se não tiver UI pra editar)
+  const ratedAnimes = library.filter(a => a.score > 0);
+  const meanScore = ratedAnimes.length > 0
+    ? (ratedAnimes.reduce((acc, curr) => acc + curr.score, 0) / ratedAnimes.length).toFixed(1)
+    : "0.0";
+
   const stats = [
-    { 
-      label: "Animes Assistidos", 
-      value: "142", 
-      icon: <TrendingUp className="w-4 h-4" />, 
-      color: "text-green-500", 
-      change: "+4",
+    {
+      label: "Animes Completos",
+      value: completedAnimes,
+      icon: <TrendingUp className="w-4 h-4" />,
+      color: "text-green-500",
+      change: null, // Poderia ser calculado se tivéssemos histórico
       bgGlow: "bg-primary/20"
     },
-    { 
-      label: "Episódios Vistos", 
-      value: "3,204", 
-      icon: <span className="text-xs">eps</span>, 
-      color: "text-gray-400", 
+    {
+      label: "Episódios Vistos",
+      value: totalEpisodes.toLocaleString(),
+      icon: <span className="text-xs">eps</span>,
+      color: "text-gray-400",
       change: null,
       bgGlow: "bg-blue-500/20"
     },
-    { 
-      label: "Nota Média", 
-      value: "8.4", 
-      icon: <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />, 
-      color: null, 
+    {
+      label: "Nota Média",
+      value: meanScore,
+      icon: <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />,
+      color: null,
       change: null,
       bgGlow: "bg-yellow-500/20"
     },
@@ -42,7 +55,7 @@ export function ProfileStats() {
               </span>
             )}
             {!stat.change && stat.icon && (
-               <span className="mb-1.5">{stat.icon}</span>
+              <span className="mb-1.5">{stat.icon}</span>
             )}
           </div>
         </div>

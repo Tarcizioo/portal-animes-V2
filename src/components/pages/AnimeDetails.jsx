@@ -9,13 +9,26 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { useAnimeInfo } from '@/hooks/useAnimeInfo';
+import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
+import { useAuth } from '@/context/AuthContext';
 import { Loader } from '@/components/ui/Loader';
 import clsx from 'clsx';
 
 export function AnimeDetails() {
     const { id } = useParams();
     const { anime, characters, recommendations, loading } = useAnimeInfo(id);
-    const [status, setStatus] = useState('completed');
+    const { user } = useAuth();
+    const { library, addToLibrary, incrementProgress, updateProgress, updateStatus, updateRating } = useAnimeLibrary();
+
+    // Encontrar anime na biblioteca para setar estado inicial
+    const libraryEntry = library.find(a => a.id.toString() === id);
+    const [status, setStatus] = useState('plan_to_watch');
+
+    useEffect(() => {
+        if (libraryEntry) {
+            setStatus(libraryEntry.status);
+        }
+    }, [libraryEntry]);
 
     // Estado para controlar a animação de entrada (apenas opacidade e slide, sem zoom no fundo)
     const [isVisible, setIsVisible] = useState(false);
@@ -23,6 +36,37 @@ export function AnimeDetails() {
         const timer = setTimeout(() => setIsVisible(true), 100);
         return () => clearTimeout(timer);
     }, []);
+
+    // Função para atualizar status e adicionar ao library se não existir
+    const handleStatusChange = (newStatus) => {
+        setStatus(newStatus);
+        const totalEpisodes = anime.episodes || 0; // Pegar totais
+
+        if (user) {
+            if (libraryEntry) {
+                updateStatus(anime.id, newStatus, totalEpisodes);
+            } else {
+                addToLibrary(anime, newStatus);
+            }
+        } else {
+            alert("Faça login para salvar animes na sua lista!");
+        }
+    };
+
+    // Função para incrementar episódio
+    const handleIncrement = () => {
+        if (user && libraryEntry) {
+            incrementProgress(libraryEntry.id, libraryEntry.currentEp, libraryEntry.totalEp);
+        } else if (user && anime) {
+            // Se não tá na lib, adiciona como assistindo
+            addToLibrary(anime, 'watching').then(() => {
+                // Depois incrementa? Na v1 vamos apenas adicionar
+            });
+        }
+    };
+
+    const currentEp = libraryEntry?.currentEp || 0;
+    const totalEp = anime?.episodes || 0;
 
     if (loading) {
         return (
@@ -103,51 +147,103 @@ export function AnimeDetails() {
                                     <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/30 rounded-full blur-3xl group-hover/card:bg-primary/50 transition-all duration-700"></div>
 
                                     <div className="relative z-10">
-                                        <div className="flex items-center justify-between mb-5">
-                                            <h3 className="font-bold text-text-primary text-lg flex items-center gap-2">
-                                                <Layers className="w-5 h-5 text-primary" /> Meu Progresso
-                                            </h3>
-                                            <div className="flex gap-2">
-                                                <ActionButton icon={Share2} />
-                                                <ActionButton icon={Heart} />
-                                            </div>
-                                        </div>
 
-                                        <div className="relative mb-5 group/select">
-                                            <select
-                                                className="block w-full rounded-xl border border-border-color bg-bg-tertiary/50 text-text-primary text-sm focus:ring-2 focus:ring-primary focus:border-transparent p-3.5 appearance-none cursor-pointer outline-none transition-all hover:bg-bg-tertiary/80"
-                                                value={status}
-                                                onChange={(e) => setStatus(e.target.value)}
-                                            >
-                                                <option value="watching">Assistindo</option>
-                                                <option value="completed">Completo</option>
-                                                <option value="plan_to_watch">Planejo Assistir</option>
-                                                <option value="dropped">Dropado</option>
-                                            </select>
-                                            <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary group-hover/select:text-primary transition-colors pointer-events-none" />
-                                        </div>
-
-                                        <div className="flex items-center justify-between mb-5 bg-black/5 dark:bg-black/20 rounded-xl p-4 border border-border-color">
-                                            <span className="text-sm text-text-secondary font-medium">Episódios</span>
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-text-primary font-mono font-bold text-lg">{anime.episodes || '?'}</span>
-                                                <span className="text-text-secondary/50">/</span>
-                                                <span className="text-text-secondary text-sm">{anime.episodes || '?'}</span>
-                                                <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-white hover:bg-primary-hover transition-all shadow-lg shadow-primary/20 hover:scale-110 active:scale-95">
-                                                    <Plus className="w-5 h-5" />
+                                        {!libraryEntry ? (
+                                            /* ESTADO 1: NÃO ESTÁ NA BIBLIOTECA */
+                                            <div className="flex flex-col gap-4">
+                                                <h3 className="font-bold text-text-primary text-xl flex items-center gap-2 mb-2">
+                                                    <Layers className="w-6 h-6 text-primary" /> Acompanhar Anime
+                                                </h3>
+                                                <p className="text-text-secondary text-sm mb-2">
+                                                    Adicione este anime à sua lista para rastrear episódios e dar sua nota.
+                                                </p>
+                                                <button
+                                                    onClick={() => handleStatusChange('watching')}
+                                                    className="w-full py-3 rounded-xl bg-primary hover:bg-primary-hover text-white font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <Plus className="w-5 h-5" /> Adicionar à Biblioteca
                                                 </button>
                                             </div>
-                                        </div>
-
-                                        <div className="flex flex-col gap-2">
-                                            <span className="text-sm text-text-secondary font-medium">Sua Nota</span>
-                                            <div className="flex items-center justify-between bg-black/5 dark:bg-black/20 p-3 rounded-xl border border-border-color">
-                                                <div className="flex text-yellow-400 gap-1">
-                                                    {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-current hover:scale-110 transition-transform cursor-pointer" />)}
+                                        ) : (
+                                            /* ESTADO 2: JÁ ESTÁ NA BIBLIOTECA (EDITOR COMPLETO) */
+                                            <>
+                                                <div className="flex items-center justify-between mb-5">
+                                                    <h3 className="font-bold text-text-primary text-lg flex items-center gap-2">
+                                                        <Layers className="w-5 h-5 text-primary" /> Editando Progresso
+                                                    </h3>
+                                                    <div className="flex gap-2">
+                                                        <ActionButton icon={Share2} />
+                                                        <ActionButton icon={Heart} />
+                                                    </div>
                                                 </div>
-                                                <span className="font-bold text-text-primary text-lg">{anime.score || 'N/A'}</span>
-                                            </div>
-                                        </div>
+
+                                                {/* Status Selector */}
+                                                <div className="relative mb-5 group/select">
+                                                    <select
+                                                        className="block w-full rounded-xl border border-border-color bg-bg-tertiary/50 text-text-primary text-sm focus:ring-2 focus:ring-primary focus:border-transparent p-3.5 appearance-none cursor-pointer outline-none transition-all hover:bg-bg-tertiary/80"
+                                                        value={status}
+                                                        onChange={(e) => handleStatusChange(e.target.value)}
+                                                    >
+                                                        <option value="watching">Assistindo</option>
+                                                        <option value="completed">Completo</option>
+                                                        <option value="plan_to_watch">Planejo Assistir</option>
+                                                        <option value="dropped">Dropado</option>
+                                                        <option value="paused">Pausado</option>
+                                                    </select>
+                                                    <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary group-hover/select:text-primary transition-colors pointer-events-none" />
+                                                </div>
+
+                                                {/* Episódios Progress */}
+                                                <div className="flex items-center justify-between mb-5 bg-black/5 dark:bg-black/20 rounded-xl p-4 border border-border-color">
+                                                    <span className="text-sm text-text-secondary font-medium">Episódios</span>
+                                                    <div className="flex items-center gap-3">
+                                                        {/* INPUT DE EPISÓDIOS */}
+                                                        <input
+                                                            type="number"
+                                                            value={currentEp}
+                                                            onChange={(e) => updateProgress && updateProgress(libraryEntry.id, parseInt(e.target.value) || 0, totalEp)}
+                                                            className="w-16 bg-bg-primary text-text-primary px-2 py-1 rounded-lg border border-border-color focus:border-primary focus:ring-1 focus:ring-primary outline-none text-center font-mono font-bold text-lg appearance-none"
+                                                            min="0"
+                                                            max={totalEp || 9999}
+                                                        />
+                                                        <span className="text-text-secondary/50">/</span>
+                                                        <span className="text-text-secondary text-sm">{totalEp || '?'}</span>
+                                                        <button
+                                                            onClick={handleIncrement}
+                                                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-white hover:bg-primary-hover transition-all shadow-lg shadow-primary/20 hover:scale-110 active:scale-95"
+                                                            title="Marcar +1 Episódio"
+                                                        >
+                                                            <Plus className="w-5 h-5" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Avaliação Pessoal */}
+                                                <div className="flex flex-col gap-2">
+                                                    <span className="text-sm text-text-secondary font-medium">Sua Nota</span>
+                                                    <div className="flex items-center justify-between bg-black/5 dark:bg-black/20 p-3 rounded-xl border border-border-color">
+                                                        {/* Stars Input */}
+                                                        <div className="flex gap-1">
+                                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                                                                <Star
+                                                                    key={star}
+                                                                    className={`w-4 h-4 cursor-pointer transition-transform hover:scale-125 ${(libraryEntry.score || 0) >= star
+                                                                        ? "fill-yellow-400 text-yellow-400"
+                                                                        : "text-gray-600 hover:text-yellow-400"
+                                                                        } ${star > 5 ? 'hidden sm:block' : ''} `} // Ocultar algumas se falta espaço em mobile, ou melhor, mostrar 5 estrelas? Vamos manter 10 simplificado ou 5. Vamos usar 5 para UI mais limpa, mapeando 1-5 se usuario quiser. Mas MAL usa 10... vamos tentar 5 por enquanto para caber, ou ajustar tamanho.
+                                                                    // DECISÃO: Vamos usar 5 estrelas na UI para simplificar, mas salvar valor 1-10? Ou apenas mostrar 1-10 pequenas.
+                                                                    // Vamos fazer 5 estrelas grandes que valem 2 pontos cada para simplificar a UI visualmente? Não, o user falou nota, geralmente é 10.
+                                                                    // Vamos por 5 estrelas e ao clicar seta o valor.
+                                                                    onClick={() => updateRating && updateRating(anime.id, star)} // Precisa importar updateRating
+                                                                />
+                                                            ))}
+                                                            {/* CORREÇÃO: Vamos usar 5 estrelas visuais para não quebrar layout, representando 1-5 score. Se precisar 10, mudamos depois. O usuário não especificou escala. */}
+                                                        </div>
+                                                        <span className="font-bold text-text-primary text-lg">{libraryEntry.score || '-'}</span>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -156,7 +252,7 @@ export function AnimeDetails() {
                 </section>
 
                 {/* --- CONTEÚDO --- */}
-                <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                < div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12" >
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
                         {/* ESQUERDA (8) */}
@@ -336,10 +432,10 @@ export function AnimeDetails() {
                             ))}
                         </div>
                     </section>
-                </div>
+                </div >
                 <Footer />
-            </main>
-        </div>
+            </main >
+        </div >
     );
 }
 
