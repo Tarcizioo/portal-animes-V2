@@ -1,17 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import {
-  Home,
-  Compass,
-  Heart,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  Zap,
-  ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
+import { Home, Compass, Heart, Settings, ChevronLeft, ChevronRight, LogOut, X, Users, Tv, Menu, Zap } from 'lucide-react';
 import clsx from 'clsx';
 import { SettingsModal } from '@/components/settings/SettingsModal';
 
@@ -98,8 +87,8 @@ export function Sidebar() {
             <Compass className="w-5 h-5 shrink-0" /> {!isCollapsed && "Catálogo"}
           </NavLink>
 
-          <NavLink to="/favorites" onClick={() => setIsOpen(false)} className={({ isActive }) => clsx(linkBase, isActive ? linkActive : linkInactive)} title={isCollapsed ? "Favoritos" : ""}>
-            <Heart className="w-5 h-5 shrink-0" /> {!isCollapsed && "Favoritos"}
+          <NavLink to="/characters" onClick={() => setIsOpen(false)} className={({ isActive }) => clsx(linkBase, isActive ? linkActive : linkInactive)} title={isCollapsed ? "Personagens" : ""}>
+            <Users className="w-5 h-5 shrink-0" /> {!isCollapsed && "Personagens"}
           </NavLink>
 
           <div className="pt-4 pb-2">

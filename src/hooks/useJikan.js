@@ -42,6 +42,21 @@ const fetchSeasonal = async () => {
   return json.data ? removeDuplicates(json.data.map(transformData)) : [];
 };
 
+const fetchTopCharacters = async () => {
+  const response = await fetch("https://api.jikan.moe/v4/top/characters?limit=25");
+  if (!response.ok) throw new Error("Erro na API Characters");
+  const json = await response.json();
+  return json.data || [];
+};
+
+export function useTopCharacters() {
+  return useQuery({
+    queryKey: ['top-characters'],
+    queryFn: fetchTopCharacters,
+    staleTime: 1000 * 60 * 60 * 24, // 24 horas
+  });
+}
+
 export function useGenreAnime(genreId, enabled = false) {
   return useQuery({
     queryKey: ['genre', genreId],

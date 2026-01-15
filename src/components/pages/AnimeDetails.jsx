@@ -288,7 +288,7 @@ export function AnimeDetails() {
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <h4 className="text-text-primary font-bold text-lg">Elenco</h4>
-                                    <a className="text-xs text-primary font-bold hover:underline" href="#">Ver Todos</a>
+                                    <Link className="text-xs text-primary font-bold hover:underline" to="/characters">Ver Todos</Link>
                                 </div>
                                 <div className="flex flex-col gap-3">
                                     {characters && characters.slice(0, 4).map(char => (
