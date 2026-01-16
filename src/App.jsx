@@ -8,7 +8,9 @@ const AnimeDetails = lazy(() => import('@/components/pages/AnimeDetails').then(m
 const Catalog = lazy(() => import('@/components/pages/Catalog').then(module => ({ default: module.Catalog })));
 const Profile = lazy(() => import('@/components/pages/Profile').then(module => ({ default: module.Profile })));
 const Characters = lazy(() => import('@/components/pages/Characters').then(module => ({ default: module.Characters })));
-const CharacterDetails = lazy(() => import('@/components/pages/CharacterDetails').then(module => ({ default: module.CharacterDetails }))); // [NEW] Lazy load CharacterDetails
+const CharacterDetails = lazy(() => import('@/components/pages/CharacterDetails').then(module => ({ default: module.CharacterDetails })));
+const PrivacyPolicy = lazy(() => import('@/components/pages/PrivacyPolicy').then(module => ({ default: module.PrivacyPolicy })));
+const TermsOfUse = lazy(() => import('@/components/pages/TermsOfUse').then(module => ({ default: module.TermsOfUse })));
 const NotFound = lazy(() => import('@/components/pages/NotFound').then(module => ({ default: module.NotFound })));
 
 // Loading Component
@@ -33,6 +35,8 @@ function App() {
           <Route path="/character/:id" element={<CharacterDetails />} /> {/* [NEW] Add route */}
           <Route path="/anime/:id" element={<AnimeDetails />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfUse />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
