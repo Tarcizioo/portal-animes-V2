@@ -15,4 +15,16 @@ export default defineConfig(({ mode }) => ({
     },
   },
   base: mode === 'production' ? "/portal-animes-V2/" : "/",
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom', 'react-router-dom'],
+          'firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          'ui': ['lucide-react', 'clsx', 'tailwind-merge']
+        }
+      }
+    }
+  }
 }))
