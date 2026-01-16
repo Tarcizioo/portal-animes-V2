@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { AnimeCard } from '@/components/ui/AnimeCard';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
 import { useCatalog } from '@/hooks/useCatalog';
-import { Filter, SlidersHorizontal, ChevronDown, Search, X, Trash2, Calendar, MonitorPlay } from 'lucide-react';
+import { Filter, SlidersHorizontal, ChevronDown, Search, X, Trash2, Calendar, MonitorPlay, Sparkles } from 'lucide-react';
 import clsx from 'clsx';
 
 const GENRES = [
@@ -33,6 +34,27 @@ export function Catalog() {
   const { animes, loading, loadMore, hasMore, filters, updateFilter, clearFilters } = useCatalog();
   const sentinelRef = useRef(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const navigate = useNavigate();
+  const [luckyLoading, setLuckyLoading] = useState(false);
+
+  const handleLuckyParams = async () => {
+    try {
+      setLuckyLoading(true);
+      // Delay para feedback visual
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      const response = await fetch('https://api.jikan.moe/v4/random/anime');
+      if (!response.ok) throw new Error('Erro ao buscar anime aleatório');
+
+      const data = await response.json();
+      const randomAnimeId = data.data.mal_id;
+
+      navigate(`/anime/${randomAnimeId}`);
+    } catch (error) {
+      console.error("Erro no 'Estou com sorte':", error);
+      setLuckyLoading(false);
+    }
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -212,6 +234,17 @@ export function Catalog() {
                   })}
                 </div>
               </div>
+
+              {/* Botão Estou com Sorte */}
+              <button
+                onClick={handleLuckyParams}
+                disabled={luckyLoading}
+                className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg shadow-purple-500/20 transition-all text-sm font-bold uppercase tracking-wider relative overflow-hidden group"
+              >
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                <Sparkles className={`w-4 h-4 ${luckyLoading ? 'animate-spin' : ''}`} />
+                {luckyLoading ? 'Sorteando...' : 'Estou com Sorte'}
+              </button>
 
               {/* Botão Limpar - MAIS CHAMATIVO SE NECESSÁRIO */}
               {hasActiveFilters && (
