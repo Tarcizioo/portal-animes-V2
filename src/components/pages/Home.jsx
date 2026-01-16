@@ -43,7 +43,7 @@ export function Home() {
               <SkeletonHero />
               <div className="space-y-4">
                 <div className="h-8 w-48 bg-gray-300 dark:bg-surface-dark/50 rounded animate-pulse" />
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
                   {[...Array(5)].map((_, i) => (
                     <SkeletonCard key={i} />
                   ))}
@@ -52,7 +52,7 @@ export function Home() {
 
               <div className="space-y-4">
                 <div className="h-8 w-64 bg-gray-300 dark:bg-surface-dark/50 rounded animate-pulse" />
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
                   {[...Array(5)].map((_, i) => (
                     <SkeletonCard key={i + 10} />
                   ))}

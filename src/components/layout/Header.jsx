@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
-import { Search, Menu, X, Home, Compass } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Search, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useSearch } from '@/hooks/useSearch';
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -10,7 +10,6 @@ export function Header() {
     const { query, setQuery, results, setResults } = useSearch();
     const navigate = useNavigate();
     const [showMobileSearch, setShowMobileSearch] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const { user } = useAuth();
     const { profile } = useUserProfile();
@@ -28,15 +27,7 @@ export function Header() {
         <>
             <header className="sticky top-0 z-40 bg-bg-primary/80 backdrop-blur-md px-4 md:px-8 py-4 flex items-center justify-between border-b border-border-color transition-colors duration-300">
 
-                <div className="flex items-center gap-4">
-                    {/* MOBILE HAMBURGER */}
-                    <button
-                        onClick={() => setIsMenuOpen(true)}
-                        className="md:hidden p-1 text-text-primary hover:bg-bg-tertiary rounded-lg"
-                    >
-                        <Menu className="w-6 h-6" />
-                    </button>
-
+                <div className="flex items-center gap-4 pl-12 md:pl-0">
                     <div className={`${showMobileSearch ? 'hidden md:block' : 'block'}`}>
                         <h1 className="text-xl font-bold text-text-primary">Olá, {displayName}!! 👋</h1>
                         <p className="text-sm text-text-secondary hidden sm:block">Descubra novos animes.</p>
@@ -94,35 +85,7 @@ export function Header() {
                 </div>
             </header>
 
-            {/* MOBILE DRAWER */}
-            {isMenuOpen && (
-                <div
-                    className="fixed inset-0 bg-black/60 z-50 md:hidden backdrop-blur-sm"
-                    onClick={() => setIsMenuOpen(false)}
-                />
-            )}
-
-            <aside className={`
-                fixed top-0 left-0 h-full w-64 bg-bg-secondary border-r border-border-color z-50 transform transition-transform duration-300 ease-in-out p-6 flex flex-col gap-6
-                ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-                md:hidden shadow-2xl
-            `}>
-                <div className="flex items-center justify-between mb-4">
-                    <span className="text-xl font-bold text-text-primary">Menu</span>
-                    <button onClick={() => setIsMenuOpen(false)} className="text-text-secondary hover:text-primary">
-                        <X className="w-6 h-6" />
-                    </button>
-                </div>
-
-                <nav className="flex flex-col gap-4">
-                    <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-text-secondary hover:text-primary p-2 rounded-lg hover:bg-bg-tertiary">
-                        <Home className="w-5 h-5" /> Início
-                    </Link>
-                    <Link to="/catalog" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-text-secondary hover:text-primary p-2 rounded-lg hover:bg-bg-tertiary">
-                        <Compass className="w-5 h-5" /> Explorar
-                    </Link>
-                </nav>
-            </aside>
+            {/* MOBILE DRAWER REMOVED - Using Sidebar's own trigger */}
         </>
     );
 }
