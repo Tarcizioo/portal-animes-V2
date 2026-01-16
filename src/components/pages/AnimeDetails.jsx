@@ -13,6 +13,9 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
+import { ActionButton } from '@/components/ui/ActionButton';
+import { FavoriteAnimes } from '@/components/profile/FavoriteAnimes'; // Se usado
+import { CommentsSection } from '@/components/comments/CommentsSection';
 import { Loader } from '@/components/ui/Loader';
 import clsx from 'clsx';
 
@@ -336,35 +339,8 @@ export function AnimeDetails() {
                             </section>
 
                             {/* Comentários */}
-                            <section className="space-y-6">
-                                <div className="flex items-center justify-between">
-                                    <SectionTitle icon={MessageSquare} title="Comentários" />
-                                    <a className="text-sm font-medium text-primary hover:underline hover:text-primary-hover transition-colors" href="#">Ver todos</a>
-                                </div>
-                                <div className="bg-bg-secondary rounded-2xl p-6 border border-border-color hover:border-primary/20 transition-colors">
-                                    <div className="flex items-start gap-4">
-                                        <div className="size-12 rounded-full bg-gradient-to-br from-primary to-indigo-900 flex items-center justify-center text-white font-bold text-lg shadow-lg">JD</div>
-                                        <div className="flex-1 space-y-2">
-                                            <div className="flex justify-between items-center">
-                                                <div>
-                                                    <h5 className="text-text-primary font-bold">Otaku_Master</h5>
-                                                    <div className="flex text-yellow-400 gap-0.5 text-xs mt-0.5">
-                                                        {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-current" />)}
-                                                    </div>
-                                                </div>
-                                                <span className="text-text-secondary text-xs bg-bg-tertiary px-2 py-1 rounded">2 dias atrás</span>
-                                            </div>
-                                            <p className="text-text-secondary leading-relaxed text-sm">
-                                                Visuais absolutamente incríveis e uma história que te acerta em cheio. A Trigger fez um trabalho sensacional com essa adaptação. Recomendo fortemente para quem gosta do gênero cyberpunk!
-                                            </p>
-                                            <div className="pt-2 flex gap-4 text-xs text-text-secondary font-medium">
-                                                <button className="hover:text-primary flex items-center gap-1.5 transition-colors"><ThumbsUp className="w-4 h-4" /> 423 Útil</button>
-                                                <button className="hover:text-primary flex items-center gap-1.5 transition-colors"><Reply className="w-4 h-4" /> Responder</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
+                            {/* Comentários */}
+                            <CommentsSection animeId={anime.id} />
                         </div>
 
                         {/* DIREITA (4) - Sidebar */}
@@ -472,14 +448,7 @@ function SectionTitle({ icon: Icon, title }) {
     );
 }
 
-// eslint-disable-next-line no-unused-vars
-function ActionButton({ icon: Icon }) {
-    return (
-        <button className="p-2.5 rounded-xl bg-bg-tertiary hover:bg-primary hover:text-white text-text-primary transition-all transform hover:scale-110 shadow-sm">
-            <Icon className="w-5 h-5" />
-        </button>
-    )
-}
+
 
 // eslint-disable-next-line no-unused-vars
 function StatsCard({ value, label, icon: Icon, color, delay }) {
