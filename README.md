@@ -1,40 +1,104 @@
 # Portal Animes V2
 
-Portal Animes V2 is a web project developed to facilitate anime discovery and tracking. The project utilizes a modern component-based architecture, ensuring high performance and a responsive user interface.
+Portal Animes V2 is a modern, feature-rich web application for discovering and tracking anime. Built with **React** and **Firebase**, it provides a seamless user experience with real-time data from the **Jikan API**.
 
-The application consumes data from the Jikan API, providing up-to-date information on current seasons, top animes, and real-time search results.
+**🌐 Live Demo:** [https://tarcizioo.github.io/portal-animes-V2/](https://tarcizioo.github.io/portal-animes-V2/)
+
+## Screenshots
+
+<!-- Add your screenshots here. Example: -->
+<!-- ![Home Page](./screenshots/home.png) -->
+*(Adicione seus prints aqui)*
+
+---
 
 ## Features
 
-* **Dynamic Catalog:** Anime listing organized by popularity and recent releases.
-* **Search System:** Real-time search integrated with the MyAnimeList database.
-* **In-Depth Details:** Dedicated pages for each anime containing synopsis, studio information, scores, and statistics.
-* **Responsive Interface:** Fluid layout developed with Tailwind CSS, adaptable to mobile devices, tablets, and desktops.
-* **Componentization:** Modular architecture facilitating code maintenance and scalability.
+### Authentication & User Profile
+-   **Google Sign-In:** Secure and easy login.
+-   **User Profile:** Customized profile page with stats, bio, and banners.
+-   **Favorites System:** Select and display your Top 3 favorite animes on your profile.
+
+### Customization & Themes
+-   **Multiple Themes:** Choose from various visual themes (Light, Dark, Blood, Rose, etc.) to suit your style.
+-   **Profile Customization:** Personalize your profile with custom banners and bio information.
+-   **Adaptive UI:** The entire application interface adapts smoothly to the selected theme.
+
+### Anime Library
+-   **Personalized Tracking:** Add animes to your library (Planning, Watching, Completed, etc.).
+-   **Progress Tracking:** Update episode progress and scores.
+-   **Cloud Sync:** All data is stored in **Firestore**, accessible from any device.
+
+### Social & Community
+-   **Native Comments System:** Real-time comments on anime details pages.
+-   **Interaction:** Delete your own comments and see others' opinions instantly.
+
+### Discovery
+-   **Dynamic Catalog:** Advanced filters (Genre, Season, Status) and search.
+-   **In-Depth Details:** Trailers, Recommendations, Characters, and Staff info.
+-   **Responsive Design:** Fully optimized for Mobile, Tablet, and Desktop with a premium Dark Mode UI.
+
+---
 
 ## Tech Stack
 
-This project was developed using the following technologies and libraries:
+-   **Frontend:** React (v18), Vite
+-   **Styling:** Tailwind CSS, PostCSS
+-   **State/Data Fetching:** TanStack Query (React Query)
+-   **Routing:** React Router DOM
+-   **Backend/BaaS:** Firebase (Authentication, Firestore)
+-   **Icons:** Lucide React
+-   **API:** Jikan API (V4)
 
-* **Core:** React (v18+)
-* **Build Tool:** Vite
-* **Language:** JavaScript (ES6+)
-* **Styling:** Tailwind CSS & PostCSS
-* **Routing:** React Router DOM
-* **API Consumption:** Fetch API / Custom Hooks
-* **Icons:** Lucide React / Heroicons (depending on implementation)
+---
 
-## Prerequisites
+## Getting Started
 
-Before starting, ensure you have the following tools installed on your machine:
+### Prerequisites
+-   Node.js (v18+)
+-   NPM or Yarn
 
-* Node.js (version 18 or higher recommended)
-* NPM or Yarn
+### Installation
 
-## Installation and Execution
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/Tarcizioo/portal-animes-V2.git
+    cd portal-animes-V2
+    ```
 
-Follow the steps below to set up the local development environment:
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-1. Clone the repository:
-   ```bash
-   git clone [https://github.com/Tarcizioo/portal-animes-V2.git](https://github.com/Tarcizioo/portal-animes-V2.git)
+3.  **Configure Environment Variables:**
+    Create a `.env` file in the root directory. You can use the example below (replace the values with your own Firebase credentials):
+    
+    ```env
+    VITE_FIREBASE_API_KEY=your_api_key
+    VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+    VITE_FIREBASE_PROJECT_ID=your_project_id
+    VITE_FIREBASE_STORAGE_BUCKET=your_bucket.appspot.com
+    VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+    VITE_FIREBASE_APP_ID=your_app_id
+    ```
+
+4.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
+
+5.  **Build for Production:**
+    ```bash
+    npm run build
+    ```
+
+---
+
+## License
+
+This project is open-source and available under the [MIT License](LICENSE).
+
+---
+
+Made with ❤️ by [Tarcizio](https://github.com/Tarcizioo)

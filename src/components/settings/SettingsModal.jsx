@@ -12,7 +12,7 @@ const themes = [
     { id: 'matcha', name: 'Matcha', icon: Palette, color: 'bg-green-100' },
     { id: 'rose', name: 'Rose', icon: Palette, color: 'bg-rose-100' },
     { id: 'dark', name: 'Escuro', icon: Moon, color: 'bg-gray-800' },
-    { id: 'majorelle', name: 'Majorelle', icon: Palette, color: 'bg-indigo-900' },
+    { id: 'majorelle', name: 'Blue', icon: Palette, color: 'bg-indigo-900' },
     { id: 'blood', name: 'Blood', icon: Palette, color: 'bg-red-900' },
     { id: 'dracula', name: 'Dracula', icon: Palette, color: 'bg-purple-900' },
 ];
