@@ -4,12 +4,6 @@ Portal Animes V2 is a modern, feature-rich web application for discovering and t
 
 **🌐 Live Demo:** [https://tarcizioo.github.io/portal-animes-V2/](https://tarcizioo.github.io/portal-animes-V2/)
 
-## Screenshots
-
-<!-- Add your screenshots here. Example: -->
-<!-- ![Home Page](./screenshots/home.png) -->
-*(Adicione seus prints aqui)*
-
 ---
 
 ## Features
