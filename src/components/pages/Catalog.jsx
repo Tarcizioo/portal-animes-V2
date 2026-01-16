@@ -6,6 +6,7 @@ import { AnimeCard } from '@/components/ui/AnimeCard';
 import { AnimeListItem } from '@/components/ui/AnimeListItem';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
 import { useCatalog } from '@/hooks/useCatalog';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { Filter, SlidersHorizontal, ChevronDown, Search, X, Trash2, Calendar, MonitorPlay, Sparkles, LayoutGrid, List } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -38,6 +39,8 @@ export function Catalog() {
   const navigate = useNavigate();
   const [luckyLoading, setLuckyLoading] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+
+  usePageTitle('Catálogo');
 
   const handleLuckyParams = async () => {
     try {

@@ -9,12 +9,15 @@ import { AnimeTrackerList } from '@/components/profile/AnimeTrackerList';
 import { EditProfileModal } from '@/components/profile/EditProfileModal';
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { LogIn, Hash, Link as LinkIcon } from 'lucide-react';
 
 export function Profile() {
   const { user, signInGoogle, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading, updateProfileData } = useUserProfile();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  usePageTitle('Meu Perfil');
 
   const loading = authLoading || (user && profileLoading);
 

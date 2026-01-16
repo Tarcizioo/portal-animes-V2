@@ -1,6 +1,7 @@
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { useCharacters } from '@/hooks/useCharacters';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { CharacterCard } from '@/components/ui/CharacterCard';
 import { Users, Loader2 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
@@ -10,6 +11,8 @@ import { SkeletonCard } from '@/components/ui/SkeletonCard'; // Reusando Skeleto
 export function Characters() {
     const { characters, loading, loadMore, hasMore } = useCharacters();
     const sentinelRef = useRef(null);
+
+    usePageTitle('Personagens');
 
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {

@@ -7,6 +7,7 @@ import { AnimeCarousel } from '@/components/ui/AnimeCarousel';
 import { LazyAnimeCarousel } from '@/components/home/LazyAnimeCarousel';
 
 import { useJikan } from '@/hooks/useJikan';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { SkeletonHero } from '@/components/ui/SkeletonHero';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
 
@@ -28,6 +29,8 @@ export function Home() {
     seasonalAnimes,
     loading
   } = useJikan();
+
+  usePageTitle('Início');
 
   return (
     <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-text-primary font-sans">

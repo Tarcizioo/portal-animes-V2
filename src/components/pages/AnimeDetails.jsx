@@ -9,6 +9,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { useAnimeInfo } from '@/hooks/useAnimeInfo';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
@@ -21,6 +22,8 @@ export function AnimeDetails() {
     const { user } = useAuth();
     const { toast } = useToast();
     const { library, addToLibrary, incrementProgress, updateProgress, updateStatus, updateRating } = useAnimeLibrary();
+
+    usePageTitle(anime?.title || 'Detalhes');
 
     // Encontrar anime na biblioteca para setar estado inicial
     const libraryEntry = library.find(a => a.id.toString() === id);
