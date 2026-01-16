@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Github, Twitter, Instagram, Zap, Heart } from 'lucide-react';
+import logoDetails from '@/assets/logo.png';
 
 export function Footer() {
     return (
@@ -10,7 +11,7 @@ export function Footer() {
                     <div className="col-span-1 md:col-span-1 space-y-4">
                         <Link to="/" className="flex items-center gap-2 group">
                             <div className="w-10 h-10 bg-transparent rounded-full flex items-center justify-center overflow-hidden shrink-0">
-                                <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
+                                <img src={logoDetails} alt="Logo" className="w-full h-full object-cover" />
                             </div>
                             <span className="text-xl font-black tracking-tight text-text-primary">
                                 Portal<span className="text-primary">Animes</span>

@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { SettingsModal } from '@/components/settings/SettingsModal';
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import logoDetails from '@/assets/logo.png';
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -76,7 +77,7 @@ export function Sidebar() {
         <div className={`p-4 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} transition-all duration-300`}>
           <Link to="/" className={`flex items-center gap-2 text-2xl font-black text-primary tracking-tighter group transition-all duration-300 ${isCollapsed ? 'justify-center w-full' : ''}`}>
             <div className="w-10 h-10 bg-transparent transition-colors rounded-full flex items-center justify-center shrink-0 overflow-hidden">
-              <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
+              <img src={logoDetails} alt="Logo" className="w-full h-full object-cover" />
             </div>
             {!isCollapsed && (
               <span className="text-text-primary group-hover:text-primary transition-colors whitespace-nowrap">
