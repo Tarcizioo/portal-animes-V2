@@ -1,7 +1,28 @@
-import { Link } from 'react-router-dom'; // <--- Importamos o Link
-import { Info, Plus, Star, Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Info, Plus, Star } from 'lucide-react';
+import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
+import { useToast } from '@/context/ToastContext';
+import { useAuth } from '@/context/AuthContext';
 
 export function Hero({ anime }) {
+  const { library, addToLibrary } = useAnimeLibrary();
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const isInLibrary = library.some(item => item.id === anime?.id);
+
+  const handleAddToList = async () => {
+    if (!user) {
+      toast.warning("Faça login para adicionar à sua lista!");
+      return;
+    }
+    try {
+      await addToLibrary(anime);
+      toast.success("Adicionado à lista com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao adicionar à lista.");
+    }
+  };
   if (!anime) {
     return (
       <div className="w-full h-[500px] rounded-3xl bg-gray-800 animate-pulse flex items-center justify-center">
@@ -67,9 +88,14 @@ export function Hero({ anime }) {
             <Info className="w-5 h-5" /> Ver Detalhes
           </Link>
 
-          <button className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-6 py-3.5 rounded-xl font-semibold flex items-center gap-2 transition-all border border-white/10 cursor-pointer">
-            <Plus className="w-5 h-5" /> Minha Lista
-          </button>
+          {!isInLibrary && (
+            <button
+              onClick={handleAddToList}
+              className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-6 py-3.5 rounded-xl font-semibold flex items-center gap-2 transition-all border border-white/10 cursor-pointer"
+            >
+              <Plus className="w-5 h-5" /> Minha Lista
+            </button>
+          )}
         </div>
       </div>
     </section>
