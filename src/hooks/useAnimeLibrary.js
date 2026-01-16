@@ -162,6 +162,39 @@ export function useAnimeLibrary() {
         }
     };
 
+    // 7. Toggle Favorito (Max 3)
+    const toggleFavorite = async (anime) => {
+        if (!user) throw new Error("Usuário não autenticado");
+
+        const animeId = anime.id || anime.mal_id;
+        const libraryItem = library.find(item => item.id === animeId);
+        const isCurrentlyFavorite = libraryItem?.isFavorite;
+
+        if (!isCurrentlyFavorite) {
+            // Verificando limite
+            const favoritesCount = library.filter(item => item.isFavorite).length;
+            if (favoritesCount >= 3) {
+                throw new Error("Você já possui 3 favoritos. Remova um para adicionar outro.");
+            }
+        }
+
+        try {
+            const animeRef = doc(db, 'users', user.uid, 'library', animeId.toString());
+
+            // Se o item não existir na lib, adiciona primeiro como plan_to_watch
+            if (!libraryItem) {
+                await addToLibrary(anime);
+                // Depois atualiza o favorito
+                await updateDoc(animeRef, { isFavorite: true });
+            } else {
+                await updateDoc(animeRef, { isFavorite: !isCurrentlyFavorite });
+            }
+        } catch (error) {
+            console.error("Erro ao alterar favorito:", error);
+            throw error;
+        }
+    };
+
     return {
         library,
         loading,
@@ -170,6 +203,8 @@ export function useAnimeLibrary() {
         updateProgress,
         updateStatus,
         updateRating,
-        removeFromLibrary
+        updateRating,
+        removeFromLibrary,
+        toggleFavorite
     };
 }

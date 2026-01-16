@@ -21,7 +21,7 @@ export function AnimeDetails() {
     const { anime, characters, recommendations, loading } = useAnimeInfo(id);
     const { user } = useAuth();
     const { toast } = useToast();
-    const { library, addToLibrary, incrementProgress, updateProgress, updateStatus, updateRating } = useAnimeLibrary();
+    const { library, addToLibrary, incrementProgress, updateProgress, updateStatus, updateRating, toggleFavorite } = useAnimeLibrary();
 
     usePageTitle(anime?.title || 'Detalhes');
 
@@ -177,8 +177,22 @@ export function AnimeDetails() {
                                                         <Layers className="w-5 h-5 text-primary" /> Editando Progresso
                                                     </h3>
                                                     <div className="flex gap-2">
-                                                        <ActionButton icon={Share2} />
-                                                        <ActionButton icon={Heart} />
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await toggleFavorite(anime);
+                                                                    toast.success(libraryEntry?.isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos!");
+                                                                } catch (error) {
+                                                                    toast.error(error.message);
+                                                                }
+                                                            }}
+                                                            className={`p-2 rounded-lg transition-all border ${libraryEntry?.isFavorite
+                                                                ? "bg-red-500/20 border-red-500 text-red-500 shadow-red-500/20 shadow-lg"
+                                                                : "bg-bg-tertiary border-border-color text-text-secondary hover:text-white hover:border-white/50"
+                                                                }`}
+                                                        >
+                                                            <Heart className={`w-5 h-5 ${libraryEntry?.isFavorite ? "fill-current" : ""}`} />
+                                                        </button>
                                                     </div>
                                                 </div>
 

@@ -7,14 +7,17 @@ import { ProfileStats } from '@/components/profile/ProfileStats';
 import { AchievementBadges } from '@/components/profile/AchievementBadges';
 import { AnimeTrackerList } from '@/components/profile/AnimeTrackerList';
 import { EditProfileModal } from '@/components/profile/EditProfileModal';
+import { FavoriteAnimes } from '@/components/profile/FavoriteAnimes';
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { LogIn, Hash, Link as LinkIcon } from 'lucide-react';
 
 export function Profile() {
   const { user, signInGoogle, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading, updateProfileData } = useUserProfile();
+  const { library } = useAnimeLibrary();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   usePageTitle('Meu Perfil');
@@ -80,6 +83,7 @@ export function Profile() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">
+                <FavoriteAnimes favorites={library?.filter(a => a.isFavorite) || []} />
                 <AchievementBadges />
                 <AnimeTrackerList />
               </div>
