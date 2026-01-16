@@ -75,9 +75,8 @@ export function Sidebar() {
         {/* 1. LOGO COM O RAIO ⚡ */}
         <div className={`p-4 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} transition-all duration-300`}>
           <Link to="/" className={`flex items-center gap-2 text-2xl font-black text-primary tracking-tighter group transition-all duration-300 ${isCollapsed ? 'justify-center w-full' : ''}`}>
-            <div className="w-8 h-8 bg-primary group-hover:bg-primary-hover transition-colors rounded-lg flex items-center justify-center text-white shadow-lg shadow-primary/30 shrink-0">
-              {/* Ícone de Raio preenchido */}
-              <Zap className="w-5 h-5 fill-white" />
+            <div className="w-10 h-10 bg-transparent transition-colors rounded-full flex items-center justify-center shrink-0 overflow-hidden">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
             </div>
             {!isCollapsed && (
               <span className="text-text-primary group-hover:text-primary transition-colors whitespace-nowrap">

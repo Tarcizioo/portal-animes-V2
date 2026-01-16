@@ -9,8 +9,8 @@ export function Footer() {
                     {/* Brand Column */}
                     <div className="col-span-1 md:col-span-1 space-y-4">
                         <Link to="/" className="flex items-center gap-2 group">
-                            <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                                <Zap className="w-5 h-5 text-primary group-hover:text-current fill-current group-hover:fill-white" />
+                            <div className="w-10 h-10 bg-transparent rounded-full flex items-center justify-center overflow-hidden shrink-0">
+                                <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
                             </div>
                             <span className="text-xl font-black tracking-tight text-text-primary">
                                 Portal<span className="text-primary">Animes</span>
