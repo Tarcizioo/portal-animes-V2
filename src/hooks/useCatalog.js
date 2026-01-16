@@ -144,7 +144,14 @@ export function useCatalog() {
           title: anime.title_english || anime.title,
           image: anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url,
           score: anime.score || 'N/A',
-          genres: anime.genres ? anime.genres.map(g => g.name).slice(0, 2).join(', ') : ''
+          genres: anime.genres ? anime.genres.map(g => g.name).slice(0, 2).join(', ') : '',
+          // Campos extras para visualização em Lista
+          synopsis: anime.synopsis,
+          status: anime.status,
+          members: anime.members,
+          year: anime.year || anime.aired?.prop?.from?.year,
+          episodes: anime.episodes,
+          type: anime.type
         }));
 
         setAnimes(prev => {

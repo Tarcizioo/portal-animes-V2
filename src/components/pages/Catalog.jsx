@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { AnimeCard } from '@/components/ui/AnimeCard';
+import { AnimeListItem } from '@/components/ui/AnimeListItem';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
 import { useCatalog } from '@/hooks/useCatalog';
-import { Filter, SlidersHorizontal, ChevronDown, Search, X, Trash2, Calendar, MonitorPlay, Sparkles } from 'lucide-react';
+import { Filter, SlidersHorizontal, ChevronDown, Search, X, Trash2, Calendar, MonitorPlay, Sparkles, LayoutGrid, List } from 'lucide-react';
 import clsx from 'clsx';
 
 const GENRES = [
@@ -36,6 +37,7 @@ export function Catalog() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const navigate = useNavigate();
   const [luckyLoading, setLuckyLoading] = useState(false);
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
 
   const handleLuckyParams = async () => {
     try {
@@ -276,7 +278,24 @@ export function Catalog() {
                 </div>
 
                 <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <span className="text-sm font-medium text-text-secondary hidden sm:inline whitespace-nowrap">Ordenar por:</span>
+
+                  {/* View Mode Toggles */}
+                  <div className="flex bg-bg-tertiary rounded-xl p-1 border border-border-color">
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-bg-secondary text-button-accent shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+                    >
+                      <LayoutGrid className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-bg-secondary text-button-accent shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+                    >
+                      <List className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <span className="text-sm font-medium text-text-secondary hidden sm:inline whitespace-nowrap pl-2 border-l border-border-color">Ordenar por:</span>
                   <div className="relative group w-full sm:w-auto">
                     <select
                       className="w-full sm:w-auto appearance-none bg-bg-tertiary border-2 border-border-color text-text-primary pl-4 pr-12 py-2.5 rounded-xl text-sm font-medium focus:outline-none focus:border-button-accent focus:ring-2 focus:ring-button-accent/20 cursor-pointer hover:bg-bg-secondary transition-all"
@@ -300,17 +319,27 @@ export function Catalog() {
                 </div>
               </div>
 
-              {/* Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {/* Grid / List */}
+              <div className={viewMode === 'grid'
+                ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                : "flex flex-col gap-4"
+              }>
                 {animes.map((anime) => (
-                  <AnimeCard
-                    key={`${anime.id}-${filters.orderBy}`}
-                    {...anime}
-                  />
+                  viewMode === 'grid' ? (
+                    <AnimeCard
+                      key={`${anime.id}-${filters.orderBy}`}
+                      {...anime}
+                    />
+                  ) : (
+                    <AnimeListItem
+                      key={`${anime.id}-${filters.orderBy}`}
+                      {...anime}
+                    />
+                  )
                 ))}
 
                 {loading && Array.from({ length: skeletonCount }).map((_, i) => (
-                  <SkeletonCard key={`skeleton-${i}`} />
+                  viewMode === 'grid' ? <SkeletonCard key={`skeleton-${i}`} /> : <div key={`skeleton-${i}`} className="h-48 bg-bg-secondary rounded-xl animate-pulse" />
                 ))}
               </div>
 
