@@ -4,7 +4,7 @@ import { Header } from '@/components/layout/Header';
 import { AnimeCard } from '@/components/ui/AnimeCard';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
 import { useCatalog } from '@/hooks/useCatalog';
-import { Filter, SlidersHorizontal, ChevronDown, Search, X, Trash2 } from 'lucide-react';
+import { Filter, SlidersHorizontal, ChevronDown, Search, X, Trash2, Calendar, MonitorPlay } from 'lucide-react';
 import clsx from 'clsx';
 
 const GENRES = [
@@ -16,10 +16,17 @@ const GENRES = [
   { id: 14, name: 'Terror' },
   { id: 22, name: 'Romance' },
   { id: 24, name: 'Sci-Fi' },
+  { id: 7, name: 'Mistério' },
+  { id: 40, name: 'Psicológico' },
+  { id: 18, name: 'Mecha' },
+  { id: 19, name: 'Musical' },
   { id: 36, name: 'Slice of Life' },
   { id: 37, name: 'Sobrenatural' },
   { id: 30, name: 'Esportes' },
   { id: 41, name: 'Suspense' },
+  { id: 23, name: 'Escolar' },
+  { id: 42, name: 'Seinen' },
+  { id: 27, name: 'Shounen' },
 ];
 
 export function Catalog() {
@@ -49,7 +56,7 @@ export function Catalog() {
     }
   };
 
-  const hasActiveFilters = filters.q || filters.status || filters.genres.length > 0;
+  const hasActiveFilters = filters.q || filters.status || filters.genres.length > 0 || filters.year || filters.season || filters.type;
   const skeletonCount = animes.length === 0 ? 12 : 4;
 
   return (
@@ -97,6 +104,54 @@ export function Catalog() {
                     </button>
                   )}
                 </div>
+              </div>
+
+              {/* Ano e Temporada e Formato */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider flex items-center gap-2">  <Calendar className="w-3.5 h-3.5 text-button-accent" /> Ano </h3>
+                  <select
+                    value={filters.year}
+                    onChange={(e) => updateFilter('year', e.target.value)}
+                    className="w-full bg-bg-secondary border-2 border-border-color rounded-xl px-2 py-2.5 text-sm text-text-primary focus:outline-none focus:border-button-accent focus:ring-2 focus:ring-button-accent/10 transition-all cursor-pointer appearance-none"
+                  >
+                    <option value="">Todos</option>
+                    {Array.from({ length: 45 }, (_, i) => new Date().getFullYear() + 1 - i).map(y => (
+                      <option key={y} value={y}>{y}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider flex items-center gap-2"> Temp. </h3>
+                  <select
+                    value={filters.season}
+                    onChange={(e) => updateFilter('season', e.target.value)}
+                    className="w-full bg-bg-secondary border-2 border-border-color rounded-xl px-2 py-2.5 text-sm text-text-primary focus:outline-none focus:border-button-accent focus:ring-2 focus:ring-button-accent/10 transition-all cursor-pointer appearance-none"
+                  >
+                    <option value="">Todas</option>
+                    <option value="winter">Inverno</option>
+                    <option value="spring">Primavera</option>
+                    <option value="summer">Verão</option>
+                    <option value="fall">Outono</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider flex items-center gap-2"> <MonitorPlay className="w-3.5 h-3.5 text-button-accent" /> Formato </h3>
+                <select
+                  value={filters.type}
+                  onChange={(e) => updateFilter('type', e.target.value)}
+                  className="w-full bg-bg-secondary border-2 border-border-color rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-button-accent focus:ring-2 focus:ring-button-accent/10 transition-all cursor-pointer"
+                >
+                  <option value="">Todos os formatos</option>
+                  <option value="tv">TV (Séries)</option>
+                  <option value="movie">Filmes</option>
+                  <option value="ova">OVAs</option>
+                  <option value="special">Especiais</option>
+                  <option value="ona">ONAs (Internet)</option>
+                  <option value="music">Musical</option>
+                </select>
               </div>
 
               {/* Status - MAIS NÍTIDO */}

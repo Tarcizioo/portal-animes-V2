@@ -11,6 +11,9 @@ export function useCatalog() {
     genres: [],
     orderBy: 'ranking',
     status: '',
+    year: '',
+    season: '',
+    type: '',
   });
 
   // --- AQUI ESTÁ A MÁGICA PARA EVITAR O BUG ---
@@ -20,7 +23,7 @@ export function useCatalog() {
     setLoading(true);   // Força o esqueleto aparecer
     setPage(1);
     setHasMore(true);
-    setFilters({ q: '', genres: [], orderBy: 'ranking', status: '' });
+    setFilters({ q: '', genres: [], orderBy: 'ranking', status: '', year: '', season: '', type: '' });
   }, []);
 
   const updateFilter = (key, value) => {
@@ -47,10 +50,11 @@ export function useCatalog() {
         let endpoint = 'https://api.jikan.moe/v4/anime';
 
         const hasTextOrGenre = filters.q !== '' || filters.genres.length > 0;
+        const hasAdvancedFilters = filters.year || filters.season || filters.type;
         const isRankingMode = ['ranking', 'score'].includes(filters.orderBy);
 
         // LÓGICA DE ENDPOINT
-        if (!hasTextOrGenre && !filters.status && (isRankingMode || filters.orderBy === 'popularity' || filters.orderBy === 'favorites')) {
+        if (!hasTextOrGenre && !filters.status && !hasAdvancedFilters && (isRankingMode || filters.orderBy === 'popularity' || filters.orderBy === 'favorites')) {
           endpoint = 'https://api.jikan.moe/v4/top/anime';
           if (filters.orderBy === 'popularity') params.append('filter', 'bypopularity');
           if (filters.orderBy === 'favorites') params.append('filter', 'favorite');
@@ -59,6 +63,36 @@ export function useCatalog() {
           if (filters.q) params.append('q', filters.q);
           if (filters.status) params.append('status', filters.status);
           if (filters.genres.length > 0) params.append('genres', filters.genres.join(','));
+          if (filters.type) params.append('type', filters.type);
+
+          // Lógica de Ano e Temporada (Simulado com datas)
+          if (filters.year) {
+            let start = `${filters.year}-01-01`;
+            let end = `${filters.year}-12-31`;
+
+            if (filters.season) {
+              switch (filters.season) {
+                case 'winter':
+                  start = `${filters.year}-01-01`;
+                  end = `${filters.year}-03-31`;
+                  break;
+                case 'spring':
+                  start = `${filters.year}-04-01`;
+                  end = `${filters.year}-06-30`;
+                  break;
+                case 'summer':
+                  start = `${filters.year}-07-01`;
+                  end = `${filters.year}-09-30`;
+                  break;
+                case 'fall':
+                  start = `${filters.year}-10-01`;
+                  end = `${filters.year}-12-31`;
+                  break;
+              }
+            }
+            params.append('start_date', start);
+            params.append('end_date', end);
+          }
 
           switch (filters.orderBy) {
             case 'ranking':
