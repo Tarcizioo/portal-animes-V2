@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { Github, Twitter, Instagram, Zap, Heart } from 'lucide-react';
+import { Github, Instagram, Zap, Heart } from 'lucide-react';
 import logoDetails from '@/assets/logo.png';
 
 export function Footer() {
     return (
         <footer className="mt-auto border-t border-border-color bg-bg-secondary/30 backdrop-blur-sm pt-12 pb-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                     {/* Brand Column */}
                     <div className="col-span-1 md:col-span-1 space-y-4">
                         <Link to="/" className="flex items-center gap-2 group">
@@ -33,24 +33,14 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* Navigation 2 */}
-                    <div>
-                        <h4 className="font-bold text-text-primary mb-4">Comunidade</h4>
-                        <ul className="space-y-2 text-sm text-text-secondary">
-                            <li><a href="#" className="hover:text-primary transition-colors">Discord</a></li>
-                            <li><a href="#" className="hover:text-primary transition-colors">Twitter</a></li>
-                            <li><a href="#" className="hover:text-primary transition-colors">Instagram</a></li>
-                            <li><a href="#" className="hover:text-primary transition-colors">Sobre Nós</a></li>
-                        </ul>
-                    </div>
+
 
                     {/* Newsletter / Socials */}
                     <div>
                         <h4 className="font-bold text-text-primary mb-4">Redes Sociais</h4>
                         <div className="flex gap-3">
-                            <SocialButton icon={Github} href="https://github.com" label="GitHub" />
-                            <SocialButton icon={Twitter} href="https://twitter.com" label="Twitter" />
-                            <SocialButton icon={Instagram} href="https://instagram.com" label="Instagram" />
+                            <SocialButton icon={Github} href="https://github.com/Tarcizioo/portal-animes-V2" label="GitHub" />
+                            <SocialButton icon={Instagram} href="https://www.instagram.com/tarcizio_nt/" label="Instagram" />
                         </div>
                         <div className="mt-6">
                             <p className="text-xs text-text-secondary mb-2">Feito com <Heart className="w-3 h-3 inline text-red-500 fill-red-500 mx-1" /> por Tarcízio</p>
