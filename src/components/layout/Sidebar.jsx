@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Home, Compass, Heart, Settings, ChevronLeft, ChevronRight, LogOut, X, Users, Tv, Menu, Zap, LogIn } from 'lucide-react';
+import { Home, Compass, Heart, Settings, ChevronLeft, ChevronRight, LogOut, X, Users, Tv, Menu, Zap, LogIn, Library } from 'lucide-react';
 import clsx from 'clsx';
 import { SettingsModal } from '@/components/settings/SettingsModal';
 import { useAuth } from '@/context/AuthContext';
@@ -35,6 +35,13 @@ export function Sidebar() {
       console.error("Erro ao sair:", error);
     }
   };
+
+  const navItems = [
+    { icon: Home, label: 'Início', path: '/' },
+    { icon: Compass, label: 'Catálogo', path: '/catalog' },
+    { icon: Library, label: 'Minha Biblioteca', path: '/library' },
+    { icon: Users, label: 'Personagens', path: '/characters' },
+  ];
 
   // Link Base Styles
   const linkBase = `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ease-in-out font-medium w-full whitespace-nowrap overflow-hidden ${isCollapsed ? 'justify-center px-2' : 'text-left'}`;
@@ -99,17 +106,17 @@ export function Sidebar() {
         <nav className="flex-1 px-3 space-y-2 overflow-y-auto overflow-x-hidden py-4 scrollbar-thin scrollbar-thumb-surface-dark/20 hover:scrollbar-thumb-surface-dark/40">
           {!isCollapsed && <div className="text-xs font-bold text-text-secondary/60 uppercase px-4 mb-2 tracking-wider">Menu</div>}
 
-          <NavLink to="/" onClick={() => setIsOpen(false)} className={({ isActive }) => clsx(linkBase, isActive ? linkActive : linkInactive)} title={isCollapsed ? "Início" : ""}>
-            <Home className="w-5 h-5 shrink-0" /> {!isCollapsed && "Início"}
-          </NavLink>
-
-          <NavLink to="/catalog" onClick={() => setIsOpen(false)} className={({ isActive }) => clsx(linkBase, isActive ? linkActive : linkInactive)} title={isCollapsed ? "Catálogo" : ""}>
-            <Compass className="w-5 h-5 shrink-0" /> {!isCollapsed && "Catálogo"}
-          </NavLink>
-
-          <NavLink to="/characters" onClick={() => setIsOpen(false)} className={({ isActive }) => clsx(linkBase, isActive ? linkActive : linkInactive)} title={isCollapsed ? "Personagens" : ""}>
-            <Users className="w-5 h-5 shrink-0" /> {!isCollapsed && "Personagens"}
-          </NavLink>
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={() => setIsOpen(false)}
+              className={({ isActive }) => clsx(linkBase, isActive ? linkActive : linkInactive)}
+              title={isCollapsed ? item.label : ""}
+            >
+              <item.icon className="w-5 h-5 shrink-0" /> {!isCollapsed && item.label}
+            </NavLink>
+          ))}
 
           <div className="pt-4 pb-2">
             <div className="h-px bg-border-color mx-4" />

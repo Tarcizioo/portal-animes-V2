@@ -34,6 +34,8 @@ async function fetchAnimeDetails(id) {
     status: data.status,
     studios: data.studios,
     genres: data.genres,
+    themes: data.themes,
+    demographics: data.demographics,
     rank: data.rank,
     season: data.season,
     source: data.source,

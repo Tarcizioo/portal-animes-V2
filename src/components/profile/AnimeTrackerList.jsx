@@ -1,8 +1,8 @@
-import { Plus, MoreVertical, PlayCircle, Search, Eye, CheckCircle, Clock, PauseCircle, LayoutGrid, List, Trash2, Star } from 'lucide-react';
+import { Plus, MoreVertical, PlayCircle, Search, Eye, CheckCircle, Clock, PauseCircle, LayoutGrid, List, Trash2, Star, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 import { useAuth } from '@/context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export function AnimeTrackerList() {
   const [activeTab, setActiveTab] = useState('todos');
@@ -57,6 +57,10 @@ export function AnimeTrackerList() {
           <span className="w-2 h-6 bg-primary rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]"></span>
           Biblioteca Pessoal
         </h3>
+
+        <Link to="/library" className="text-xs font-bold text-primary hover:text-primary-hover flex items-center gap-1 transition-transform hover:translate-x-1">
+          Ver Biblioteca <ArrowRight className="w-3 h-3" />
+        </Link>
 
         {/* Barra de Busca Pequena */}
         <div className="relative group w-full md:w-64">

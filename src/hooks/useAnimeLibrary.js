@@ -11,7 +11,8 @@ import {
     deleteDoc,
     serverTimestamp,
     increment,
-    writeBatch
+    writeBatch,
+    getDoc
 } from 'firebase/firestore';
 
 export function useAnimeLibrary() {
@@ -45,7 +46,7 @@ export function useAnimeLibrary() {
         return () => unsubscribe();
     }, [user]);
 
-    // 2. Adicionar Anime (ou Atualizar se já existe)
+    // 2. Adicionar Anime (ou Atualizar se já existe - Preservando progresso)
     const addToLibrary = async (anime, status = 'plan_to_watch') => {
         if (!user) return;
 
@@ -58,22 +59,42 @@ export function useAnimeLibrary() {
 
             const animeRef = doc(db, 'users', user.uid, 'library', animeId.toString());
 
+            // Verificar se já existe para não sobreescrever progresso
+            const docSnap = await getDoc(animeRef);
+            const exists = docSnap.exists();
+            const existingData = exists ? docSnap.data() : {};
+
             // Dados básicos para salvar
             const animeData = {
-                id: animeId, // Salvar o ID explicitamente também é bom
+                id: animeId,
                 title: anime.title,
                 image: anime.images?.jpg?.image_url || anime.image,
                 totalEp: anime.episodes || 0,
-                currentEp: 0,
-                status: status,
-                score: 0,
-                lastUpdated: serverTimestamp()
+                // Preservar dados existentes ou iniciar com 0. Se completo, preenche tudo.
+                currentEp: (status === 'completed' && (anime.episodes || 0) > 0) ? (anime.episodes || 0) : (exists ? existingData.currentEp : 0),
+                score: exists ? (existingData.score || 0) : 0,
+                status: status, // Status atualizado
+                lastUpdated: serverTimestamp(),
+
+                // Dados Enriquecidos para Filtros (Sempre atualiza com o que veio da API)
+                genres: [
+                    ...(anime.genres || []),
+                    ...(anime.themes || []),
+                    ...(anime.demographics || [])
+                ].map(g => g.name),
+                year: anime.year || anime.aired?.prop?.from?.year || null,
+                season: anime.season || null,
+                type: anime.type || 'TV',
+                synopsis: anime.synopsis || '',
+                studios: anime.studios ? anime.studios.map(s => s.name) : [],
+                members: anime.members || 0,
+
+                // Preservar isFavorite se existir
+                isFavorite: exists ? (existingData.isFavorite || false) : false
             };
 
             await setDoc(animeRef, animeData, { merge: true });
 
-            // Atualizar contagem global de stats (opcional, pode ser feito via Cloud Functions, mas faremos local aqui por simplicidade)
-            // await updateStats(1, 0); 
         } catch (error) {
             console.error("Erro ao adicionar anime:", error);
             throw error;
@@ -195,6 +216,76 @@ export function useAnimeLibrary() {
         }
     };
 
+    // 8. Sincronizar/Reparar Dados da Biblioteca
+    const syncLibraryData = async (onProgress) => {
+        if (!user || !library.length) return;
+
+        // Filtrar animes que precisam de atualização (sem sinopse ou info antiga)
+        // Critério: Sem sinopse, sem genres ou genres é string antiga
+        const animesToUpdate = library.filter(anime => {
+            const hasSynopsis = !!anime.synopsis;
+            const hasGenerosArray = Array.isArray(anime.genres);
+            // Se faltar sinopse ou gênero for formato antigo, atualiza.
+            return !hasSynopsis || !hasGenerosArray;
+        });
+
+        if (animesToUpdate.length === 0) return 0; // Nada a fazer
+
+        let processed = 0;
+        const total = animesToUpdate.length;
+
+        for (const anime of animesToUpdate) {
+            try {
+                // Rate Limiting: Esperar 600ms entre chamadas
+                await new Promise(r => setTimeout(r, 600));
+
+                const response = await fetch(`https://api.jikan.moe/v4/anime/${anime.id}/full`);
+                if (!response.ok) {
+                    if (response.status === 429) {
+                        // Se der rate limit, espera mais um pouco e tenta de novo
+                        await new Promise(r => setTimeout(r, 2000));
+                    }
+                    continue;
+                }
+
+                const json = await response.json();
+                const freshData = json.data;
+
+                // Mapear dados frescos para o formato esperado (incluindo themes/demographics!)
+                // E usar addToLibrary para salvar (preservando progresso)
+                const animePayload = {
+                    id: freshData.mal_id,
+                    title: freshData.title_english || freshData.title,
+                    image: freshData.images?.jpg?.image_url,
+                    episodes: freshData.episodes,
+                    year: freshData.year || freshData.aired?.prop?.from?.year,
+                    season: freshData.season,
+                    type: freshData.type,
+                    synopsis: freshData.synopsis,
+                    studios: freshData.studios,
+                    genres: freshData.genres,
+                    themes: freshData.themes,
+                    demographics: freshData.demographics,
+                    members: freshData.members,
+                    score: freshData.score // Ops, isso pode sobrescrever nota user? Não, addToLibrary usa existingData.score se existir.
+                    // Espera, no addToLibrary: "score: exists ? (existingData.score || 0) : 0" -> Isso é a nota do USER.
+                    // Mas o payload aqui tem score do MAL?
+                    // O addToLibrary NÃO usa o score do payload para o user score, ele usa o score do payload só pra nada?
+                    // Ah, no meu código do addToLibrary eu NÃO salvei o score global do anime, só o do user.
+                    // Tudo bem, o importante é synopsis, genres, etc.
+                };
+
+                await addToLibrary(animePayload, anime.status); // Mantém status original
+
+                processed++;
+                if (onProgress) onProgress(processed, total);
+
+            } catch (err) {
+                console.error(`Falha ao sync anime ${anime.id}:`, err);
+            }
+        }
+    };
+
     return {
         library,
         loading,
@@ -203,8 +294,8 @@ export function useAnimeLibrary() {
         updateProgress,
         updateStatus,
         updateRating,
-        updateRating,
         removeFromLibrary,
-        toggleFavorite
+        toggleFavorite,
+        syncLibraryData
     };
 }

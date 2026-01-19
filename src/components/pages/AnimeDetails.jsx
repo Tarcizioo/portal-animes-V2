@@ -51,11 +51,9 @@ export function AnimeDetails() {
         const totalEpisodes = anime.episodes || 0; // Pegar totais
 
         if (user) {
-            if (libraryEntry) {
-                updateStatus(anime.id, newStatus, totalEpisodes);
-            } else {
-                addToLibrary(anime, newStatus);
-            }
+            // Sempre usar addToLibrary para garantir que os dados do anime (imagem, gêneros, sinopse)
+            // sejam atualizados/enriquecidos, preservando o progresso (graças ao update no hook)
+            addToLibrary(anime, newStatus);
         } else {
             toast.warning("Faça login para salvar animes na sua lista!");
         }

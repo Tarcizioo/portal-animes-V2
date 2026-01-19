@@ -1,7 +1,7 @@
 import { Star, Users, Calendar, MonitorPlay, Film } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export function AnimeListItem({ id, title, image, score, synopsis, status, members, year, episodes, type, genres }) {
+export function AnimeListItem({ id, title, image, score, synopsis, status, members, year, episodes, totalEp, type, genres }) {
     // Limita a sinopse para não ficar gigante
     const truncatedSynopsis = synopsis?.length > 250 ? synopsis.substring(0, 250) + "..." : synopsis;
 
@@ -34,7 +34,7 @@ export function AnimeListItem({ id, title, image, score, synopsis, status, membe
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-sm text-text-secondary">
                             {type && <span className="flex items-center gap-1"><MonitorPlay className="w-3.5 h-3.5" /> {type}</span>}
                             {year && <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {year}</span>}
-                            {episodes && <span className="flex items-center gap-1"><Film className="w-3.5 h-3.5" /> {episodes} eps</span>}
+                            {(episodes || totalEp) && <span className="flex items-center gap-1"><Film className="w-3.5 h-3.5" /> {episodes || totalEp} eps</span>}
                             {members && <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {members.toLocaleString()}</span>}
                         </div>
                     </div>
@@ -47,9 +47,14 @@ export function AnimeListItem({ id, title, image, score, synopsis, status, membe
                 </div>
 
                 <div className="my-3 flex flex-wrap gap-2">
-                    {genres.split(', ').map(g => (
-                        <span key={g} className="text-xs px-2 py-1 rounded bg-bg-tertiary text-text-secondary border border-border-color">{g}</span>
-                    ))}
+                    {Array.isArray(genres)
+                        ? genres.map(g => (
+                            <span key={g} className="text-xs px-2 py-1 rounded bg-bg-tertiary text-text-secondary border border-border-color">{g}</span>
+                        ))
+                        : (genres || "").split(', ').filter(Boolean).map(g => (
+                            <span key={g} className="text-xs px-2 py-1 rounded bg-bg-tertiary text-text-secondary border border-border-color">{g}</span>
+                        ))
+                    }
                 </div>
 
                 <p className="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-3">

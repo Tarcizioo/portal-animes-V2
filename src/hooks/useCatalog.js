@@ -6,15 +6,30 @@ export function useCatalog() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const [filters, setFilters] = useState({
-    q: '',
-    genres: [],
-    orderBy: 'ranking',
-    status: '',
-    year: '',
-    season: '',
-    type: '',
+  const [filters, setFilters] = useState(() => {
+    const saved = localStorage.getItem('anime_catalog_filters');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Erro ao ler filtros do catálogo", e);
+      }
+    }
+    return {
+      q: '',
+      genres: [],
+      orderBy: 'ranking',
+      status: '',
+      year: '',
+      season: '',
+      type: '',
+    };
   });
+
+  // Salva filtros no localStorage
+  useEffect(() => {
+    localStorage.setItem('anime_catalog_filters', JSON.stringify(filters));
+  }, [filters]);
 
   // --- AQUI ESTÁ A MÁGICA PARA EVITAR O BUG ---
   // Limpamos os animes IMEDIATAMENTE ao chamar essa função.

@@ -27,7 +27,7 @@ function FavoriteCard({ anime, isOverlay = false, dragListeners = {}, dragAttrib
             <div
                 {...dragListeners}
                 {...dragAttributes}
-                className="absolute top-2 left-2 z-20 p-1.5 bg-black/50 hover:bg-black/70 rounded-lg cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-2 left-2 z-20 p-1.5 bg-black/50 hover:bg-black/70 rounded-lg cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity touch-none"
             >
                 <GripVertical className="w-4 h-4 text-white" />
             </div>

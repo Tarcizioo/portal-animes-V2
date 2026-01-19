@@ -38,7 +38,15 @@ export function Catalog() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const navigate = useNavigate();
   const [luckyLoading, setLuckyLoading] = useState(false);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const [viewMode, setViewMode] = useState(() => {
+    const saved = localStorage.getItem('anime_catalog_view_mode');
+    return saved || 'grid';
+  });
+
+  // Salva ViewMode
+  useEffect(() => {
+    localStorage.setItem('anime_catalog_view_mode', viewMode);
+  }, [viewMode]);
 
   usePageTitle('Catálogo');
 
