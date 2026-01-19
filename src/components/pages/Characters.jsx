@@ -3,14 +3,22 @@ import { Header } from '@/components/layout/Header';
 import { useCharacters } from '@/hooks/useCharacters';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { CharacterCard } from '@/components/ui/CharacterCard';
-import { Users, Loader2 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
-import { SkeletonCard } from '@/components/ui/SkeletonCard'; // Reusando SkeletonCard por enquanto ou criar SkeletonCharacterCard? 
-// Vou usar div simples com skeleton style para personagem já que o SkeletonCard é layout de anime portrait
+import { LayoutGrid, List, Users } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { CharacterListItem } from '@/components/ui/CharacterListItem'; // [NEW] Import
 
 export function Characters() {
     const { characters, loading, loadMore, hasMore } = useCharacters();
     const sentinelRef = useRef(null);
+
+    // [NEW] Persisted View Mode
+    const [viewMode, setViewMode] = useState(() => {
+        return localStorage.getItem('anime_chars_view_mode') || 'grid';
+    });
+
+    useEffect(() => {
+        localStorage.setItem('anime_chars_view_mode', viewMode);
+    }, [viewMode]);
 
     usePageTitle('Personagens');
 
@@ -33,7 +41,7 @@ export function Characters() {
                 <div className="p-6 lg:p-10 max-w-[1600px] mx-auto">
 
                     {/* Header da Página */}
-                    <div className="mb-10 flex items-center justify-between">
+                    <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
                             <h1 className="text-4xl font-black text-text-primary mb-2 flex items-center gap-3">
                                 <Users className="w-10 h-10 text-primary" />
@@ -43,24 +51,58 @@ export function Characters() {
                                 Os personagens mais amados pela comunidade mundial.
                             </p>
                         </div>
+
+                        {/* View Toggles */}
+                        <div className="flex items-center gap-2 bg-bg-secondary p-1 rounded-lg border border-border-color self-start md:self-auto">
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-bg-tertiary text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+                                title="Visualização em Grade"
+                            >
+                                <LayoutGrid className="w-5 h-5" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={`p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-bg-tertiary text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+                                title="Visualização em Lista"
+                            >
+                                <List className="w-5 h-5" />
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Grid de Personagens */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                        {characters.map((char, index) => (
-                            <CharacterCard
-                                key={char.mal_id}
-                                character={char}
-                                rank={index + 1}
-                            />
-                        ))}
-
-                        {loading && Array.from({ length: 10 }).map((_, i) => (
-                            <div key={`skeleton-${i}`} className="bg-bg-secondary rounded-2xl overflow-hidden shadow-sm border border-border-color aspect-[3/4] animate-pulse relative">
-                                <div className="absolute inset-0 bg-gray-700/50"></div>
-                            </div>
-                        ))}
-                    </div>
+                    {/* Content Area */}
+                    {viewMode === 'grid' ? (
+                        /* GRID VIEW */
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                            {characters.map((char, index) => (
+                                <CharacterCard
+                                    key={char.mal_id}
+                                    character={char}
+                                    rank={index + 1}
+                                />
+                            ))}
+                            {loading && Array.from({ length: 10 }).map((_, i) => (
+                                <div key={`skeleton-${i}`} className="bg-bg-secondary rounded-2xl overflow-hidden shadow-sm border border-border-color aspect-[3/4] animate-pulse relative">
+                                    <div className="absolute inset-0 bg-gray-700/50"></div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        /* LIST VIEW */
+                        <div className="flex flex-col gap-4">
+                            {characters.map((char, index) => (
+                                <CharacterListItem
+                                    key={char.mal_id}
+                                    character={char}
+                                    rank={index + 1}
+                                />
+                            ))}
+                            {loading && Array.from({ length: 5 }).map((_, i) => (
+                                <div key={`skeleton-list-${i}`} className="h-24 bg-bg-secondary rounded-xl animate-pulse border border-border-color"></div>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Sentinel para Infinite Scroll */}
                     <div ref={sentinelRef} className="h-10 mt-8" />
