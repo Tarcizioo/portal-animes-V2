@@ -7,10 +7,12 @@ import { ProfileStats } from '@/components/profile/ProfileStats';
 import { AchievementBadges } from '@/components/profile/AchievementBadges';
 import { AnimeTrackerList } from '@/components/profile/AnimeTrackerList';
 import { EditProfileModal } from '@/components/profile/EditProfileModal';
-import { FavoriteAnimes } from '@/components/profile/FavoriteAnimes';
+import { FavoriteAnimes } from '@/components/profile/FavoriteAnimes'; // REMOVER DEPOIS
+import { FavoritesWidget } from '@/components/profile/FavoritesWidget'; // [NEW]
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
+import { useCharacterLibrary } from '@/hooks/useCharacterLibrary'; // [NEW]
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { LogIn, Hash, Link as LinkIcon } from 'lucide-react';
 
@@ -18,35 +20,65 @@ export function Profile() {
   const { user, signInGoogle, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading, updateProfileData } = useUserProfile();
   const { library } = useAnimeLibrary();
+  const { characterLibrary } = useCharacterLibrary(); // [NEW]
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   usePageTitle('Meu Perfil');
 
-  // Calcular favoritos ordenados
+  // Calcular favoritos ordenados (Animes)
   const sortedFavorites = useMemo(() => {
     const favorites = library?.filter(a => a.isFavorite) || [];
     const order = profile?.favoritesOrder || [];
 
     if (!order.length) return favorites;
-
-    // Criar mapa de posição para O(1)
     const orderMap = new Map(order.map((id, index) => [String(id), index]));
 
     return [...favorites].sort((a, b) => {
       const indexA = orderMap.get(String(a.id)) ?? Infinity;
       const indexB = orderMap.get(String(b.id)) ?? Infinity;
-
-      if (indexA === indexB) return 0; // Ordem estável se ambos não estiverem na lista
+      if (indexA === indexB) return 0;
       return indexA - indexB;
     });
   }, [library, profile?.favoritesOrder]);
 
+  // Calcular favoritos ordenados (Personagens)
+  const sortedCharFavorites = useMemo(() => {
+    const favorites = characterLibrary || [];
+    const order = profile?.favoriteCharactersOrder || [];
+
+    if (!order.length) return favorites;
+    const orderMap = new Map(order.map((id, index) => [String(id), index]));
+
+    return [...favorites].sort((a, b) => {
+      const indexA = orderMap.get(String(a.id)) ?? Infinity;
+      const indexB = orderMap.get(String(b.id)) ?? Infinity;
+      if (indexA === indexB) return 0;
+      return indexA - indexB;
+    });
+  }, [characterLibrary, profile?.favoriteCharactersOrder]);
+
+
   const handleFavoritesReorder = useCallback(async (newOrderIds) => {
-    // Atualiza apenas a ordem no perfil
     try {
       await updateProfileData({ favoritesOrder: newOrderIds });
     } catch (error) {
       console.error("Failed to update favorites order:", error);
+    }
+  }, [updateProfileData]);
+
+  const handleCharFavoritesReorder = useCallback(async (newOrderIds) => {
+    try {
+      await updateProfileData({ favoriteCharactersOrder: newOrderIds });
+    } catch (error) {
+      console.error("Failed to update char favorites order:", error);
+    }
+  }, [updateProfileData]);
+
+  const handleSetPreferredView = useCallback(async (view) => {
+    try {
+      await updateProfileData({ preferredFavoritesView: view });
+    } catch (error) {
+      console.error("Failed to set preferred view:", error);
     }
   }, [updateProfileData]);
 
@@ -111,9 +143,13 @@ export function Profile() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">
-                <FavoriteAnimes
-                  favorites={sortedFavorites}
-                  onReorder={handleFavoritesReorder}
+                <FavoritesWidget
+                  animeFavorites={sortedFavorites}
+                  characterFavorites={sortedCharFavorites}
+                  onReorderAnimes={handleFavoritesReorder}
+                  onReorderCharacters={handleCharFavoritesReorder}
+                  preferredView={profile?.preferredFavoritesView}
+                  onSetPreferredView={handleSetPreferredView}
                 />
                 <AchievementBadges />
                 <AnimeTrackerList />

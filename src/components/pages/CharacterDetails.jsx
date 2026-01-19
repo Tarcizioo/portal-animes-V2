@@ -4,6 +4,8 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { useCharacterInfo } from '@/hooks/useCharacterInfo';
+import { useCharacterLibrary } from '@/hooks/useCharacterLibrary'; // [NEW]
+import { useAuth } from '@/context/AuthContext'; // [NEW]
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { Heart, Mic2, Tv, Film, User, Image as ImageIcon, X, ChevronRight, ArrowLeft } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -11,10 +13,53 @@ import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { Loader } from '@/components/ui/Loader';
 import { ReusableCarousel } from '@/components/ui/ReusableCarousel';
 
+import { toast } from 'sonner';
+
 export function CharacterDetails() {
     const { id } = useParams();
     const { character, animeography, voiceActors, pictures, loading } = useCharacterInfo(id);
+    const { isCharacterFavorite, toggleCharacterFavorite } = useCharacterLibrary(); // [NEW]
+    const { user } = useAuth(); // [NEW]
     const [isAboutExpanded, setIsAboutExpanded] = useState(false);
+    const [favLoading, setFavLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [isAnimating, setIsAnimating] = useState(false); // [NEW] Animation state
+
+    const isFavorite = character ? isCharacterFavorite(character.mal_id) : false;
+
+    const handleToggleFavorite = async () => {
+        if (!user) {
+            toast.error("Faça login para favoritar!");
+            return;
+        }
+
+        // Trigger animation immediately
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), 500); // Reset after 500ms
+
+        setFavLoading(true);
+        setError(null);
+        try {
+            await toggleCharacterFavorite(character);
+
+            // Success Toast
+            if (!isFavorite) {
+                toast.success(`${character.name} adicionado aos favoritos!`, {
+                    description: "Seu perfil ficou mais estiloso.",
+                    icon: '💖'
+                });
+            } else {
+                toast.info(`${character.name} removido dos favoritos.`);
+            }
+
+        } catch (err) {
+            toast.error(err.message, { description: "Talvez você tenha atingido o limite de 3 favoritos." });
+            setError(err.message);
+            setTimeout(() => setError(null), 3000);
+        } finally {
+            setFavLoading(false);
+        }
+    };
 
     usePageTitle(character?.name || 'Detalhes do Personagem');
 
@@ -79,14 +124,26 @@ export function CharacterDetails() {
 
                             {/* Actions Card */}
                             <div className="bg-bg-secondary rounded-xl p-4 border border-border-color shadow-sm hover:border-primary/30 transition-colors duration-300">
-                                <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-bg-tertiary to-bg-secondary hover:from-primary hover:to-primary/80 text-text-primary hover:text-white py-3 rounded-lg font-bold transition-all duration-300 border border-border-color hover:border-primary shadow-sm hover:shadow-primary/25 active:scale-[0.98] group relative overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:animate-shimmer" />
-                                    <Heart className="w-5 h-5 group-hover:fill-current transition-colors" />
+                                <button
+                                    onClick={() => handleToggleFavorite()}
+                                    disabled={favLoading}
+                                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-bold transition-all duration-300 border shadow-sm active:scale-[0.98] group relative overflow-hidden ${isFavorite
+                                        ? "bg-red-500/10 text-red-500 border-red-500/50 hover:bg-red-500/20"
+                                        : "bg-gradient-to-r from-bg-tertiary to-bg-secondary hover:from-primary hover:to-primary/80 text-text-primary hover:text-white border-border-color hover:border-primary hover:shadow-primary/25"
+                                        }`}
+                                >
+                                    {!isFavorite && (
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:animate-shimmer" />
+                                    )}
+                                    <Heart className={`w-5 h-5 transition-all duration-300 ${isFavorite ? "fill-current" : "group-hover:fill-current"} ${isAnimating ? "scale-150 animate-pulse text-red-500 fill-red-500" : ""}`} />
                                     <div className="flex flex-col items-start leading-tight">
-                                        <span className="text-xs font-normal opacity-70 group-hover:opacity-100">Adicionar aos</span>
+                                        <span className={`text-xs font-normal opacity-70 ${isFavorite ? "" : "group-hover:opacity-100"}`}>
+                                            {isFavorite ? "Remover dos" : "Adicionar aos"}
+                                        </span>
                                         <span>Favoritos</span>
                                     </div>
                                 </button>
+                                {error && <p className="text-red-500 text-xs mt-2 text-center">{error}</p>}
                             </div>
                         </div>
 
