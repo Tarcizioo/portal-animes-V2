@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -21,6 +21,34 @@ export function Profile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   usePageTitle('Meu Perfil');
+
+  // Calcular favoritos ordenados
+  const sortedFavorites = useMemo(() => {
+    const favorites = library?.filter(a => a.isFavorite) || [];
+    const order = profile?.favoritesOrder || [];
+
+    if (!order.length) return favorites;
+
+    // Criar mapa de posição para O(1)
+    const orderMap = new Map(order.map((id, index) => [String(id), index]));
+
+    return [...favorites].sort((a, b) => {
+      const indexA = orderMap.get(String(a.id)) ?? Infinity;
+      const indexB = orderMap.get(String(b.id)) ?? Infinity;
+
+      if (indexA === indexB) return 0; // Ordem estável se ambos não estiverem na lista
+      return indexA - indexB;
+    });
+  }, [library, profile?.favoritesOrder]);
+
+  const handleFavoritesReorder = useCallback(async (newOrderIds) => {
+    // Atualiza apenas a ordem no perfil
+    try {
+      await updateProfileData({ favoritesOrder: newOrderIds });
+    } catch (error) {
+      console.error("Failed to update favorites order:", error);
+    }
+  }, [updateProfileData]);
 
   const loading = authLoading || (user && profileLoading);
 
@@ -83,7 +111,10 @@ export function Profile() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">
-                <FavoriteAnimes favorites={library?.filter(a => a.isFavorite) || []} />
+                <FavoriteAnimes
+                  favorites={sortedFavorites}
+                  onReorder={handleFavoritesReorder}
+                />
                 <AchievementBadges />
                 <AnimeTrackerList />
               </div>
