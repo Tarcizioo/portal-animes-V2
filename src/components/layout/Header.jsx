@@ -10,17 +10,44 @@ export function Header() {
     const { query, setQuery, results, setResults } = useSearch();
     const navigate = useNavigate();
     const [showMobileSearch, setShowMobileSearch] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
 
     const { user } = useAuth();
     const { profile } = useUserProfile();
 
     const displayName = profile?.displayName || user?.displayName || 'Visitante';
 
-    const handleResultClick = (animeId) => {
-        navigate(`/anime/${animeId}`);
+    const handleResultClick = (result) => { // Recebe o objeto anime/personagem inteiro
+        if (result.kind === 'character') {
+            navigate(`/character/${result.id}`);
+        } else {
+            navigate(`/anime/${result.id}`);
+        }
         setQuery('');
         setResults([]);
+        setSelectedIndex(-1);
         setShowMobileSearch(false);
+    };
+
+    const handleKeyDown = (e) => {
+        if (results.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setSelectedIndex(prev => (prev < results.length - 1 ? prev + 1 : prev));
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1));
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (selectedIndex >= 0 && results[selectedIndex]) {
+                handleResultClick(results[selectedIndex]);
+            }
+        } else if (e.key === 'Escape') {
+            setResults([]);
+            setSelectedIndex(-1);
+            setShowMobileSearch(false);
+        }
     };
 
     return (
@@ -44,23 +71,26 @@ export function Header() {
                 )}
 
                 {/* DESKTOP SEARCH */}
-                <div className={`relative group w-full max-w-md ml-auto transition-all duration-300 ${showMobileSearch ? 'block' : 'hidden md:flex items-center gap-4'}`}>
+                <div className={`relative group w-full max-w-sm focus-within:max-w-xl ml-auto transition-all duration-500 ease-out ${showMobileSearch ? 'block' : 'hidden md:flex items-center gap-4'}`}>
 
                     {/* Mobile Search Overlay */}
                     <div className={`${showMobileSearch ? 'fixed inset-0 z-50 bg-bg-primary px-4 flex items-center' : 'relative w-full'}`}>
-                        {/* Mobile Close Button (Left side now for better UX?) No, keep explicit close */}
 
-                        <div className={`relative w-full ${showMobileSearch ? 'max-w-full' : 'max-w-md'}`}>
+                        <div className={`relative w-full ${showMobileSearch ? 'max-w-full' : 'max-w-full'}`}>
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Search className="w-5 h-5 text-text-secondary" />
+                                <Search className="w-5 h-5 text-text-secondary group-focus-within:text-primary transition-colors duration-300" />
                             </div>
                             <input
                                 type="text"
                                 value={query}
-                                onChange={(e) => setQuery(e.target.value)}
+                                onChange={(e) => {
+                                    setQuery(e.target.value);
+                                    setSelectedIndex(-1); // Reset selection on type
+                                }}
+                                onKeyDown={handleKeyDown}
                                 placeholder="Pesquisar..."
                                 autoFocus={showMobileSearch}
-                                className="block w-full pl-10 pr-10 py-2.5 border-none rounded-xl bg-bg-tertiary text-text-primary focus:outline-none focus:ring-2 focus:ring-primary placeholder-text-secondary/50"
+                                className="block w-full pl-10 pr-10 py-2.5 border-2 border-transparent rounded-2xl bg-bg-tertiary text-text-primary focus:outline-none focus:border-primary focus:bg-bg-secondary focus:shadow-[0_0_20px_var(--shadow-color)] transition-all duration-300 shadow-sm hover:shadow-md placeholder-text-secondary/50"
                             />
                             {/* Mobile Close Button (Inside Input) */}
                             {showMobileSearch && (
@@ -71,13 +101,62 @@ export function Header() {
 
                             {/* Results Dropdown */}
                             {results.length > 0 && (
-                                <div className="absolute top-full mt-2 left-0 w-full bg-bg-secondary rounded-xl shadow-2xl z-50 max-h-[60vh] overflow-y-auto border border-border-color">
-                                    {results.map(anime => (
-                                        <div key={anime.id} onClick={() => handleResultClick(anime.id)} className="flex gap-3 p-3 hover:bg-primary/10 cursor-pointer border-b border-border-color last:border-0">
-                                            <img src={anime.image} className="w-8 h-12 object-cover rounded" alt={anime.title} />
-                                            <div className="text-sm text-text-primary">{anime.title}</div>
-                                        </div>
-                                    ))}
+                                <div className="absolute top-full mt-3 left-0 w-full bg-bg-secondary rounded-2xl shadow-2xl z-50 max-h-[70vh] overflow-y-auto border border-border-color overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                    <div className="py-2">
+                                        {results.map((item, index) => (
+                                            <div
+                                                key={item.id}
+                                                onClick={() => handleResultClick(item)}
+                                                className={`
+                                                    flex gap-4 p-3 cursor-pointer transition-all border-l-4 relative overflow-hidden group/item
+                                                    ${index === selectedIndex ? 'bg-primary/5 border-primary pl-4' : 'border-transparent hover:bg-bg-tertiary/50 hover:pl-4'}
+                                                `}
+                                            >
+                                                {/* Poster */}
+                                                <div className="w-12 h-16 flex-shrink-0 rounded-lg overflow-hidden shadow-sm relative group-hover/item:scale-105 transition-transform duration-300">
+                                                    <img src={item.image} className="w-full h-full object-cover" alt={item.title} />
+                                                </div>
+
+                                                {/* Meta Info */}
+                                                <div className="flex flex-col justify-center min-w-0">
+                                                    <h4 className={`text-sm font-bold truncate transition-colors duration-200 ${index === selectedIndex ? 'text-primary' : 'text-text-primary group-hover/item:text-primary'}`}>
+                                                        {item.title}
+                                                    </h4>
+
+                                                    <div className="flex items-center gap-2 mt-1 text-xs text-text-secondary">
+                                                        {/* Badge de Tipo */}
+                                                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${item.kind === 'character' ? 'bg-purple-500/10 text-purple-400' : 'bg-blue-500/10 text-blue-400'}`}>
+                                                            {item.kind === 'character' ? 'Personagem' : 'Anime'}
+                                                        </span>
+
+                                                        {item.year && item.year !== 'N/A' && (
+                                                            <span>{item.year}</span>
+                                                        )}
+                                                        {item.type && item.kind !== 'character' && (
+                                                            <>
+                                                                <span className="w-1 h-1 bg-text-secondary/30 rounded-full"></span>
+                                                                <span>{item.type}</span>
+                                                            </>
+                                                        )}
+                                                        {item.score && (
+                                                            <>
+                                                                <span className="w-1 h-1 bg-text-secondary/30 rounded-full"></span>
+                                                                <span className="flex items-center gap-1 text-yellow-500 font-medium">
+                                                                    ★ {item.score}
+                                                                </span>
+                                                            </>
+                                                        )}
+                                                    </div>
+
+                                                    {item.status && (
+                                                        <span className="text-[10px] uppercase font-bold tracking-wider text-text-secondary/30 mt-1">
+                                                            {item.status}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
