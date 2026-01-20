@@ -92,7 +92,8 @@ export function FavoritesWidget({
     onReorderAnimes,
     onReorderCharacters,
     preferredView,
-    onSetPreferredView
+    onSetPreferredView,
+    readOnly = false // [NEW]
 }) {
     // Determine initial active tab based on saved preference or default to 'anime'
     const [activeTab, setActiveTab] = useState(preferredView || 'anime');
@@ -197,57 +198,75 @@ export function FavoritesWidget({
                 </div>
 
                 {/* Pin Action */}
-                <button
-                    onClick={handlePin}
-                    className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${isPinned
-                        ? 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/20'
-                        : 'bg-transparent text-text-secondary border-transparent hover:bg-bg-tertiary'
-                        }`}
-                    title={isPinned ? "Desfixar visão padrão" : "Fixar esta visão como padrão"}
-                >
-                    {isPinned ? <Pin className="w-3.5 h-3.5 fill-current" /> : <Pin className="w-3.5 h-3.5" />}
-                    {isPinned ? 'Fixado' : 'Fixar no Perfil'}
-                </button>
+                {/* Pin Action (Hidden in Read-Only) */}
+                {!readOnly && (
+                    <button
+                        onClick={handlePin}
+                        className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${isPinned
+                            ? 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/20'
+                            : 'bg-transparent text-text-secondary border-transparent hover:bg-bg-tertiary'
+                            }`}
+                        title={isPinned ? "Desfixar visão padrão" : "Fixar esta visão como padrão"}
+                    >
+                        {isPinned ? <Pin className="w-3.5 h-3.5 fill-current" /> : <Pin className="w-3.5 h-3.5" />}
+                        {isPinned ? 'Fixado' : 'Fixar no Perfil'}
+                    </button>
+                )}
             </div>
 
             {/* Content Area (DND) */}
-            <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragStart={(e) => setActiveId(e.active.id)}
-                onDragEnd={handleDragEnd}
-            >
+            {/* Content Area (DND Conditional) */}
+            {readOnly ? (
+                // Static Grid for Public View
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <SortableContext items={localItems.map(i => i.id)} strategy={rectSortingStrategy}>
-                        {localItems.map((item) => (
-                            <SortableFavoriteItem key={item.id} item={item} type={type} />
-                        ))}
-                    </SortableContext>
-
-                    {/* Slots Vazios */}
-                    {Array.from({ length: 3 - localItems.length }).map((_, i) => (
-                        <div
-                            key={`empty-${i}`}
-                            className="aspect-[3/4] rounded-xl border-2 border-dashed border-border-color bg-bg-tertiary/30 flex flex-col items-center justify-center gap-2 text-text-secondary hover:border-text-secondary/50 transition-colors group cursor-default"
-                        >
-                            <div className="w-10 h-10 rounded-full bg-bg-tertiary flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <Plus className="w-5 h-5 opacity-50" />
-                            </div>
-                            <span className="text-xs font-medium opacity-50">Vazio</span>
-                        </div>
+                    {localItems.map((item) => (
+                        <FavoriteCard key={item.id} item={item} type={type} />
                     ))}
+                    {localItems.length === 0 && (
+                        <div className="col-span-3 text-center py-8 text-text-secondary text-sm italic">
+                            Nenhum favorito selecionado.
+                        </div>
+                    )}
                 </div>
+            ) : (
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragStart={(e) => setActiveId(e.active.id)}
+                    onDragEnd={handleDragEnd}
+                >
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <SortableContext items={localItems.map(i => i.id)} strategy={rectSortingStrategy}>
+                            {localItems.map((item) => (
+                                <SortableFavoriteItem key={item.id} item={item} type={type} />
+                            ))}
+                        </SortableContext>
 
-                <DragOverlay adjustScale={true}>
-                    {activeId ? (
-                        <FavoriteCard
-                            item={localItems.find(i => i.id === activeId)}
-                            type={type}
-                            isOverlay
-                        />
-                    ) : null}
-                </DragOverlay>
-            </DndContext>
+                        {/* Slots Vazios */}
+                        {Array.from({ length: 3 - localItems.length }).map((_, i) => (
+                            <div
+                                key={`empty-${i}`}
+                                className="aspect-[3/4] rounded-xl border-2 border-dashed border-border-color bg-bg-tertiary/30 flex flex-col items-center justify-center gap-2 text-text-secondary hover:border-text-secondary/50 transition-colors group cursor-default"
+                            >
+                                <div className="w-10 h-10 rounded-full bg-bg-tertiary flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Plus className="w-5 h-5 opacity-50" />
+                                </div>
+                                <span className="text-xs font-medium opacity-50">Vazio</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    <DragOverlay adjustScale={true}>
+                        {activeId ? (
+                            <FavoriteCard
+                                item={localItems.find(i => i.id === activeId)}
+                                type={type}
+                                isOverlay
+                            />
+                        ) : null}
+                    </DragOverlay>
+                </DndContext>
+            )}
         </div>
     );
 }

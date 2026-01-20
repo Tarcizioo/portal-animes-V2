@@ -8,6 +8,7 @@ import { AchievementBadges } from '@/components/profile/AchievementBadges';
 import { AnimeTrackerList } from '@/components/profile/AnimeTrackerList';
 import { EditProfileModal } from '@/components/profile/EditProfileModal';
 import { FavoritesWidget } from '@/components/profile/FavoritesWidget'; // [NEW]
+import { ShareProfileModal } from '@/components/profile/ShareProfileModal'; // [NEW]
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
@@ -22,6 +23,7 @@ export function Profile() {
   const { library } = useAnimeLibrary();
   const { characterLibrary } = useCharacterLibrary(); // [NEW]
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false); // [NEW]
 
   usePageTitle('Meu Perfil');
 
@@ -176,6 +178,7 @@ export function Profile() {
               user={user}
               profile={profile}
               onEdit={() => setIsModalOpen(true)}
+              onShare={() => setIsShareModalOpen(true)} // [NEW]
             />
 
             <ProfileStats />
@@ -260,6 +263,15 @@ export function Profile() {
         onClose={() => setIsModalOpen(false)}
         profile={profile}
         onSave={updateProfileData}
+      />
+
+      <ShareProfileModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        user={user}
+        profile={profile}
+        favorites={sortedFavorites}
+        library={library}
       />
 
     </div>

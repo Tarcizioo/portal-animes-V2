@@ -1,6 +1,6 @@
-import { Edit2 } from 'lucide-react';
+import { Edit2, Share2 } from 'lucide-react';
 
-export function ProfileHeader({ user, profile, onEdit }) {
+export function ProfileHeader({ user, profile, onEdit, onShare, readOnly = false }) {
   // Safe Fallbacks (Prioridade: Profile Firestore -> Auth User -> Placeholder)
   const banner = profile?.bannerURL || user?.bannerURL || "https://placehold.co/1200x400/1a1a1a/FFF?text=Banner+Anime";
   const photo = profile?.photoURL || user?.photoURL || "https://placehold.co/200x200/6366f1/FFF?text=User";
@@ -36,13 +36,26 @@ export function ProfileHeader({ user, profile, onEdit }) {
               className="w-full h-full rounded-full object-cover border-4 border-white dark:border-[#1e1e24]"
             />
           </div>
-          <button
-            onClick={onEdit}
-            className="absolute bottom-2 right-2 p-2 bg-primary text-white rounded-full shadow-lg hover:bg-primary-hover transition-all transform hover:scale-110 cursor-pointer z-10"
-            title="Editar Perfil"
-          >
-            <Edit2 className="w-4 h-4" />
-          </button>
+          {!readOnly && (
+            <div className="absolute bottom-2 right-2 flex gap-2 z-10">
+              {/* Share Button [NEW] */}
+              <button
+                onClick={onShare}
+                className="p-2 bg-bg-tertiary text-text-primary rounded-full shadow-lg hover:bg-bg-secondary transition-all transform hover:scale-110 cursor-pointer border border-border-color"
+                title="Compartilhar Perfil"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={onEdit}
+                className="p-2 bg-primary text-white rounded-full shadow-lg hover:bg-primary-hover transition-all transform hover:scale-110 cursor-pointer"
+                title="Editar Perfil"
+              >
+                <Edit2 className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Nome e Info (Novo) */}
