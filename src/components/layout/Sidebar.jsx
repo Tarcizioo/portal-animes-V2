@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Home, Compass, Heart, Settings, ChevronLeft, ChevronRight, LogOut, X, Users, Tv, Menu, Zap, LogIn, Library } from 'lucide-react';
+import { Home, Compass, Heart, Settings, ChevronLeft, ChevronRight, LogOut, X, Users, Tv, Menu, Zap, LogIn, Library, Globe } from 'lucide-react'; // [Modified]
 import clsx from 'clsx';
 import { SettingsModal } from '@/components/settings/SettingsModal';
+import { UserSearchModal } from '@/components/profile/UserSearchModal'; // [NEW]
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import logoDetails from '@/assets/logo.png';
@@ -14,6 +15,7 @@ export function Sidebar() {
     return saved === 'true';
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isUserSearchOpen, setIsUserSearchOpen] = useState(false); // [NEW]
 
   const { user, signOut } = useAuth();
   const { profile } = useUserProfile();
@@ -56,6 +58,7 @@ export function Sidebar() {
     <>
       {/* --- SETTINGS MODAL --- */}
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <UserSearchModal isOpen={isUserSearchOpen} onClose={() => setIsUserSearchOpen(false)} /> {/* [NEW] */}
 
       {/* --- MOBILE TRIGGER (Botão Flutuante) --- */}
       <button
@@ -118,11 +121,25 @@ export function Sidebar() {
             </NavLink>
           ))}
 
+
+
           <div className="pt-4 pb-2">
             <div className="h-px bg-border-color mx-4" />
           </div>
 
           {!isCollapsed && <div className="text-xs font-bold text-text-secondary/60 uppercase px-4 mb-2 tracking-wider">Geral</div>}
+
+          {/* User Search Button [MOVED HERE] */}
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              setIsUserSearchOpen(true);
+            }}
+            title={isCollapsed ? "Explorar Usuários" : ""}
+            className={clsx(linkBase, linkInactive)}
+          >
+            <Globe className="w-5 h-5 shrink-0" /> {!isCollapsed && "Explorar Usuários"}
+          </button>
 
           <button
             onClick={() => {

@@ -8,7 +8,7 @@ import { ProfileStats } from '@/components/profile/ProfileStats';
 import { AchievementBadges } from '@/components/profile/AchievementBadges';
 import { FavoritesWidget } from '@/components/profile/FavoritesWidget';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { Hash, Link as LinkIcon, AlertCircle } from 'lucide-react';
+import { Hash, Link as LinkIcon, AlertCircle, Lock } from 'lucide-react'; // [Modified]
 import { useMemo } from 'react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
@@ -61,9 +61,23 @@ export function PublicProfile() {
                     <Header />
                     <main className="flex-1 flex flex-col items-center justify-center p-4">
                         <div className="text-center space-y-4">
-                            <AlertCircle className="w-16 h-16 text-red-500 mx-auto" />
-                            <h2 className="text-3xl font-bold">Usuário não encontrado</h2>
-                            <p className="text-text-secondary">O perfil que você procura não existe ou está privado.</p>
+                            {error === 'Este perfil é privado.' ? (
+                                <>
+                                    <div className="bg-bg-secondary p-6 rounded-full inline-block mb-2">
+                                        <Lock className="w-16 h-16 text-text-secondary mx-auto" />
+                                    </div>
+                                    <h2 className="text-3xl font-bold">Perfil Privado</h2>
+                                    <p className="text-text-secondary max-w-md mx-auto">
+                                        Este usuário optou por manter seu perfil e biblioteca privados.
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <AlertCircle className="w-16 h-16 text-red-500 mx-auto" />
+                                    <h2 className="text-3xl font-bold">Usuário não encontrado</h2>
+                                    <p className="text-text-secondary">O perfil que você procura não existe.</p>
+                                </>
+                            )}
                         </div>
                     </main>
                 </div>

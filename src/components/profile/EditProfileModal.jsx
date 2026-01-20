@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Save, Upload, Link as LinkIcon, Hash, Camera } from 'lucide-react';
+import { X, Save, Upload, Link as LinkIcon, Hash, Camera, Lock, Globe } from 'lucide-react'; // [Modified]
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
@@ -26,6 +26,7 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
         photoURL: '',
         bannerURL: '',
         about: '',
+        isPublic: true, // [NEW] Default true
         favoriteGenres: [],
         connections: {
             discord: '',
@@ -53,6 +54,7 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
                 photoURL: profile.photoURL || '',
                 bannerURL: profile.bannerURL || '',
                 about: profile.about || '',
+                isPublic: profile.isPublic !== undefined ? profile.isPublic : true, // [NEW]
                 favoriteGenres: profile.favoriteGenres || [],
                 connections: {
                     discord: profile.connections?.discord || '',
@@ -344,7 +346,37 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
                         </div>
                     </section>
 
-                    {/* 3. Conexões */}
+                    {/* 3. Privacidade [NEW] */}
+                    <section className="space-y-4">
+                        <h3 className="text-sm font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center gap-2">
+                            <Lock className="w-4 h-4" /> Privacidade
+                        </h3>
+
+                        <div className="bg-[var(--bg-primary)]/30 border border-[var(--border-color)] rounded-xl p-4 flex items-center justify-between">
+                            <div>
+                                <h4 className="font-bold text-[var(--text-primary)] flex items-center gap-2">
+                                    {formData.isPublic ? <Globe className="w-4 h-4 text-green-400" /> : <Lock className="w-4 h-4 text-red-400" />}
+                                    Perfil Público
+                                </h4>
+                                <p className="text-xs text-[var(--text-secondary)] mt-1 max-w-[80%]">
+                                    Se desativado, seu link de compartilhamento e perfil público ficarão inacessíveis para outras pessoas.
+                                </p>
+                            </div>
+
+                            {/* Toggle Switch */}
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={formData.isPublic}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, isPublic: e.target.checked }))}
+                                />
+                                <div className="w-11 h-6 bg-[var(--bg-tertiary)] peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </section>
+
+                    {/* 4. Conexões */}
                     <section className="space-y-4">
                         <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
                             <LinkIcon className="w-4 h-4" /> Conexões

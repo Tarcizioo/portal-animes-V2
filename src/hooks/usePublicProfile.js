@@ -28,6 +28,15 @@ export function usePublicProfile(userId) {
 
                 const userData = userSnap.data();
 
+                // 2. Verificar Privacidade (Padrão: Público se undefined)
+                const isPublic = userData.isPublic !== false;
+
+                if (!isPublic) {
+                    setError('Este perfil é privado.');
+                    setLoading(false);
+                    return;
+                }
+
                 // 2. Buscar Biblioteca do Usuário (Subcoleção 'library')
                 const libraryRef = collection(db, 'users', userId, 'library');
                 const librarySnap = await getDocs(libraryRef);
