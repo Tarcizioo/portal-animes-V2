@@ -8,10 +8,11 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { Filter, SlidersHorizontal, ChevronDown, Search, X, Trash2, Calendar, MonitorPlay, LayoutGrid, List, Library as LibraryIcon, RefreshCw } from 'lucide-react';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
-import { useToast } from '@/context/ToastContext';
 
-// IDs em Inglês (Jikan API/Firestore) -> Names em Português (UI)
-// IDs numéricos iguais ao Catálogo
+import { useToast } from '@/context/ToastContext';
+import { SkeletonCard } from '@/components/ui/SkeletonCard'; // [NEW]
+
+
 const GENRES = [
     { id: 1, name: 'Ação' },
     { id: 2, name: 'Aventura' },
@@ -238,8 +239,42 @@ export function Library() {
 
     if (loading) {
         return (
-            <div className="flex h-screen items-center justify-center bg-bg-primary">
-                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div className="flex h-screen overflow-hidden bg-bg-primary text-text-primary font-sans">
+                <Sidebar />
+                <main className="flex-1 h-full overflow-y-auto relative scrollbar-thin scrollbar-thumb-surface-dark scrollbar-track-bg-primary">
+                    <Header />
+                    <div className="p-6 lg:p-10 max-w-[1600px] mx-auto">
+                        {/* Skeleton Header */}
+                        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-pulse">
+                            <div className="flex items-center gap-4">
+                                <div className="w-14 h-14 bg-bg-secondary rounded-xl"></div>
+                                <div className="space-y-2">
+                                    <div className="h-8 w-64 bg-bg-secondary rounded-lg"></div>
+                                    <div className="h-5 w-96 bg-bg-secondary rounded-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col lg:flex-row gap-8">
+                            {/* Skeleton Sidebar Filters */}
+                            <div className="hidden lg:block w-72 space-y-8">
+                                <div className="h-40 bg-bg-secondary rounded-2xl"></div>
+                                <div className="h-20 bg-bg-secondary rounded-2xl"></div>
+                                <div className="h-60 bg-bg-secondary rounded-2xl"></div>
+                            </div>
+
+                            {/* Skeleton Grid */}
+                            <div className="flex-1">
+                                <div className="h-16 bg-bg-secondary rounded-2xl mb-8 w-full"></div>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                                    {[...Array(12)].map((_, i) => (
+                                        <SkeletonCard key={i} />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
             </div>
         );
     }

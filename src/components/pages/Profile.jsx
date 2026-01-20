@@ -7,13 +7,13 @@ import { ProfileStats } from '@/components/profile/ProfileStats';
 import { AchievementBadges } from '@/components/profile/AchievementBadges';
 import { AnimeTrackerList } from '@/components/profile/AnimeTrackerList';
 import { EditProfileModal } from '@/components/profile/EditProfileModal';
-import { FavoriteAnimes } from '@/components/profile/FavoriteAnimes'; // REMOVER DEPOIS
 import { FavoritesWidget } from '@/components/profile/FavoritesWidget'; // [NEW]
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 import { useCharacterLibrary } from '@/hooks/useCharacterLibrary'; // [NEW]
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { Skeleton } from '@/components/ui/Skeleton'; // [NEW]
 import { LogIn, Hash, Link as LinkIcon } from 'lucide-react';
 
 export function Profile() {
@@ -86,10 +86,49 @@ export function Profile() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[var(--bg-primary)] text-[var(--text-primary)]">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      <div className="flex h-screen overflow-hidden bg-bg-primary text-text-primary font-sans">
+        <Sidebar />
+        <div className="flex-1 flex flex-col min-w-0">
+          <Header />
+          <main className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+            <div className="max-w-7xl mx-auto space-y-8 pb-10">
+
+              {/* Skeleton Profile Header */}
+              <div className="relative mb-20">
+                {/* Banner */}
+                <Skeleton className="h-48 md:h-64 w-full rounded-2xl" />
+                {/* Avatar area */}
+                <div className="absolute -bottom-16 left-8 flex items-end">
+                  <div className="w-32 h-32 rounded-full border-4 border-bg-primary bg-bg-tertiary overflow-hidden">
+                    <Skeleton className="w-full h-full" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Skeleton Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[...Array(4)].map((_, i) => (
+                  <Skeleton key={i} className="h-24 rounded-2xl" />
+                ))}
+              </div>
+
+              {/* Skeleton Widgets */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-8">
+                  <Skeleton className="h-80 rounded-2xl" />
+                  <Skeleton className="h-40 rounded-2xl" />
+                </div>
+                <div className="space-y-6">
+                  <Skeleton className="h-40 rounded-2xl" />
+                  <Skeleton className="h-60 rounded-2xl" />
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
     );
+
   }
 
   if (!user) {
