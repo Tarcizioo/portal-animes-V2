@@ -54,6 +54,7 @@ export function useTopCharacters() {
     queryKey: ['top-characters'],
     queryFn: fetchTopCharacters,
     staleTime: 1000 * 60 * 60 * 24, // 24 horas
+    gcTime: 1000 * 60 * 60 * 24,
   });
 }
 
@@ -70,13 +71,15 @@ export function useJikan() {
   const popularQuery = useQuery({
     queryKey: ['popular-anime'],
     queryFn: fetchPopular,
-    staleTime: 1000 * 60 * 60, // 1 hora
+    staleTime: 1000 * 60 * 60 * 24, // 24 horas (Lista estática diária)
+    gcTime: 1000 * 60 * 60 * 24, // Manter em cache por 24h
   });
 
   const seasonalQuery = useQuery({
     queryKey: ['seasonal-anime'],
     queryFn: fetchSeasonal,
-    staleTime: 1000 * 60 * 60, // 1 hora
+    staleTime: 1000 * 60 * 60 * 24, // 24 horas (Muda raramente na temporada)
+    gcTime: 1000 * 60 * 60 * 24,
   });
 
   const heroAnime = popularQuery.data ? popularQuery.data[0] : null;

@@ -12,19 +12,24 @@ export function useSearch() {
       return;
     }
 
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     // O "Debounce": Espera 500ms antes de chamar a API
     const delayDebounce = setTimeout(async () => {
       setIsSearching(true);
       try {
         const [animeRes, charRes] = await Promise.all([
-          fetch(`https://api.jikan.moe/v4/anime?q=${query}&limit=4&order_by=members&sort=desc`),
-          fetch(`https://api.jikan.moe/v4/characters?q=${query}&limit=3&order_by=favorites&sort=desc`)
+          fetch(`https://api.jikan.moe/v4/anime?q=${query}&limit=4&order_by=members&sort=desc`, { signal }),
+          fetch(`https://api.jikan.moe/v4/characters?q=${query}&limit=3&order_by=favorites&sort=desc`, { signal })
         ]);
 
         const [animeJson, charJson] = await Promise.all([
           animeRes.json(),
           charRes.json()
         ]);
+
+        if (signal.aborted) return; // Se foi cancelado, não faz nada
 
         // Formatar Animes
         const animes = (animeJson.data || []).map(anime => ({
@@ -55,14 +60,19 @@ export function useSearch() {
         // Combina e limita resultados
         setResults([...animes, ...characters]);
       } catch (error) {
-        console.error("Erro na busca:", error);
+        if (error.name !== 'AbortError') {
+          console.error("Erro na busca:", error);
+        }
       } finally {
-        setIsSearching(false);
+        if (!signal.aborted) setIsSearching(false);
       }
     }, 500);
 
     // Limpeza: Se o usuário digitar de novo antes dos 500ms, cancela a busca anterior
-    return () => clearTimeout(delayDebounce);
+    return () => {
+      clearTimeout(delayDebounce);
+      controller.abort(); // Cancela request em voo
+    };
   }, [query]);
 
   return { query, setQuery, results, isSearching, setResults };

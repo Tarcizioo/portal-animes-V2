@@ -16,6 +16,7 @@ const Library = lazy(() => import('@/components/pages/Library').then(module => (
 
 // Loading Component
 import { Loader } from '@/components/ui/Loader';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 // Loading Component
 const PageLoader = () => (
@@ -29,18 +30,20 @@ function App() {
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ScrollToTop />
       <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/catalog" element={<Catalog />} />
-          <Route path="/characters" element={<Characters />} />
-          <Route path="/character/:id" element={<CharacterDetails />} /> {/* [NEW] Add route */}
-          <Route path="/anime/:id" element={<AnimeDetails />} />
-          <Route path="/library" element={<Library />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TermsOfUse />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/catalog" element={<Catalog />} />
+            <Route path="/characters" element={<Characters />} />
+            <Route path="/character/:id" element={<CharacterDetails />} /> {/* [NEW] Add route */}
+            <Route path="/anime/:id" element={<AnimeDetails />} />
+            <Route path="/library" element={<Library />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfUse />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
       </Suspense>
     </BrowserRouter>
   );
