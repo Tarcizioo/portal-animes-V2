@@ -5,12 +5,18 @@ import { useNavigate } from 'react-router-dom';
 import { useSearch } from '@/hooks/useSearch';
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useNotifications } from '@/hooks/useNotifications';
+import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
+import { Bell } from 'lucide-react';
 
 export function Header() {
     const { query, setQuery, results, setResults } = useSearch();
     const navigate = useNavigate();
     const [showMobileSearch, setShowMobileSearch] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+    const { unreadCount } = useNotifications();
 
     const { user } = useAuth();
     const { profile } = useUserProfile();
@@ -51,19 +57,37 @@ export function Header() {
     };
 
     return (
-        <>
-            <header className="sticky top-0 z-40 bg-bg-primary/80 backdrop-blur-md px-4 md:px-8 py-4 flex items-center justify-between border-b border-border-color transition-colors duration-300">
+        <header className="sticky top-0 z-40 bg-bg-primary/80 backdrop-blur-md px-4 md:px-8 py-4 flex items-center justify-between border-b border-border-color transition-colors duration-300">
 
-                <div className="flex items-center gap-4 pl-12 md:pl-0">
-                    <div className={`${showMobileSearch ? 'hidden md:block' : 'block'}`}>
-                        <h1 className="text-xl font-bold text-text-primary">Olá, {displayName}!! 👋</h1>
-                        <p className="text-sm text-text-secondary hidden sm:block">Descubra novos animes.</p>
-                    </div>
+            <div className="flex items-center gap-4 pl-12 md:pl-0">
+                <div className={`${showMobileSearch ? 'hidden md:block' : 'block'}`}>
+                    <h1 className="text-xl font-bold text-text-primary">Olá, {displayName}!! 👋</h1>
+                    <p className="text-sm text-text-secondary hidden sm:block">Descubra novos animes.</p>
                 </div>
+            </div>
+
+            {/* NOTIFICATIONS & SEARCH CONTAINER */}
+            <div className={`flex items-center gap-4 ml-auto ${showMobileSearch ? 'w-full' : ''}`}>
+
+                {/* Notification Bell (Hidden if mobile search active) */}
+                {!showMobileSearch && (
+                    <div className="relative">
+                        <button
+                            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                            className="p-2 relative text-text-secondary hover:text-primary transition-colors rounded-full hover:bg-bg-tertiary"
+                        >
+                            <Bell className="w-6 h-6" />
+                            {unreadCount > 0 && (
+                                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-bg-primary animate-pulse"></span>
+                            )}
+                        </button>
+                        <NotificationDropdown isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
+                    </div>
+                )}
 
                 {/* SEARCH LOGIC */}
                 {!showMobileSearch && (
-                    <div className="flex items-center gap-2 md:hidden ml-auto">
+                    <div className="flex items-center gap-2 md:hidden">
                         <button onClick={() => setShowMobileSearch(true)} className="p-2 text-text-secondary hover:text-primary">
                             <Search className="w-6 h-6" />
                         </button>
@@ -71,12 +95,12 @@ export function Header() {
                 )}
 
                 {/* DESKTOP SEARCH */}
-                <div className={`relative group w-full max-w-sm focus-within:max-w-xl ml-auto transition-all duration-500 ease-out ${showMobileSearch ? 'block' : 'hidden md:flex items-center gap-4'}`}>
+                <div className={`relative group transition-all duration-300 ease-out ${showMobileSearch ? 'block flex-1 w-full' : 'hidden md:flex items-center gap-4 w-72 focus-within:w-96'}`}>
 
                     {/* Mobile Search Overlay */}
-                    <div className={`${showMobileSearch ? 'fixed inset-0 z-50 bg-bg-primary px-4 flex items-center' : 'relative w-full'}`}>
+                    <div className={`${showMobileSearch ? 'relative w-full' : 'relative w-full'}`}>
 
-                        <div className={`relative w-full ${showMobileSearch ? 'max-w-full' : 'max-w-full'}`}>
+                        <div className="relative w-full">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <Search className="w-5 h-5 text-text-secondary group-focus-within:text-primary transition-colors duration-300" />
                             </div>
@@ -85,7 +109,7 @@ export function Header() {
                                 value={query}
                                 onChange={(e) => {
                                     setQuery(e.target.value);
-                                    setSelectedIndex(-1); // Reset selection on type
+                                    setSelectedIndex(-1);
                                 }}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Pesquisar..."
@@ -124,7 +148,6 @@ export function Header() {
                                                     </h4>
 
                                                     <div className="flex items-center gap-2 mt-1 text-xs text-text-secondary">
-                                                        {/* Badge de Tipo */}
                                                         <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${item.kind === 'character' ? 'bg-purple-500/10 text-purple-400' : 'bg-blue-500/10 text-blue-400'}`}>
                                                             {item.kind === 'character' ? 'Personagem' : 'Anime'}
                                                         </span>
@@ -162,9 +185,7 @@ export function Header() {
                         </div>
                     </div>
                 </div>
-            </header>
-
-            {/* MOBILE DRAWER REMOVED - Using Sidebar's own trigger */}
-        </>
+            </div>
+        </header>
     );
 }
