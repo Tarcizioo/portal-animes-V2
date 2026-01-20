@@ -104,8 +104,17 @@ export function FavoritesWidget({
 
     const isPinned = preferredView === activeTab;
 
-    const items = activeTab === 'anime' ? animeFavorites : characterFavorites;
+    // Derived props based on active tab
+    const propItems = activeTab === 'anime' ? animeFavorites : characterFavorites;
     const type = activeTab; // 'anime' or 'character'
+
+    // Optimistic Local State
+    const [localItems, setLocalItems] = useState(propItems);
+
+    // Sync local state when props change (or tab switches)
+    useEffect(() => {
+        setLocalItems(propItems);
+    }, [propItems]);
 
     // Dnd State
     const [activeId, setActiveId] = useState(null);
@@ -117,17 +126,23 @@ export function FavoritesWidget({
 
     const handleDragEnd = (event) => {
         const { active, over } = event;
-        if (active.id !== over?.id) {
-            const oldIndex = items.findIndex((item) => item.id === active.id);
-            const newIndex = items.findIndex((item) => item.id === over.id);
-            const newOrder = arrayMove(items, oldIndex, newIndex);
 
-            const newOrderIds = newOrder.map(item => item.id);
-            if (activeTab === 'anime') {
-                onReorderAnimes(newOrderIds);
-            } else {
-                onReorderCharacters(newOrderIds);
-            }
+        if (active.id !== over?.id) {
+            setLocalItems((items) => {
+                const oldIndex = items.findIndex((item) => item.id === active.id);
+                const newIndex = items.findIndex((item) => item.id === over.id);
+                const newOrder = arrayMove(items, oldIndex, newIndex);
+
+                // Notify parent regardless of local update (for persistence)
+                const newOrderIds = newOrder.map(item => item.id);
+                if (activeTab === 'anime') {
+                    onReorderAnimes(newOrderIds);
+                } else {
+                    onReorderCharacters(newOrderIds);
+                }
+
+                return newOrder;
+            });
         }
         setActiveId(null);
     };
@@ -156,8 +171,8 @@ export function FavoritesWidget({
                         <button
                             onClick={() => setActiveTab('anime')}
                             className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'anime'
-                                    ? 'bg-bg-secondary text-primary shadow-sm'
-                                    : 'text-text-secondary hover:text-text-primary'
+                                ? 'bg-bg-secondary text-primary shadow-sm'
+                                : 'text-text-secondary hover:text-text-primary'
                                 }`}
                         >
                             <Heart className={`w-4 h-4 ${activeTab === 'anime' ? 'fill-primary' : ''}`} />
@@ -166,8 +181,8 @@ export function FavoritesWidget({
                         <button
                             onClick={() => setActiveTab('character')}
                             className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'character'
-                                    ? 'bg-bg-secondary text-primary shadow-sm'
-                                    : 'text-text-secondary hover:text-text-primary'
+                                ? 'bg-bg-secondary text-primary shadow-sm'
+                                : 'text-text-secondary hover:text-text-primary'
                                 }`}
                         >
                             <User className={`w-4 h-4 ${activeTab === 'character' ? 'fill-primary' : ''}`} />
@@ -177,7 +192,7 @@ export function FavoritesWidget({
 
                     {/* Counter */}
                     <span className="text-xs font-bold bg-bg-tertiary text-text-secondary px-2 py-1 rounded-md hidden sm:block">
-                        {items.length} / 3
+                        {localItems.length} / 3
                     </span>
                 </div>
 
@@ -185,8 +200,8 @@ export function FavoritesWidget({
                 <button
                     onClick={handlePin}
                     className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${isPinned
-                            ? 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/20'
-                            : 'bg-transparent text-text-secondary border-transparent hover:bg-bg-tertiary'
+                        ? 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/20'
+                        : 'bg-transparent text-text-secondary border-transparent hover:bg-bg-tertiary'
                         }`}
                     title={isPinned ? "Desfixar visão padrão" : "Fixar esta visão como padrão"}
                 >
@@ -203,14 +218,14 @@ export function FavoritesWidget({
                 onDragEnd={handleDragEnd}
             >
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <SortableContext items={items.map(i => i.id)} strategy={rectSortingStrategy}>
-                        {items.map((item) => (
+                    <SortableContext items={localItems.map(i => i.id)} strategy={rectSortingStrategy}>
+                        {localItems.map((item) => (
                             <SortableFavoriteItem key={item.id} item={item} type={type} />
                         ))}
                     </SortableContext>
 
                     {/* Slots Vazios */}
-                    {Array.from({ length: 3 - items.length }).map((_, i) => (
+                    {Array.from({ length: 3 - localItems.length }).map((_, i) => (
                         <div
                             key={`empty-${i}`}
                             className="aspect-[3/4] rounded-xl border-2 border-dashed border-border-color bg-bg-tertiary/30 flex flex-col items-center justify-center gap-2 text-text-secondary hover:border-text-secondary/50 transition-colors group cursor-default"
@@ -226,7 +241,7 @@ export function FavoritesWidget({
                 <DragOverlay adjustScale={true}>
                     {activeId ? (
                         <FavoriteCard
-                            item={items.find(i => i.id === activeId)}
+                            item={localItems.find(i => i.id === activeId)}
                             type={type}
                             isOverlay
                         />

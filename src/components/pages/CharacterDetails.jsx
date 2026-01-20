@@ -13,19 +13,20 @@ import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { Loader } from '@/components/ui/Loader';
 import { ReusableCarousel } from '@/components/ui/ReusableCarousel';
 
-import { toast } from 'sonner';
+import { useToast } from '@/context/ToastContext'; // [UPDATED]
 
 export function CharacterDetails() {
     const { id } = useParams();
     const { character, animeography, voiceActors, pictures, loading } = useCharacterInfo(id);
-    const { isCharacterFavorite, toggleCharacterFavorite } = useCharacterLibrary(); // [NEW]
+    const { isCharacterFavorite, toggleCharacterFavorite, characterLibrary } = useCharacterLibrary(); // [Updated]
     const { user } = useAuth(); // [NEW]
+    const { toast } = useToast(); // [NEW]
     const [isAboutExpanded, setIsAboutExpanded] = useState(false);
     const [favLoading, setFavLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isAnimating, setIsAnimating] = useState(false); // [NEW] Animation state
 
-    const isFavorite = character ? isCharacterFavorite(character.mal_id) : false;
+    const isFavorite = character ? isCharacterFavorite(character.id) : false;
 
     const handleToggleFavorite = async () => {
         if (!user) {
@@ -44,16 +45,13 @@ export function CharacterDetails() {
 
             // Success Toast
             if (!isFavorite) {
-                toast.success(`${character.name} adicionado aos favoritos!`, {
-                    description: "Seu perfil ficou mais estiloso.",
-                    icon: '💖'
-                });
+                toast.success(`${character.name} adicionado aos favoritos!`, "Favorito Adicionado");
             } else {
-                toast.info(`${character.name} removido dos favoritos.`);
+                toast.info(`${character.name} removido dos favoritos.`, "Favorito Removido");
             }
 
         } catch (err) {
-            toast.error(err.message, { description: "Talvez você tenha atingido o limite de 3 favoritos." });
+            toast.error(err.message, "Erro ao Favoritar");
             setError(err.message);
             setTimeout(() => setError(null), 3000);
         } finally {
@@ -135,7 +133,9 @@ export function CharacterDetails() {
                                     {!isFavorite && (
                                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:animate-shimmer" />
                                     )}
-                                    <Heart className={`w-5 h-5 transition-all duration-300 ${isFavorite ? "fill-current" : "group-hover:fill-current"} ${isAnimating ? "scale-150 animate-pulse text-red-500 fill-red-500" : ""}`} />
+
+                                    <Heart className={`w-5 h-5 transition-all duration-300 ${isFavorite ? "fill-current text-red-500 scale-110" : "group-hover:fill-current"} ${isAnimating ? "scale-150 animate-pulse text-red-500 fill-red-500" : ""}`} />
+
                                     <div className="flex flex-col items-start leading-tight">
                                         <span className={`text-xs font-normal opacity-70 ${isFavorite ? "" : "group-hover:opacity-100"}`}>
                                             {isFavorite ? "Remover dos" : "Adicionar aos"}
@@ -366,6 +366,8 @@ export function CharacterDetails() {
                 )}
 
                 <Footer />
+
+                {/* DEBUG BOARD REMOVED */}
             </main>
         </div>
     );

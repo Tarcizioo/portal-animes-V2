@@ -24,12 +24,9 @@ const PageLoader = () => (
   </div>
 );
 
-import { Toaster } from 'sonner';
-
 function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <Toaster richColors position="top-right" theme="dark" />
       <ScrollToTop />
       <Suspense fallback={<PageLoader />}>
         <Routes>

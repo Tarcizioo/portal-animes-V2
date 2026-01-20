@@ -85,7 +85,9 @@ export function useCharacterLibrary() {
     };
 
     const isCharacterFavorite = (charId) => {
-        return characterLibrary.some(c => c.id === Number(charId));
+        if (!charId) return false;
+        // console.log("Checking Favorite:", charId, typeof charId, "Library:", characterLibrary);
+        return characterLibrary.some(c => String(c.id) === String(charId));
     };
 
     return {
