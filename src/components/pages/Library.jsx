@@ -5,13 +5,13 @@ import { AnimeCard } from '@/components/ui/AnimeCard';
 import { AnimeListItem } from '@/components/ui/AnimeListItem';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { Filter, SlidersHorizontal, ChevronDown, Search, X, Trash2, Calendar, MonitorPlay, LayoutGrid, List, Library as LibraryIcon, RefreshCw } from 'lucide-react';
+import { Filter, SlidersHorizontal, ChevronDown, Search, X, Trash2, Calendar, MonitorPlay, LayoutGrid, List, Library as LibraryIcon, RefreshCw, Sparkles } from 'lucide-react';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { useToast } from '@/context/ToastContext';
-import { SkeletonCard } from '@/components/ui/SkeletonCard'; // [NEW]
-
+import { SkeletonCard } from '@/components/ui/SkeletonCard';
 
 const GENRES = [
     { id: 1, name: 'Ação' },
@@ -35,7 +35,6 @@ const GENRES = [
     { id: 27, name: 'Shounen' },
 ];
 
-// Mapa para converter IDs numéricos do filtro para Strings em Inglês (armazenadas no banco)
 const GENRE_ID_MAP = {
     1: 'Action',
     2: 'Adventure',
@@ -48,14 +47,33 @@ const GENRE_ID_MAP = {
     7: 'Mystery',
     40: 'Psychological',
     18: 'Mecha',
-    19: 'Music', // Jikan usa 'Music'
+    19: 'Music',
     36: 'Slice of Life',
     37: 'Supernatural',
     30: 'Sports',
     41: 'Suspense',
-    23: 'School',
-    42: 'Seinen',
+    56: 'School',
+    57: 'Seinen',
     27: 'Shounen'
+};
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.05
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.3 }
+    }
 };
 
 export function Library() {
@@ -300,9 +318,11 @@ export function Library() {
                         </div>
 
                         {/* Botão de Sync */}
-                        <button
+                        <motion.button
                             onClick={handleSync}
                             disabled={isSyncing}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border transition-all ${isSyncing
                                 ? 'bg-bg-tertiary text-text-secondary border-transparent cursor-not-allowed'
                                 : 'bg-bg-secondary hover:bg-bg-tertiary text-text-primary border-border-color hover:border-primary/50'}`}
@@ -310,7 +330,7 @@ export function Library() {
                         >
                             <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
                             {isSyncing ? 'Sincronizando...' : 'Sincronizar Dados'}
-                        </button>
+                        </motion.button>
                     </div>
 
                     <div className="flex flex-col lg:flex-row gap-8">
@@ -338,10 +358,12 @@ export function Library() {
                                         { val: 'dropped', label: 'Dropados', color: 'bg-red-500' },
                                         { val: 'paused', label: 'Pausados', color: 'bg-yellow-500' },
                                     ].map(st => (
-                                        <button
+                                        <motion.button
                                             key={st.val}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
                                             onClick={() => updateFilter('libraryStatus', filters.libraryStatus === st.val ? '' : st.val)}
-                                            className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all border-2 w-full text-left
+                                            className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors border-2 w-full text-left
                                 ${filters.libraryStatus === st.val
                                                     ? 'bg-bg-secondary border-button-accent text-text-primary shadow-lg'
                                                     : 'bg-bg-secondary/50 border-transparent hover:bg-bg-secondary hover:border-border-color text-text-secondary hover:text-text-primary'}
@@ -349,7 +371,7 @@ export function Library() {
                                         >
                                             <div className={`w-3 h-3 rounded-full ${st.color}`} />
                                             <span className="font-medium">{st.label}</span>
-                                        </button>
+                                        </motion.button>
                                     ))}
                                 </div>
                             </div>
@@ -440,18 +462,20 @@ export function Library() {
                                     {GENRES.map((g) => {
                                         const isSelected = filters.genres.includes(g.id);
                                         return (
-                                            <button
+                                            <motion.button
                                                 key={g.id}
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
                                                 onClick={() => handleGenreToggle(g.id)}
                                                 className={`
-                            text-sm px-3 py-1.5 rounded-lg border transition-all font-medium
+                            text-sm px-3 py-1.5 rounded-lg border transition-colors font-medium
                             ${isSelected
                                                         ? 'bg-button-accent border-button-accent text-text-on-primary'
                                                         : 'bg-bg-secondary border-border-color text-text-secondary hover:border-border-color/80 hover:text-text-primary'}
                         `}
                                             >
                                                 {g.name}
-                                            </button>
+                                            </motion.button>
                                         );
                                     })}
                                 </div>
@@ -460,12 +484,14 @@ export function Library() {
 
                             {/* Botão Limpar */}
                             {hasActiveFilters && (
-                                <button
+                                <motion.button
                                     onClick={clearFilters}
-                                    className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all text-sm font-bold uppercase tracking-wider"
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors text-sm font-bold uppercase tracking-wider"
                                 >
                                     <Trash2 className="w-4 h-4" /> Limpar Filtros
-                                </button>
+                                </motion.button>
                             )}
 
                         </aside>
@@ -488,25 +514,39 @@ export function Library() {
 
                                 <div className="flex items-center gap-3 w-full sm:w-auto">
 
-                                    <div className="flex bg-bg-tertiary rounded-xl p-1 border border-border-color">
-                                        <button
+                                    <div className="flex bg-bg-tertiary rounded-xl p-1 border border-border-color relative">
+                                        <motion.button
                                             onClick={() => setViewMode('grid')}
-                                            className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-bg-secondary text-button-accent shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+                                            className={`relative z-10 p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'text-button-accent' : 'text-text-secondary hover:text-text-primary'}`}
+                                            whileTap={{ scale: 0.9 }}
                                         >
                                             <LayoutGrid className="w-5 h-5" />
-                                        </button>
-                                        <button
+                                            {viewMode === 'grid' && (
+                                                <motion.div
+                                                    layoutId="viewModeBgLib"
+                                                    className="absolute inset-0 bg-bg-secondary rounded-lg shadow-sm border border-border-color/50 -z-10"
+                                                />
+                                            )}
+                                        </motion.button>
+                                        <motion.button
                                             onClick={() => setViewMode('list')}
-                                            className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-bg-secondary text-button-accent shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+                                            className={`relative z-10 p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'text-button-accent' : 'text-text-secondary hover:text-text-primary'}`}
+                                            whileTap={{ scale: 0.9 }}
                                         >
                                             <List className="w-5 h-5" />
-                                        </button>
+                                            {viewMode === 'list' && (
+                                                <motion.div
+                                                    layoutId="viewModeBgLib"
+                                                    className="absolute inset-0 bg-bg-secondary rounded-lg shadow-sm border border-border-color/50 -z-10"
+                                                />
+                                            )}
+                                        </motion.button>
                                     </div>
 
                                     <span className="text-sm font-medium text-text-secondary hidden sm:inline whitespace-nowrap pl-2 border-l border-border-color">Ordenar por:</span>
                                     <div className="relative w-full sm:w-auto">
                                         <select
-                                            className="w-full sm:w-auto appearance-none bg-bg-tertiary border-2 border-border-color text-text-primary pl-4 pr-12 py-2.5 rounded-xl text-sm font-medium focus:outline-none focus:border-button-accent focus:ring-2 focus:ring-button-accent/20 cursor-pointer hover:bg-bg-secondary transition-all"
+                                            className="w-full sm:w-auto appearance-none bg-bg-tertiary border-2 border-border-color text-text-primary pl-4 pr-12 py-2.5 rounded-xl text-sm font-medium focus:outline-none focus:border-button-accent focus:ring-2 focus:ring-button-accent/20 cursor-pointer hover:bg-bg-secondary transition-colors"
                                             value={filters.orderBy}
                                             onChange={(e) => updateFilter('orderBy', e.target.value)}
                                         >
@@ -523,25 +563,39 @@ export function Library() {
                             </div>
 
                             {/* Grid / List */}
-                            <div className={viewMode === 'grid'
-                                ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
-                                : "flex flex-col gap-4"
-                            }>
-                                {filteredLibrary.map((anime) => (
-                                    viewMode === 'grid' ? (
-                                        <AnimeCard
+                            <motion.div
+                                className={viewMode === 'grid'
+                                    ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+                                    : "flex flex-col gap-4"
+                                }
+                                variants={containerVariants}
+                                initial="hidden"
+                                animate="visible"
+                                key={`${viewMode}-${JSON.stringify(filters)}-${filteredLibrary.length > 0}`}
+                            >
+                                <AnimatePresence mode="popLayout">
+                                    {filteredLibrary.map((anime) => (
+                                        <motion.div
                                             key={anime.id}
-                                            {...anime}
-                                        />
-                                    ) : (
-                                        <AnimeListItem
-                                            key={anime.id}
-                                            {...anime}
-                                            showPersonalProgress // Flag para mostrar progresso pessoal na lista
-                                        />
-                                    )
-                                ))}
-                            </div>
+                                            variants={itemVariants}
+                                            layout
+                                        >
+                                            {viewMode === 'grid' ? (
+                                                <AnimeCard
+                                                    key={`${anime.id}-card`}
+                                                    {...anime}
+                                                />
+                                            ) : (
+                                                <AnimeListItem
+                                                    key={`${anime.id}-list`}
+                                                    {...anime}
+                                                    showPersonalProgress // Flag para mostrar progresso pessoal na lista
+                                                />
+                                            )}
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
+                            </motion.div>
 
                             {filteredLibrary.length === 0 && (
                                 <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -556,12 +610,14 @@ export function Library() {
                                         }
                                     </p>
                                     {hasActiveFilters ? (
-                                        <button
+                                        <motion.button
                                             onClick={clearFilters}
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
                                             className="px-6 py-3 bg-button-accent hover:bg-button-accent/90 text-text-on-primary rounded-xl font-bold transition-all shadow-lg"
                                         >
                                             Limpar filtros
-                                        </button>
+                                        </motion.button>
                                     ) : (
                                         <Link
                                             to="/catalog"

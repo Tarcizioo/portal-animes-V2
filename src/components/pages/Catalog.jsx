@@ -9,6 +9,7 @@ import { useCatalog } from '@/hooks/useCatalog';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { Filter, SlidersHorizontal, ChevronDown, Search, X, Trash2, Calendar, MonitorPlay, Sparkles, LayoutGrid, List } from 'lucide-react';
 import clsx from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const GENRES = [
   { id: 1, name: 'Ação' },
@@ -31,6 +32,25 @@ const GENRES = [
   { id: 42, name: 'Seinen' },
   { id: 27, name: 'Shounen' },
 ];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3 }
+  }
+};
 
 export function Catalog() {
   const { animes, loading, loadMore, hasMore, filters, updateFilter, clearFilters } = useCatalog();
@@ -200,11 +220,13 @@ export function Catalog() {
                     { val: 'complete', label: 'Completo', color: 'bg-blue-500' },
                     { val: 'upcoming', label: 'Em Breve', color: 'bg-purple-500' }
                   ].map((item) => (
-                    <div
+                    <motion.div
                       key={item.val}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => handleStatusToggle(item.val)}
                       className={`
-                            flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all border-2
+                            flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors border-2
                             ${filters.status === item.val
                           ? 'bg-bg-secondary border-button-accent text-text-primary shadow-lg shadow-button-accent/10'
                           : 'bg-bg-secondary/50 border-transparent hover:bg-bg-secondary hover:border-border-color text-text-secondary hover:text-text-primary'}
@@ -212,7 +234,7 @@ export function Catalog() {
                     >
                       <div className={`w-3 h-3 rounded-full ${filters.status === item.val ? item.color : 'bg-gray-600'}`} />
                       <span className="font-medium">{item.label}</span>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -231,42 +253,48 @@ export function Catalog() {
                   {GENRES.map((g) => {
                     const isSelected = filters.genres.includes(g.id);
                     return (
-                      <button
+                      <motion.button
                         key={g.id}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => handleGenreToggle(g.id)}
                         className={`
-                            text-sm px-4 py-2 rounded-lg border transition-all font-medium
+                            text-sm px-4 py-2 rounded-lg border transition-colors font-medium
                             ${isSelected
                             ? 'bg-button-accent border-button-accent text-text-on-primary shadow-md shadow-button-accent/20'
                             : 'bg-bg-secondary border-border-color text-text-secondary hover:border-border-color/80 hover:text-text-primary hover:bg-bg-tertiary'}
                         `}
                       >
                         {g.name}
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
               </div>
 
               {/* Botão Estou com Sorte */}
-              <button
+              <motion.button
                 onClick={handleLuckyParams}
                 disabled={luckyLoading}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg shadow-purple-500/20 transition-all text-sm font-bold uppercase tracking-wider relative overflow-hidden group"
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 <Sparkles className={`w-4 h-4 ${luckyLoading ? 'animate-spin' : ''}`} />
                 {luckyLoading ? 'Sorteando...' : 'Estou com Sorte'}
-              </button>
+              </motion.button>
 
-              {/* Botão Limpar - MAIS CHAMATIVO SE NECESSÁRIO */}
+              {/* Botão Limpar */}
               {hasActiveFilters && (
-                <button
+                <motion.button
                   onClick={clearFilters}
-                  className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all text-sm font-bold uppercase tracking-wider"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors text-sm font-bold uppercase tracking-wider"
                 >
                   <Trash2 className="w-4 h-4" /> Limpar Filtros
-                </button>
+                </motion.button>
               )}
 
             </aside>
@@ -291,25 +319,40 @@ export function Catalog() {
                 <div className="flex items-center gap-3 w-full sm:w-auto">
 
                   {/* View Mode Toggles */}
-                  <div className="flex bg-bg-tertiary rounded-xl p-1 border border-border-color">
-                    <button
+                  <div className="flex bg-bg-tertiary rounded-xl p-1 border border-border-color relative">
+                    <motion.button
                       onClick={() => setViewMode('grid')}
-                      className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-bg-secondary text-button-accent shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+                      className={`relative z-10 p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'text-button-accent' : 'text-text-secondary hover:text-text-primary'}`}
+                      whileTap={{ scale: 0.9 }}
                     >
                       <LayoutGrid className="w-5 h-5" />
-                    </button>
-                    <button
+                      {viewMode === 'grid' && (
+                        <motion.div
+                          layoutId="viewModeBg"
+                          className="absolute inset-0 bg-bg-secondary rounded-lg shadow-sm border border-border-color/50 -z-10"
+                        />
+                      )}
+                    </motion.button>
+
+                    <motion.button
                       onClick={() => setViewMode('list')}
-                      className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-bg-secondary text-button-accent shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+                      className={`relative z-10 p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'text-button-accent' : 'text-text-secondary hover:text-text-primary'}`}
+                      whileTap={{ scale: 0.9 }}
                     >
                       <List className="w-5 h-5" />
-                    </button>
+                      {viewMode === 'list' && (
+                        <motion.div
+                          layoutId="viewModeBg"
+                          className="absolute inset-0 bg-bg-secondary rounded-lg shadow-sm border border-border-color/50 -z-10"
+                        />
+                      )}
+                    </motion.button>
                   </div>
 
                   <span className="text-sm font-medium text-text-secondary hidden sm:inline whitespace-nowrap pl-2 border-l border-border-color">Ordenar por:</span>
                   <div className="relative group w-full sm:w-auto">
                     <select
-                      className="w-full sm:w-auto appearance-none bg-bg-tertiary border-2 border-border-color text-text-primary pl-4 pr-12 py-2.5 rounded-xl text-sm font-medium focus:outline-none focus:border-button-accent focus:ring-2 focus:ring-button-accent/20 cursor-pointer hover:bg-bg-secondary transition-all"
+                      className="w-full sm:w-auto appearance-none bg-bg-tertiary border-2 border-border-color text-text-primary pl-4 pr-12 py-2.5 rounded-xl text-sm font-medium focus:outline-none focus:border-button-accent focus:ring-2 focus:ring-button-accent/20 cursor-pointer hover:bg-bg-secondary transition-colors"
                       value={filters.orderBy}
                       onChange={(e) => updateFilter('orderBy', e.target.value)}
                     >
@@ -331,28 +374,44 @@ export function Catalog() {
               </div>
 
               {/* Grid / List */}
-              <div className={viewMode === 'grid'
-                ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
-                : "flex flex-col gap-4"
-              }>
-                {animes.map((anime) => (
-                  viewMode === 'grid' ? (
-                    <AnimeCard
+              <motion.div
+                className={viewMode === 'grid'
+                  ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+                  : "flex flex-col gap-4"
+                }
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                key={`${viewMode}-${JSON.stringify(filters)}-${animes.length > 0}`} // Re-renders on data load
+              >
+                <AnimatePresence mode="popLayout">
+                  {animes.map((anime) => (
+                    <motion.div
                       key={`${anime.id}-${filters.orderBy}`}
-                      {...anime}
-                    />
-                  ) : (
-                    <AnimeListItem
-                      key={`${anime.id}-${filters.orderBy}`}
-                      {...anime}
-                    />
-                  )
-                ))}
+                      variants={itemVariants}
+                      layout
+                    >
+                      {viewMode === 'grid' ? (
+                        <AnimeCard
+                          key={`${anime.id}-${filters.orderBy}-card`}
+                          {...anime}
+                        />
+                      ) : (
+                        <AnimeListItem
+                          key={`${anime.id}-${filters.orderBy}-list`}
+                          {...anime}
+                        />
+                      )}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
 
                 {loading && Array.from({ length: skeletonCount }).map((_, i) => (
-                  viewMode === 'grid' ? <SkeletonCard key={`skeleton-${i}`} /> : <div key={`skeleton-${i}`} className="h-48 bg-bg-secondary rounded-xl animate-pulse" />
+                  <motion.div key={`skeleton-${i}`} variants={itemVariants}>
+                    {viewMode === 'grid' ? <SkeletonCard /> : <div className="h-48 bg-bg-secondary rounded-xl animate-pulse" />}
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
 
               {!loading && animes.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -361,12 +420,14 @@ export function Catalog() {
                   </div>
                   <h3 className="text-2xl font-bold text-text-primary mb-2">Nenhum resultado encontrado</h3>
                   <p className="text-text-secondary mb-6">Tente usar outros termos ou limpe os filtros.</p>
-                  <button
+                  <motion.button
                     onClick={clearFilters}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     className="px-6 py-3 bg-button-accent hover:bg-button-accent/90 text-text-on-primary rounded-xl font-bold transition-all shadow-lg shadow-button-accent/20"
                   >
                     Limpar todos os filtros
-                  </button>
+                  </motion.button>
                 </div>
               )}
 
