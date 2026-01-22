@@ -1,12 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 
+const currentYear = new Date().getFullYear();
+
 const transformData = (anime) => ({
   id: anime.mal_id,
   title: anime.title_english || anime.title,
   image: anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url,
-  year: anime.year || anime.aired?.prop?.from?.year || '2024',
+  year: anime.year || anime.aired?.prop?.from?.year || currentYear,
   score: anime.score || 'N/A',
-  isNew: anime.airing || anime.year >= 2023,
+  isNew: anime.airing || (anime.year >= currentYear - 1),
   genres: (anime.genres || []).map(g => g.name).slice(0, 3),
   synopsis: anime.synopsis ? anime.synopsis : "Sinopse indisponível.",
   trailerUrl: anime.trailer?.url
