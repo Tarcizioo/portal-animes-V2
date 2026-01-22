@@ -3,6 +3,9 @@ import { Info, Plus, Star } from 'lucide-react';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
+import { motion } from 'framer-motion';
+
+const MotionLink = motion(Link);
 
 export function Hero({ anime }) {
   const { library, addToLibrary } = useAnimeLibrary();
@@ -49,7 +52,12 @@ export function Hero({ anime }) {
       {/* Conteúdo */}
       <div className="relative z-10 h-full flex flex-col justify-end lg:justify-center p-8 lg:p-12 max-w-4xl">
 
-        <div className="flex items-center gap-3 mb-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex items-center gap-3 mb-4"
+        >
           <span className="bg-primary text-white text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
             {anime.isNew ? 'TOP #1' : 'Destaque'}
           </span>
@@ -59,13 +67,23 @@ export function Hero({ anime }) {
           <span className="text-gray-300 text-sm flex items-center gap-1">
             {anime.year}
           </span>
-        </div>
+        </motion.div>
 
-        <h2 className="text-4xl lg:text-6xl font-black text-white mb-4 leading-tight">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="text-4xl lg:text-6xl font-black text-white mb-4 leading-tight"
+        >
           {anime.title}
-        </h2>
+        </motion.h2>
 
-        <div className="flex flex-wrap gap-2 mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="flex flex-wrap gap-2 mb-6"
+        >
           {anime.genres && anime.genres.map((genre, index) => (
             <span
               key={`${genre}-${index}`}
@@ -74,29 +92,43 @@ export function Hero({ anime }) {
               {genre}
             </span>
           ))}
-        </div>
+        </motion.div>
 
-        <p className="text-gray-300 mb-8 line-clamp-3 max-w-2xl text-lg leading-relaxed">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-gray-300 mb-8 line-clamp-3 max-w-2xl text-lg leading-relaxed"
+        >
           {anime.synopsis}
-        </p>
+        </motion.p>
 
-        <div className="flex items-center gap-4">
-          <Link
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="flex items-center gap-4"
+        >
+          <MotionLink
             to={`/anime/${anime.id}`}
-            className="bg-button-accent hover:bg-button-accent/90 text-text-on-primary px-8 py-3.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-button-accent/30 transform hover:-translate-y-1 cursor-pointer"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-button-accent hover:bg-button-accent/90 text-text-on-primary px-8 py-3.5 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-lg shadow-button-accent/30 cursor-pointer"
           >
             <Info className="w-5 h-5" /> Ver Detalhes
-          </Link>
+          </MotionLink>
 
           {!isInLibrary && (
-            <button
+            <motion.button
               onClick={handleAddToList}
-              className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-6 py-3.5 rounded-xl font-semibold flex items-center gap-2 transition-all border border-white/10 cursor-pointer"
+              whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.2)" }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-white/10 backdrop-blur-md text-white px-6 py-3.5 rounded-xl font-semibold flex items-center gap-2 transition-colors border border-white/10 cursor-pointer"
             >
               <Plus className="w-5 h-5" /> Minha Lista
-            </button>
+            </motion.button>
           )}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

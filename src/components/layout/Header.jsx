@@ -1,13 +1,13 @@
 
 import { useState } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSearch } from '@/hooks/useSearch';
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
-import { Bell } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export function Header() {
     const { query, setQuery, results, setResults } = useSearch();
@@ -18,12 +18,15 @@ export function Header() {
 
     const { unreadCount } = useNotifications();
 
+    // ... (rest of the hook logic is fine)
+
+    // Just replacing the render part for buttons mainly
     const { user } = useAuth();
     const { profile } = useUserProfile();
 
     const displayName = profile?.displayName || user?.displayName || 'Visitante';
 
-    const handleResultClick = (result) => { // Recebe o objeto anime/personagem inteiro
+    const handleResultClick = (result) => {
         if (result.kind === 'character') {
             navigate(`/character/${result.id}`);
         } else {
@@ -72,7 +75,9 @@ export function Header() {
                 {/* Notification Bell (Hidden if mobile search active) */}
                 {!showMobileSearch && (
                     <div className="relative">
-                        <button
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
                             className="p-2 relative text-text-secondary hover:text-primary transition-colors rounded-full hover:bg-bg-tertiary"
                         >
@@ -80,7 +85,7 @@ export function Header() {
                             {unreadCount > 0 && (
                                 <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-bg-primary animate-pulse"></span>
                             )}
-                        </button>
+                        </motion.button>
                         <NotificationDropdown isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
                     </div>
                 )}
@@ -88,9 +93,14 @@ export function Header() {
                 {/* SEARCH LOGIC */}
                 {!showMobileSearch && (
                     <div className="flex items-center gap-2 md:hidden">
-                        <button onClick={() => setShowMobileSearch(true)} className="p-2 text-text-secondary hover:text-primary">
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => setShowMobileSearch(true)}
+                            className="p-2 text-text-secondary hover:text-primary"
+                        >
                             <Search className="w-6 h-6" />
-                        </button>
+                        </motion.button>
                     </div>
                 )}
 

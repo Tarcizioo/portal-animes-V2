@@ -1,6 +1,8 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
+import { AnimatePresence } from 'framer-motion';
+import { PageTransition } from '@/components/layout/PageTransition';
 
 // Lazy loading pages
 const Home = lazy(() => import('@/components/pages/Home').then(module => ({ default: module.Home })));
@@ -13,18 +15,39 @@ const PrivacyPolicy = lazy(() => import('@/components/pages/PrivacyPolicy').then
 const TermsOfUse = lazy(() => import('@/components/pages/TermsOfUse').then(module => ({ default: module.TermsOfUse })));
 const NotFound = lazy(() => import('@/components/pages/NotFound').then(module => ({ default: module.NotFound })));
 const Library = lazy(() => import('@/components/pages/Library').then(module => ({ default: module.Library })));
-const PublicProfile = lazy(() => import('@/components/pages/PublicProfile').then(module => ({ default: module.PublicProfile }))); // [NEW]
+const PublicProfile = lazy(() => import('@/components/pages/PublicProfile').then(module => ({ default: module.PublicProfile })));
 
 // Loading Component
 import { Loader } from '@/components/ui/Loader';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
-// Loading Component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen bg-bg-primary">
     <Loader />
   </div>
 );
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+        <Route path="/catalog" element={<PageTransition><Catalog /></PageTransition>} />
+        <Route path="/characters" element={<PageTransition><Characters /></PageTransition>} />
+        <Route path="/character/:id" element={<PageTransition><CharacterDetails /></PageTransition>} />
+        <Route path="/anime/:id" element={<PageTransition><AnimeDetails /></PageTransition>} />
+        <Route path="/library" element={<PageTransition><Library /></PageTransition>} />
+        <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+        <Route path="/u/:uid" element={<PageTransition><PublicProfile /></PageTransition>} />
+        <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+        <Route path="/terms" element={<PageTransition><TermsOfUse /></PageTransition>} />
+        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
 
 function App() {
   return (
@@ -32,19 +55,7 @@ function App() {
       <ScrollToTop />
       <Suspense fallback={<PageLoader />}>
         <ErrorBoundary>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/catalog" element={<Catalog />} />
-            <Route path="/characters" element={<Characters />} />
-            <Route path="/character/:id" element={<CharacterDetails />} /> {/* [NEW] Add route */}
-            <Route path="/anime/:id" element={<AnimeDetails />} />
-            <Route path="/library" element={<Library />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/u/:uid" element={<PublicProfile />} /> {/* [NEW] Public Route */}
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfUse />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AnimatedRoutes />
         </ErrorBoundary>
       </Suspense>
     </BrowserRouter>
