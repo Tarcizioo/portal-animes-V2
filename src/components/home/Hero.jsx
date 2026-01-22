@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Info, Plus, Star } from 'lucide-react';
+import { Info, Plus, Star, PlayCircle } from 'lucide-react';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
@@ -118,7 +118,7 @@ export function Hero({ anime }) {
             <Info className="w-5 h-5" /> Ver Detalhes
           </MotionLink>
 
-          {!isInLibrary && (
+          {!isInLibrary ? (
             <motion.button
               onClick={handleAddToList}
               whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.2)" }}
@@ -127,6 +127,10 @@ export function Hero({ anime }) {
             >
               <Plus className="w-5 h-5" /> Minha Lista
             </motion.button>
+          ) : (
+            <div className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 font-bold backdrop-blur-md cursor-default">
+              <PlayCircle className="w-5 h-5" /> Na sua Lista
+            </div>
           )}
         </motion.div>
       </div>
