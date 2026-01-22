@@ -17,8 +17,8 @@ export function AnimeCarousel({ animes, title, icon: Icon }) {
     <section className="mb-12 relative group/carousel">
       {/* Header com Título */}
       <div className="flex items-center justify-between mb-4 px-1">
-        <h3 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-          {Icon && <Icon className="text-primary" />}
+        <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+          {Icon && <Icon className="text-primary w-6 h-6" />}
           {title}
         </h3>
       </div>

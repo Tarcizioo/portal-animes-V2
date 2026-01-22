@@ -1,15 +1,11 @@
 import { Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 export function AnimeCard({ id, title, genre, image, score }) {
   return (
     <Link to={`/anime/${id}`} className="block group relative cursor-pointer">
-      <motion.div
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="relative aspect-[2/3] rounded-xl overflow-hidden mb-3 shadow-lg group-hover:shadow-xl group-hover:shadow-primary/30 transition-shadow duration-300"
+      <div
+        className="relative aspect-[2/3] rounded-xl overflow-hidden mb-3 shadow-lg group-hover:shadow-xl group-hover:shadow-primary/30 transition-all duration-300 transform hover:scale-[1.02] active:scale-95"
       >
         {/* Imagem */}
         <img
@@ -31,7 +27,7 @@ export function AnimeCard({ id, title, genre, image, score }) {
           <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
           <span className="text-white text-xs font-bold">{score}</span>
         </div>
-      </motion.div>
+      </div>
 
       {/* Título e Gênero */}
       <div className="space-y-1">
