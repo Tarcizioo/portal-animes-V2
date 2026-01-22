@@ -1,66 +1,139 @@
-import { Star, Users, Calendar, MonitorPlay, Film } from 'lucide-react';
+import { Star, Users, Calendar, MonitorPlay, Film, PlayCircle, CheckCircle, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import clsx from 'clsx';
 
-export function AnimeListItem({ id, title, image, score, synopsis, status, members, year, episodes, totalEp, type, genres }) {
-    // Limita a sinopse para não ficar gigante
-    const truncatedSynopsis = synopsis?.length > 250 ? synopsis.substring(0, 250) + "..." : synopsis;
+export function AnimeListItem({
+    id, title, image, score, synopsis, status, members, year, episodes, totalEp, type, genres,
+    showPersonalProgress, currentEp, userScore
+}) {
+    // Truncate synopsis
+    const truncatedSynopsis = synopsis?.length > 200 ? synopsis.substring(0, 200) + "..." : synopsis;
 
-    const statusColor = status === 'Currently Airing' ? 'text-green-400 border-green-400/30 bg-green-400/10' :
-        status === 'Finished Airing' ? 'text-blue-400 border-blue-400/30 bg-blue-400/10' :
-            'text-text-secondary border-text-secondary/30 bg-text-secondary/10';
+    // Status Logic
+    const getStatusInfo = (s) => {
+        const normalized = s?.toLowerCase()?.replace(/\s/g, '_');
+        switch (normalized) {
+            case 'currently_airing':
+            case 'airing':
+            case 'watching':
+                return { label: 'Assistindo / Lançando', color: 'text-green-400 bg-green-400/10 border-green-400/20', icon: PlayCircle };
+            case 'finished_airing':
+            case 'completed':
+                return { label: 'Completo', color: 'text-blue-400 bg-blue-400/10 border-blue-400/20', icon: CheckCircle };
+            case 'upcoming':
+            case 'plan_to_watch':
+                return { label: 'Planejo', color: 'text-gray-400 bg-gray-400/10 border-gray-400/20', icon: Clock };
+            case 'dropped':
+                return { label: 'Dropado', color: 'text-red-400 bg-red-400/10 border-red-400/20', icon: X };
+            default:
+                return { label: s || 'Desconhecido', color: 'text-text-secondary bg-bg-tertiary border-border-color', icon: null };
+        }
+    };
+
+    const statusInfo = getStatusInfo(status);
+    const StatusIcon = statusInfo.icon;
+
+    // Progress Calculation
+    const totalEpisodes = totalEp || episodes || 0;
+    const progressPercentage = totalEpisodes > 0 ? ((currentEp || 0) / totalEpisodes) * 100 : 0;
 
     return (
-        <Link to={`/anime/${id}`} className="group flex flex-col sm:flex-row gap-5 bg-bg-secondary border border-border-color rounded-xl p-4 hover:border-button-accent transition-all hover:shadow-lg hover:shadow-button-accent/5">
+        <Link
+            to={`/anime/${id}`}
+            className="group relative flex flex-row gap-3 sm:gap-4 bg-bg-secondary hover:bg-bg-tertiary border border-border-color rounded-xl p-3 hover:border-button-accent transition-all hover:shadow-lg hover:shadow-button-accent/5 overflow-hidden"
+        >
+            {/* Background Gradient on Hover */}
+            <div className="absolute inset-0 bg-gradient-to-r from-button-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
-            {/* Imagem (Capa) */}
-            <div className="shrink-0 w-full sm:w-32 aspect-[2/3] rounded-lg overflow-hidden relative">
+            {/* Poster - Fixed width for mobile and desktop */}
+            <div className="shrink-0 w-24 sm:w-[100px] aspect-[2/3] rounded-lg overflow-hidden relative shadow-md">
                 <img
                     src={image}
                     alt={title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     loading="lazy"
                 />
-                <div className="absolute top-1 right-1 bg-black/70 backdrop-blur-sm px-1.5 py-0.5 rounded text-xs font-bold text-white flex items-center gap-1">
-                    <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" /> {score}
-                </div>
+                {/* Only show Global Score overlay if NOT personal progress context, or if we want both. 
+                     For list view, clean is better. Let's keep global score if provided and not personal. */}
+                {!showPersonalProgress && score > 0 && (
+                    <div className="absolute top-1 right-1 bg-black/70 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] font-bold text-white flex items-center gap-1">
+                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" /> {score}
+                    </div>
+                )}
             </div>
 
-            {/* Conteúdo */}
-            <div className="flex-1 flex flex-col min-w-0">
+            {/* Content Container */}
+            <div className="flex-1 flex flex-col min-w-0 py-0.5 relative z-10">
 
-                <div className="flex items-start justify-between gap-4 mb-2">
-                    <div>
-                        <h3 className="text-xl font-bold text-text-primary group-hover:text-button-accent transition-colors line-clamp-1">{title}</h3>
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-sm text-text-secondary">
-                            {type && <span className="flex items-center gap-1"><MonitorPlay className="w-3.5 h-3.5" /> {type}</span>}
-                            {year && <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {year}</span>}
-                            {(episodes || totalEp) && <span className="flex items-center gap-1"><Film className="w-3.5 h-3.5" /> {episodes || totalEp} eps</span>}
-                            {members && <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {members.toLocaleString()}</span>}
-                        </div>
+                {/* Header: Title & Status */}
+                <div className="flex items-start justify-between gap-2 mb-1">
+                    <h3 className="text-base sm:text-lg font-bold text-text-primary group-hover:text-button-accent transition-colors line-clamp-2 sm:line-clamp-1 leading-tight">
+                        {title}
+                    </h3>
+                    <div className={clsx("hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider shrink-0", statusInfo.color)}>
+                        {StatusIcon && <StatusIcon className="w-3 h-3" />}
+                        {statusInfo.label}
                     </div>
-
-                    {status && (
-                        <span className={`px-2 py-1 rounded-md border text-xs font-bold uppercase tracking-wider whitespace-nowrap ${statusColor}`}>
-                            {status === 'Currently Airing' ? 'Lançando' : status === 'Finished Airing' ? 'Completo' : status}
-                        </span>
-                    )}
                 </div>
 
-                <div className="my-3 flex flex-wrap gap-2">
+                {/* Mobile Status (Compact) */}
+                <div className="sm:hidden flex mb-1.5">
+                    <span className={clsx("text-[10px] font-bold uppercase px-1.5 py-0.5 rounded border flex items-center gap-1", statusInfo.color)}>
+                        {statusInfo.label}
+                    </span>
+                </div>
+
+                {/* Meta Row */}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-secondary mb-2">
+                    {type && <span className="flex items-center gap-1"><MonitorPlay className="w-3 h-3" /> {type}</span>}
+                    {year && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {year}</span>}
+                    {totalEpisodes > 0 && <span className="flex items-center gap-1"><Film className="w-3 h-3" /> {totalEpisodes} eps</span>}
+                </div>
+
+                {/* Personal Progress Bar (Library Only) */}
+                {showPersonalProgress && (
+                    <div className="mb-2 sm:mb-4 bg-bg-tertiary/50 p-1.5 sm:p-2 rounded-lg">
+                        <div className="flex items-center justify-between text-[10px] sm:text-xs font-bold mb-1">
+                            <span className="text-text-primary flex items-center gap-1">
+                                <span className="hidden sm:inline">Progresso:</span> <span className="text-button-accent">{currentEp || 0}</span> / {totalEpisodes || '?'}
+                            </span>
+                            {(userScore || score) > 0 && (
+                                <span className="flex items-center gap-1 text-yellow-500">
+                                    <Star className="w-3 h-3 fill-current" /> {userScore || score}
+                                </span>
+                            )}
+                        </div>
+                        <div className="h-1 sm:h-1.5 w-full bg-bg-primary rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-button-accent shadow-[0_0_10px_rgba(var(--button-accent),0.5)] transition-all duration-500"
+                                style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                {/* Synopsis (Non-Library or if space permits) */}
+                {!showPersonalProgress && (
+                    <p className="text-text-secondary text-xs leading-relaxed mb-auto line-clamp-2 hidden sm:block">
+                        {truncatedSynopsis || "Sem sinopse."}
+                    </p>
+                )}
+
+                {/* Genres (Bottom Row) */}
+                <div className="mt-auto pt-1 flex flex-wrap gap-1">
                     {Array.isArray(genres)
-                        ? genres.map(g => (
-                            <span key={g} className="text-xs px-2 py-1 rounded bg-bg-tertiary text-text-secondary border border-border-color">{g}</span>
+                        ? genres.slice(0, 3).map(g => (
+                            <span key={g} className="text-[9px] sm:text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-bg-tertiary text-text-secondary border border-border-color/50">
+                                {g}
+                            </span>
                         ))
-                        : (genres || "").split(', ').filter(Boolean).map(g => (
-                            <span key={g} className="text-xs px-2 py-1 rounded bg-bg-tertiary text-text-secondary border border-border-color">{g}</span>
+                        : (genres || "").split(', ').filter(Boolean).slice(0, 3).map(g => (
+                            <span key={g} className="text-[9px] sm:text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-bg-tertiary text-text-secondary border border-border-color/50">
+                                {g}
+                            </span>
                         ))
                     }
                 </div>
-
-                <p className="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-3">
-                    {truncatedSynopsis || "Sem sinopse disponível."}
-                </p>
-
             </div>
         </Link>
     );

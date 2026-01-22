@@ -42,7 +42,7 @@ export function ProfileStats() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-3 gap-4">
       {stats.map((stat, index) => (
         <div key={index} className="bg-[var(--bg-secondary)] backdrop-blur-md border border-[var(--border-color)] p-5 rounded-2xl flex flex-col gap-1 relative overflow-hidden group hover:bg-[var(--bg-tertiary)] transition-all">
           <div className={`absolute -right-4 -top-4 w-20 h-20 rounded-full blur-2xl group-hover:bg-opacity-50 transition-all ${stat.bgGlow}`}></div>

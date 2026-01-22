@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Plus, GripVertical, User, Pin, PinOff } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Heart, Plus, GripVertical, User, Pin, Pencil, Check, X } from 'lucide-react';
 import {
     DndContext,
     closestCenter,
@@ -18,50 +19,53 @@ import {
     useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { clsx } from 'clsx';
 
 // --- Components Helpers ---
 
-function FavoriteCard({ item, type, isOverlay = false, dragListeners = {}, dragAttributes = {} }) {
+function FavoriteCard({ item, type, isOverlay = false, isEditing = false, dragListeners = {}, dragAttributes = {} }) {
     const linkPath = type === 'anime' ? `/anime/${item.id}` : `/character/${item.id}`;
 
     return (
-        <div className={`relative aspect-[3/4] rounded-xl overflow-hidden bg-bg-tertiary border border-border-color shadow-lg group ${isOverlay ? 'cursor-grabbing scale-105 shadow-2xl ring-2 ring-primary z-50' : ''}`}>
-            {/* Drag Handle */}
-            <div
-                {...dragListeners}
-                {...dragAttributes}
-                className="absolute top-2 left-2 z-20 p-1.5 bg-black/50 hover:bg-black/70 rounded-lg cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity touch-none"
-            >
-                <GripVertical className="w-4 h-4 text-white" />
-            </div>
+        <div className={clsx(
+            "relative aspect-[2/3] rounded-xl overflow-hidden bg-bg-tertiary border border-border-color shadow-sm group transition-all",
+            isOverlay && "cursor-grabbing scale-105 shadow-2xl ring-2 ring-primary z-50",
+            isEditing && "hover:border-primary/50"
+        )}>
+            {/* Drag Handle (Only in Edit Mode) */}
+            {isEditing && (
+                <div
+                    {...dragListeners}
+                    {...dragAttributes}
+                    className="absolute top-2 right-2 z-20 p-2 bg-black/60 backdrop-blur-md rounded-lg cursor-grab active:cursor-grabbing hover:bg-primary transition-colors touch-none shadow-lg"
+                >
+                    <GripVertical className="w-4 h-4 text-white" />
+                </div>
+            )}
 
             <Link
-                to={linkPath}
-                className="block w-full h-full"
+                to={isEditing ? "#" : linkPath} // Disable link in edit mode prevent accidental clicks
+                className={clsx("block w-full h-full", isEditing && "pointer-events-none")}
                 draggable={false}
             >
                 <img
                     src={item.image}
                     alt={item.title || item.name}
-                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     draggable={false}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
                 <div className="absolute bottom-0 left-0 p-3 w-full">
-                    <h4 className="text-white text-sm font-bold line-clamp-2 leading-tight drop-shadow-md">
+                    <h4 className="text-white text-xs md:text-sm font-bold line-clamp-2 leading-tight drop-shadow-md">
                         {item.title || item.name}
                     </h4>
-                </div>
-                {/* Badge de TOP / Icon (Optional) */}
-                <div className="absolute top-2 right-2">
-                    <Heart className="w-4 h-4 text-red-500 fill-red-500 drop-shadow-lg" />
                 </div>
             </Link>
         </div>
     );
 }
 
-function SortableFavoriteItem({ item, type }) {
+function SortableFavoriteItem({ item, type, isEditing }) {
     const {
         attributes,
         listeners,
@@ -69,17 +73,24 @@ function SortableFavoriteItem({ item, type }) {
         transform,
         transition,
         isDragging
-    } = useSortable({ id: item.id });
+    } = useSortable({ id: item.id, disabled: !isEditing });
 
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.3 : 1,
+        touchAction: 'none'
     };
 
     return (
-        <div ref={setNodeRef} style={style} className="touch-none">
-            <FavoriteCard item={item} type={type} dragListeners={listeners} dragAttributes={attributes} />
+        <div ref={setNodeRef} style={style}>
+            <FavoriteCard
+                item={item}
+                type={type}
+                isEditing={isEditing}
+                dragListeners={listeners}
+                dragAttributes={attributes}
+            />
         </div>
     );
 }
@@ -93,29 +104,27 @@ export function FavoritesWidget({
     onReorderCharacters,
     preferredView,
     onSetPreferredView,
-    readOnly = false // [NEW]
+    readOnly = false
 }) {
-    // Determine initial active tab based on saved preference or default to 'anime'
     const [activeTab, setActiveTab] = useState(preferredView || 'anime');
+    const [isEditing, setIsEditing] = useState(false);
 
-    // Sync if preference updates externally
+    // Sync preference
     useEffect(() => {
         if (preferredView) setActiveTab(preferredView);
     }, [preferredView]);
 
     const isPinned = preferredView === activeTab;
-
-    // Derived props based on active tab
     const propItems = activeTab === 'anime' ? animeFavorites : characterFavorites;
-    const type = activeTab; // 'anime' or 'character'
+    const type = activeTab;
 
-    // Optimistic Local State
-    const [localItems, setLocalItems] = useState(propItems);
+    // Local State (Slice to top 6)
+    const [localItems, setLocalItems] = useState(propItems.slice(0, 6));
 
-    // Sync local state when props change (or tab switches)
+    // Update local items when props change (and slice again to ensure limits)
     useEffect(() => {
-        setLocalItems(propItems);
-    }, [propItems]);
+        setLocalItems(propItems.slice(0, 6));
+    }, [propItems, activeTab]);
 
     // Dnd State
     const [activeId, setActiveId] = useState(null);
@@ -134,12 +143,18 @@ export function FavoritesWidget({
                 const newIndex = items.findIndex((item) => item.id === over.id);
                 const newOrder = arrayMove(items, oldIndex, newIndex);
 
-                // Notify parent regardless of local update (for persistence)
+                // Notify parent
                 const newOrderIds = newOrder.map(item => item.id);
+
+                // IMPORTANT: We must merge this "reordered top 6" with the "rest of the favorites" 
+                // to preserve the full list order, otherwise we lose data.
+                const restOfItems = propItems.slice(6).map(i => i.id);
+                const fullIds = [...newOrderIds, ...restOfItems];
+
                 if (activeTab === 'anime') {
-                    onReorderAnimes(newOrderIds);
+                    onReorderAnimes(fullIds);
                 } else {
-                    onReorderCharacters(newOrderIds);
+                    onReorderCharacters(fullIds);
                 }
 
                 return newOrder;
@@ -150,10 +165,6 @@ export function FavoritesWidget({
 
     const handlePin = () => {
         if (isPinned) {
-            // Unpin (set to null or keep logic? User said "fixar qual ele quer manter". So unpin implies no specific preference? or maybe just toggle?)
-            // If currently pinned, maybe unsetting it? But user likely wants to SWITCH pin.
-            // If I click PIN on the ACTIVE tab, it sets it as preference.
-            // If it is ALREADY pinned, maybe I can un-pin (clear preference)?
             onSetPreferredView(null);
         } else {
             onSetPreferredView(activeTab);
@@ -161,97 +172,113 @@ export function FavoritesWidget({
     };
 
     return (
-        <div className="bg-bg-secondary border border-border-color rounded-2xl p-6 relative">
+        <div className="bg-bg-secondary border border-border-color rounded-2xl p-6 relative overflow-hidden">
 
-            {/* Header com Abas e Pin */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            {/* Decorative Background */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 relative z-10">
 
                 <div className="flex items-center gap-4">
-                    {/* Tabs Switcher */}
-                    <div className="flex bg-bg-tertiary/50 p-1 rounded-xl border border-border-color">
-                        <button
-                            onClick={() => setActiveTab('anime')}
-                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'anime'
-                                ? 'bg-bg-secondary text-primary shadow-sm'
-                                : 'text-text-secondary hover:text-text-primary'
-                                }`}
-                        >
-                            <Heart className={`w-4 h-4 ${activeTab === 'anime' ? 'fill-primary' : ''}`} />
-                            Animes
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('character')}
-                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'character'
-                                ? 'bg-bg-secondary text-primary shadow-sm'
-                                : 'text-text-secondary hover:text-text-primary'
-                                }`}
-                        >
-                            <User className={`w-4 h-4 ${activeTab === 'character' ? 'fill-primary' : ''}`} />
-                            Personagens
-                        </button>
+                    {/* Modern Tab Switcher */}
+                    <div className="flex p-1 bg-bg-tertiary rounded-xl border border-border-color">
+                        {['anime', 'character'].map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => { setActiveTab(tab); setIsEditing(false); }}
+                                className={clsx(
+                                    "px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2",
+                                    activeTab === tab
+                                        ? "bg-bg-secondary text-primary shadow-sm ring-1 ring-border-color"
+                                        : "text-text-secondary hover:text-text-primary hover:bg-white/5"
+                                )}
+                            >
+                                {tab === 'anime' ? <Heart className={clsx("w-4 h-4", activeTab === 'anime' && "fill-current")} /> : <User className={clsx("w-4 h-4", activeTab === 'character' && "fill-current")} />}
+                                {tab === 'anime' ? 'Animes' : 'Personagens'}
+                            </button>
+                        ))}
                     </div>
 
-                    {/* Counter */}
-                    <span className="text-xs font-bold bg-bg-tertiary text-text-secondary px-2 py-1 rounded-md hidden sm:block">
-                        {localItems.length} / 3
+                    {/* Count Badge */}
+                    <span className="text-xs font-bold text-text-secondary bg-bg-tertiary px-3 py-1.5 rounded-full border border-border-color">
+                        {localItems.length} / 6
                     </span>
                 </div>
 
-                {/* Pin Action */}
-                {/* Pin Action (Hidden in Read-Only) */}
+                {/* Actions */}
                 {!readOnly && (
-                    <button
-                        onClick={handlePin}
-                        className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${isPinned
-                            ? 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/20'
-                            : 'bg-transparent text-text-secondary border-transparent hover:bg-bg-tertiary'
-                            }`}
-                        title={isPinned ? "Desfixar visão padrão" : "Fixar esta visão como padrão"}
-                    >
-                        {isPinned ? <Pin className="w-3.5 h-3.5 fill-current" /> : <Pin className="w-3.5 h-3.5" />}
-                        {isPinned ? 'Fixado' : 'Fixar no Perfil'}
-                    </button>
+                    <div className="flex items-center gap-2">
+                        {/* Edit Toggle */}
+                        <button
+                            onClick={() => setIsEditing(!isEditing)}
+                            className={clsx(
+                                "flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-lg border transition-all",
+                                isEditing
+                                    ? "bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500/20"
+                                    : "bg-bg-tertiary text-text-secondary border-border-color hover:text-text-primary hover:bg-bg-tertiary/80"
+                            )}
+                        >
+                            {isEditing ? <Check className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
+                            {isEditing ? 'Concluir' : 'Organizar'}
+                        </button>
+
+                        {/* Pin Button */}
+                        <button
+                            onClick={handlePin}
+                            className={clsx(
+                                "p-2 rounded-lg border transition-all",
+                                isPinned
+                                    ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                                    : "bg-transparent text-text-secondary border-transparent hover:bg-bg-tertiary"
+                            )}
+                            title={isPinned ? "Visão padrão definida" : "Definir como visão padrão"}
+                        >
+                            <Pin className={clsx("w-4 h-4", isPinned && "fill-current")} />
+                        </button>
+                    </div>
                 )}
             </div>
 
-            {/* Content Area (DND) */}
-            {/* Content Area (DND Conditional) */}
+            {/* Grid Area */}
             {readOnly ? (
-                // Static Grid for Public View
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                // Static View
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 relative z-10">
                     {localItems.map((item) => (
                         <FavoriteCard key={item.id} item={item} type={type} />
                     ))}
                     {localItems.length === 0 && (
-                        <div className="col-span-3 text-center py-8 text-text-secondary text-sm italic">
-                            Nenhum favorito selecionado.
+                        <div className="col-span-full py-12 text-center border-2 border-dashed border-border-color rounded-xl">
+                            <Heart className="w-12 h-12 text-text-secondary/20 mx-auto mb-3" />
+                            <p className="text-text-secondary font-medium">Nenhum favorito selecionado.</p>
                         </div>
                     )}
                 </div>
             ) : (
+                // Interactive View
                 <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
                     onDragStart={(e) => setActiveId(e.active.id)}
                     onDragEnd={handleDragEnd}
                 >
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 relative z-10">
                         <SortableContext items={localItems.map(i => i.id)} strategy={rectSortingStrategy}>
                             {localItems.map((item) => (
-                                <SortableFavoriteItem key={item.id} item={item} type={type} />
+                                <SortableFavoriteItem key={item.id} item={item} type={type} isEditing={isEditing} />
                             ))}
                         </SortableContext>
 
-                        {/* Slots Vazios */}
-                        {Array.from({ length: 3 - localItems.length }).map((_, i) => (
+                        {/* Empty Slots */}
+                        {Array.from({ length: 6 - localItems.length }).map((_, i) => (
                             <div
                                 key={`empty-${i}`}
-                                className="aspect-[3/4] rounded-xl border-2 border-dashed border-border-color bg-bg-tertiary/30 flex flex-col items-center justify-center gap-2 text-text-secondary hover:border-text-secondary/50 transition-colors group cursor-default"
+                                className="aspect-[2/3] rounded-xl border-2 border-dashed border-border-color bg-bg-tertiary/30 flex flex-col items-center justify-center gap-3 text-text-secondary/50 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer group"
                             >
-                                <div className="w-10 h-10 rounded-full bg-bg-tertiary flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <Plus className="w-5 h-5 opacity-50" />
+                                <div className="p-3 rounded-full bg-bg-tertiary group-hover:scale-110 transition-transform shadow-sm">
+                                    <Plus className="w-5 h-5" />
                                 </div>
-                                <span className="text-xs font-medium opacity-50">Vazio</span>
+                                <span className="text-xs font-bold uppercase tracking-wider opacity-70">Vazio</span>
                             </div>
                         ))}
                     </div>
@@ -262,6 +289,7 @@ export function FavoritesWidget({
                                 item={localItems.find(i => i.id === activeId)}
                                 type={type}
                                 isOverlay
+                                isEditing
                             />
                         ) : null}
                     </DragOverlay>

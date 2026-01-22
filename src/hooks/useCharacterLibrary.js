@@ -63,8 +63,8 @@ export function useCharacterLibrary() {
                 await deleteDoc(charRef);
             } else {
                 // Adicionar - Verificar Limite
-                if (characterLibrary.length >= 3) {
-                    throw new Error("Você já possui 3 personagens favoritos. Remova um para adicionar outro.");
+                if (characterLibrary.length >= 6) {
+                    throw new Error("Você já possui 6 personagens favoritos. Remova um para adicionar outro.");
                 }
 
                 // Salvar dados mínimos para exibição

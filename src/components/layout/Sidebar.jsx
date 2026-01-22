@@ -57,29 +57,13 @@ export function Sidebar() {
   return (
     <>
       {/* --- SETTINGS MODAL --- */}
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-      <UserSearchModal isOpen={isUserSearchOpen} onClose={() => setIsUserSearchOpen(false)} /> {/* [NEW] */}
-
-      {/* --- MOBILE TRIGGER (Botão Flutuante) --- */}
-      <button
-        onClick={toggleSidebar}
-        className="md:hidden fixed top-4 left-4 z-50 p-2.5 bg-bg-secondary rounded-lg shadow-lg border border-border-color text-text-primary active:scale-95 transition-transform"
-      >
-        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-      </button>
-
-      {/* --- OVERLAY (Fundo escuro no mobile) --- */}
-      {isOpen && (
-        <div
-          onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
-        />
-      )}
+      < SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)
+      } />
+      < UserSearchModal isOpen={isUserSearchOpen} onClose={() => setIsUserSearchOpen(false)} />
 
       {/* --- SIDEBAR CONTAINER --- */}
       <aside className={clsx(
-        "fixed md:static inset-y-0 left-0 z-50 bg-bg-secondary border-r border-border-color flex flex-col transition-all duration-300 ease-in-out will-change-[width]",
-        isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+        "relative bg-bg-secondary border-r border-border-color flex flex-col transition-all duration-300 ease-in-out will-change-[width] h-full",
         isCollapsed ? "w-20" : "w-72"
       )}>
 
@@ -113,7 +97,6 @@ export function Sidebar() {
             <NavLink
               key={item.path}
               to={item.path}
-              onClick={() => setIsOpen(false)}
               className={({ isActive }) => clsx(linkBase, isActive ? linkActive : linkInactive)}
               title={isCollapsed ? item.label : ""}
             >
@@ -121,18 +104,15 @@ export function Sidebar() {
             </NavLink>
           ))}
 
-
-
           <div className="pt-4 pb-2">
             <div className="h-px bg-border-color mx-4" />
           </div>
 
           {!isCollapsed && <div className="text-xs font-bold text-text-secondary/60 uppercase px-4 mb-2 tracking-wider">Geral</div>}
 
-          {/* User Search Button [MOVED HERE] */}
+          {/* User Search Button */}
           <button
             onClick={() => {
-              setIsOpen(false);
               setIsUserSearchOpen(true);
             }}
             title={isCollapsed ? "Explorar Usuários" : ""}
@@ -143,7 +123,6 @@ export function Sidebar() {
 
           <button
             onClick={() => {
-              setIsOpen(false);
               setIsSettingsOpen(true);
             }}
             title={isCollapsed ? "Configurações" : ""}
@@ -157,7 +136,6 @@ export function Sidebar() {
         <div className="p-4 border-t border-border-color bg-bg-tertiary">
           <Link
             to="/profile"
-            onClick={() => setIsOpen(false)}
             className={`flex items-center gap-3 p-3 rounded-xl bg-bg-secondary border border-border-color shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden ${isCollapsed ? 'justify-center w-12 h-12 p-0' : ''}`}
             title={!isCollapsed ? "Ver Perfil" : displayName}
           >
@@ -192,7 +170,7 @@ export function Sidebar() {
             {!isCollapsed && (
               <div
                 className="z-10 p-1.5 text-text-secondary group-hover:text-primary transition-colors"
-                onClick={user ? handleLogout : undefined} // Se não tiver user, o Link pai já leva para profile/login
+                onClick={user ? handleLogout : undefined}
                 title={user ? "Sair" : "Entrar"}
               >
                 {user ? <LogOut className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}

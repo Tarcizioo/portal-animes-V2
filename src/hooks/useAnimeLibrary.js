@@ -44,7 +44,7 @@ export function useAnimeLibrary() {
         });
 
         return () => unsubscribe();
-    }, [user]);
+    }, [user?.uid]);
 
     // 2. Adicionar Anime (ou Atualizar se já existe - Preservando progresso)
     const addToLibrary = async (anime, status = 'plan_to_watch') => {
@@ -194,8 +194,8 @@ export function useAnimeLibrary() {
         if (!isCurrentlyFavorite) {
             // Verificando limite
             const favoritesCount = library.filter(item => item.isFavorite).length;
-            if (favoritesCount >= 3) {
-                throw new Error("Você já possui 3 favoritos. Remova um para adicionar outro.");
+            if (favoritesCount >= 6) {
+                throw new Error("Você já possui 6 favoritos. Remova um para adicionar outro.");
             }
         }
 

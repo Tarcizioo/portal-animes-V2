@@ -36,7 +36,7 @@ export function useNotifications() {
         });
 
         return () => unsubscribe();
-    }, [user]);
+    }, [user?.uid]);
 
     const markAsRead = async (notificationId) => {
         if (!user) return;
