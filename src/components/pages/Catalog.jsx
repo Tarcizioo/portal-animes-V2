@@ -9,6 +9,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { Filter, SlidersHorizontal, ChevronDown, Search, X, Trash2, Calendar, MonitorPlay, Sparkles, LayoutGrid, List } from 'lucide-react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ViewToggle } from '@/components/ui/ViewToggle';
 
 const GENRES = [
   { id: 1, name: 'Ação' },
@@ -313,35 +314,14 @@ export function Catalog() {
               <div className="flex items-center gap-3 w-full sm:w-auto">
 
                 {/* View Mode Toggles */}
-                <div className="flex bg-bg-tertiary rounded-xl p-1 border border-border-color relative">
-                  <motion.button
-                    onClick={() => setViewMode('grid')}
-                    className={`relative z-10 p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'text-button-accent' : 'text-text-secondary hover:text-text-primary'}`}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <LayoutGrid className="w-5 h-5" />
-                    {viewMode === 'grid' && (
-                      <motion.div
-                        layoutId="viewModeBg"
-                        className="absolute inset-0 bg-bg-secondary rounded-lg shadow-sm border border-border-color/50 -z-10"
-                      />
-                    )}
-                  </motion.button>
-
-                  <motion.button
-                    onClick={() => setViewMode('list')}
-                    className={`relative z-10 p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'text-button-accent' : 'text-text-secondary hover:text-text-primary'}`}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <List className="w-5 h-5" />
-                    {viewMode === 'list' && (
-                      <motion.div
-                        layoutId="viewModeBg"
-                        className="absolute inset-0 bg-bg-secondary rounded-lg shadow-sm border border-border-color/50 -z-10"
-                      />
-                    )}
-                  </motion.button>
-                </div>
+                <ViewToggle
+                  value={viewMode}
+                  onChange={setViewMode}
+                  options={[
+                    { value: 'grid', label: '', icon: LayoutGrid },
+                    { value: 'list', label: '', icon: List },
+                  ]}
+                />
 
                 <span className="text-sm font-medium text-text-secondary hidden sm:inline whitespace-nowrap pl-2 border-l border-border-color">Ordenar por:</span>
                 <div className="relative group w-full sm:w-auto">

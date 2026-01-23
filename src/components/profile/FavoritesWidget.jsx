@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, Plus, GripVertical, User, Pin, Pencil, Check, X } from 'lucide-react';
+import { ViewToggle } from '@/components/ui/ViewToggle';
 import {
     DndContext,
     closestCenter,
@@ -182,23 +183,14 @@ export function FavoritesWidget({
 
                 <div className="flex items-center gap-4">
                     {/* Modern Tab Switcher */}
-                    <div className="flex p-1 bg-bg-tertiary rounded-xl border border-border-color">
-                        {['anime', 'character'].map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => { setActiveTab(tab); setIsEditing(false); }}
-                                className={clsx(
-                                    "px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2",
-                                    activeTab === tab
-                                        ? "bg-bg-secondary text-primary shadow-sm ring-1 ring-border-color"
-                                        : "text-text-secondary hover:text-text-primary hover:bg-white/5"
-                                )}
-                            >
-                                {tab === 'anime' ? <Heart className={clsx("w-4 h-4", activeTab === 'anime' && "fill-current")} /> : <User className={clsx("w-4 h-4", activeTab === 'character' && "fill-current")} />}
-                                {tab === 'anime' ? 'Animes' : 'Personagens'}
-                            </button>
-                        ))}
-                    </div>
+                    <ViewToggle
+                        value={activeTab}
+                        onChange={(val) => { setActiveTab(val); setIsEditing(false); }}
+                        options={[
+                            { value: 'anime', label: 'Animes', icon: Heart },
+                            { value: 'character', label: 'Personagens', icon: User },
+                        ]}
+                    />
 
                     {/* Count Badge */}
                     <span className="text-xs font-bold text-text-secondary bg-bg-tertiary px-3 py-1.5 rounded-full border border-border-color">
