@@ -4,17 +4,20 @@ async function fetchAnimeDetails(id) {
   // Pequeno delay preventivo apenas na primeira busca real
   await new Promise(resolve => setTimeout(resolve, 300));
 
-  const [animeRes, charRes, recRes] = await Promise.all([
+  // Helper para não quebrar tudo se uma request falhar
+  const safeFetch = (url) => fetch(url).then(res => res.ok ? res.json() : { data: [] }).catch(() => ({ data: [] }));
+
+  const [animeRes, charJson, recJson, epJson] = await Promise.all([
     fetch(`https://api.jikan.moe/v4/anime/${id}/full`),
-    fetch(`https://api.jikan.moe/v4/anime/${id}/characters`),
-    fetch(`https://api.jikan.moe/v4/anime/${id}/recommendations`)
+    safeFetch(`https://api.jikan.moe/v4/anime/${id}/characters`),
+    safeFetch(`https://api.jikan.moe/v4/anime/${id}/recommendations`),
+    safeFetch(`https://api.jikan.moe/v4/anime/${id}/episodes`)
   ]);
 
   if (!animeRes.ok) throw new Error("Falha ao carregar anime");
 
   const animeJson = await animeRes.json();
-  const charJson = await charRes.json();
-  const recJson = await recRes.json();
+  // charJson, recJson, epJson já são os objetos JSON ou fallback { data: [] }
 
   const data = animeJson.data;
 
@@ -41,7 +44,8 @@ async function fetchAnimeDetails(id) {
     source: data.source,
     type: data.type,
     members: data.members,
-    aired: data.aired
+    aired: data.aired,
+    episodesList: epJson.data || []
   };
 
   return {
