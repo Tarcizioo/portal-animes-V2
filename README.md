@@ -89,6 +89,33 @@ Portal Animes V2 is a modern, feature-rich web application for discovering and t
 
 ---
 
+
+## Deployment
+
+### Vercel (Recommended)
+
+1.  Create a Vercel account and link it to your GitHub.
+2.  Import the repository `portal-animes-V2`.
+3.  Vercel will automatically detect Vite and configure the build settings.
+4.  **Important:** In the Vercel Project Settings, go to **Environment Variables** and add your Firebase configuration keys (same as `.env`):
+    - `VITE_FIREBASE_API_KEY`
+    - `VITE_FIREBASE_AUTH_DOMAIN`
+    - `VITE_FIREBASE_PROJECT_ID`
+    - `VITE_FIREBASE_STORAGE_BUCKET`
+    - `VITE_FIREBASE_MESSAGING_SENDER_ID`
+    - `VITE_FIREBASE_APP_ID`
+5.  Deploy!
+
+### Netlify
+
+1.  Create a Netlify account and link it to your GitHub.
+2.  "Import from Git" and select the repository.
+3.  Netlify should detect the build command `npm run build` and publish directory `dist`.
+4.  Go to **Site settings > Build & deploy > Environment** and add the Firebase environment variables.
+5.  Deploy site.
+
+---
+
 ## License
 
 This project is open-source and available under the [MIT License](LICENSE).

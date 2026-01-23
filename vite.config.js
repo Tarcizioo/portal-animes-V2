@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: mode === 'production' ? "/portal-animes-V2/" : "/",
+  base: "/",
   build: {
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
