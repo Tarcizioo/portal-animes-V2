@@ -34,16 +34,14 @@ export function useCatalog() {
   // --- AQUI ESTÁ A MÁGICA PARA EVITAR O BUG ---
   // Limpamos os animes IMEDIATAMENTE ao chamar essa função.
   const clearFilters = useCallback(() => {
-    setAnimes([]);      // Limpa a tela na hora
-    setLoading(true);   // Força o esqueleto aparecer
+    setLoading(true);
     setPage(1);
     setHasMore(true);
     setFilters({ q: '', genres: [], orderBy: 'ranking', status: '', year: '', season: '', type: '' });
   }, []);
 
   const updateFilter = (key, value) => {
-    setAnimes([]);      // Limpa a tela na hora
-    setLoading(true);   // Força o esqueleto aparecer
+    setLoading(true);
     setPage(1);
     setHasMore(true);
     setFilters(prev => ({ ...prev, [key]: value }));

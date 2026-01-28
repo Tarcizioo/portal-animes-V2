@@ -5,7 +5,7 @@ import {
     Calendar, Monitor, Globe, Film, List, MessageSquare, ThumbsUp, Reply,
     ChevronDown, ArrowRight, PlayCircle, Layers, Mic2, Info, AlertCircle
 } from 'lucide-react';
-import { Layout } from '@/components/layout/Layout';
+
 import { useAnimeInfo } from '@/hooks/useAnimeInfo';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
@@ -62,306 +62,307 @@ export function AnimeDetails() {
 
     if (loading) {
         return (
-            <Layout>
-                <div className="flex h-[80vh] items-center justify-center">
-                    <Loader />
-                </div>
-            </Layout>
+
+            <div className="flex h-[80vh] items-center justify-center">
+                <Loader />
+            </div>
+
         );
     }
 
-    if (!anime) return (
-        <Layout>
+
+    if (!anime) {
+        return (
             <div className="flex bg-bg-primary text-text-primary items-center justify-center h-screen">
                 <p>Anime não encontrado.</p>
             </div>
-        </Layout>
-    );
+        );
+    }
 
     const bannerImage = anime.banner || anime.image;
 
     return (
-        <Layout>
-            <div className="min-h-screen bg-bg-primary text-text-primary font-sans selection:bg-primary selection:text-white pb-20">
 
-                {/* --- HERO SECTION --- */}
-                <motion.section
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.8 }}
-                    className="relative w-full min-h-[50vh] lg:h-[65vh] flex items-end"
-                >
-                    {/* Background & Gradients */}
-                    <div className="absolute inset-0 z-0 overflow-hidden">
-                        <div
-                            className="absolute inset-0 bg-cover bg-center blur-sm scale-105"
-                            style={{ backgroundImage: `url('${bannerImage}')` }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/80 to-transparent z-10" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-primary/50 to-transparent z-10" />
-                    </div>
+        <div className="min-h-screen bg-bg-primary text-text-primary font-sans selection:bg-primary selection:text-white pb-20">
 
-                    {/* Conteúdo do Hero */}
-                    <div className="relative z-20 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 pb-8 lg:pb-16">
-                        <div className={`grid lg:grid-cols-12 gap-8 items-end transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            {/* --- HERO SECTION --- */}
+            <motion.section
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                className="relative w-full min-h-[50vh] lg:h-[65vh] flex items-end"
+            >
+                {/* Background & Gradients */}
+                <div className="absolute inset-0 z-0 overflow-hidden">
+                    <div
+                        className="absolute inset-0 bg-cover bg-center blur-sm scale-105"
+                        style={{ backgroundImage: `url('${bannerImage}')` }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/80 to-transparent z-10" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-bg-primary/50 to-transparent z-10" />
+                </div>
 
-                            {/* Poster (Mobile: Visible / Desktop: Visible) */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 50 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: 0.2 }}
-                                className="lg:col-span-3 xl:col-span-2 order-2 lg:order-1 flex justify-center lg:block mb-6 lg:mb-0"
-                            >
-                                <div className="w-48 sm:w-64 lg:w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-bg-secondary relative group">
-                                    <img src={anime.image} alt={anime.title} className="w-full h-full object-cover" />
-                                </div>
-                            </motion.div>
+                {/* Conteúdo do Hero */}
+                <div className="relative z-20 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 pb-8 lg:pb-16">
+                    <div className={`grid lg:grid-cols-12 gap-8 items-end transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
 
-                            {/* Info Principal */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: 0.4 }}
-                                className="lg:col-span-6 xl:col-span-7 flex flex-col gap-4 order-1 lg:order-2 mb-6 lg:mb-0 text-center lg:text-left items-center lg:items-start pt-6 lg:pt-0"
-                            >
-                                {/* Badges */}
-                                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
-                                    <span className="px-3 py-1 rounded-lg bg-primary text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary/20">
-                                        {anime.type || 'TV'}
+                        {/* Poster (Mobile: Visible / Desktop: Visible) */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="lg:col-span-3 xl:col-span-2 order-2 lg:order-1 flex justify-center lg:block mb-6 lg:mb-0"
+                        >
+                            <div className="w-48 sm:w-64 lg:w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-bg-secondary relative group">
+                                <img src={anime.image} alt={anime.title} className="w-full h-full object-cover" />
+                            </div>
+                        </motion.div>
+
+                        {/* Info Principal */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.4 }}
+                            className="lg:col-span-6 xl:col-span-7 flex flex-col gap-4 order-1 lg:order-2 mb-6 lg:mb-0 text-center lg:text-left items-center lg:items-start pt-6 lg:pt-0"
+                        >
+                            {/* Badges */}
+                            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
+                                <span className="px-3 py-1 rounded-lg bg-primary text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary/20">
+                                    {anime.type || 'TV'}
+                                </span>
+                                <span className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-xs font-bold uppercase tracking-wider">
+                                    {anime.year || 'Unknown'}
+                                </span>
+                                {anime.status && (
+                                    <span className={clsx(
+                                        "px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border backdrop-blur-md",
+                                        anime.status === 'Finished Airing'
+                                            ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
+                                            : "bg-blue-500/10 text-blue-300 border-blue-500/20"
+                                    )}>
+                                        {anime.status === 'Finished Airing' ? 'Completo' : 'Em Lançamento'}
                                     </span>
-                                    <span className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-xs font-bold uppercase tracking-wider">
-                                        {anime.year || 'Unknown'}
-                                    </span>
-                                    {anime.status && (
-                                        <span className={clsx(
-                                            "px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border backdrop-blur-md",
-                                            anime.status === 'Finished Airing'
-                                                ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
-                                                : "bg-blue-500/10 text-blue-300 border-blue-500/20"
-                                        )}>
-                                            {anime.status === 'Finished Airing' ? 'Completo' : 'Em Lançamento'}
-                                        </span>
-                                    )}
-                                </div>
-
-                                <h1 className="text-3xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-white drop-shadow-2xl">
-                                    {anime.title}
-                                </h1>
-                                {anime.title_english && (
-                                    <h2 className="text-lg md:text-xl text-gray-300 font-medium">{anime.title_english}</h2>
                                 )}
+                            </div>
 
-                                <p className="text-gray-300 text-sm md:text-base leading-relaxed max-w-3xl line-clamp-3 md:line-clamp-4">
-                                    {anime.synopsis}
-                                </p>
-                            </motion.div>
-
-                            {/* Card de Ação (Desktop: Right / Mobile: Below) */}
-                            <motion.div
-                                initial={{ opacity: 0, x: 50 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.8, delay: 0.6 }}
-                                className="lg:col-span-3 flex flex-col justify-end order-3 lg:order-3 w-full"
-                            >
-                                <HeroActionCard
-                                    anime={anime}
-                                    libraryEntry={libraryEntry}
-                                    status={status}
-                                    handleStatusChange={handleStatusChange}
-                                    handleIncrement={handleIncrement}
-                                    updateProgress={updateProgress}
-                                    updateRating={updateRating}
-                                    toggleFavorite={toggleFavorite}
-                                    currentEp={currentEp}
-                                    totalEp={totalEp}
-                                />
-                            </motion.div>
-                        </div>
-                    </div>
-                </motion.section>
-
-                {/* --- CONTEÚDO PRINCIPAL --- */}
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-12">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-
-                        {/* DIREITA (Conteúdo) --> Agora na ESQUERDA (Desktop) */}
-                        <div className="lg:col-span-9 xl:col-span-9 space-y-12 order-2 lg:order-1">
-
-                            {/* Stats Grid */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5 }}
-                                className="grid grid-cols-2 md:grid-cols-4 gap-4"
-                            >
-                                <StatsCard value={`#${anime.rank || '-'}`} label="Ranking" icon={Trophy} />
-                                <StatsCard value={anime.score || '-'} label="Score" icon={Star} color="text-yellow-500" />
-                                <StatsCard value={anime.popularity || '-'} label="Popularidade" icon={Heart} color="text-red-500" />
-                                <StatsCard value={anime.members?.toLocaleString() || '-'} label="Membros" icon={Users} color="text-blue-500" />
-                            </motion.div>
-
-                            {/* Trailer */}
-                            {anime.trailer && (
-                                <motion.section
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 0.5, delay: 0.1 }}
-                                >
-                                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Film className="w-5 h-5 text-primary" /> Trailer</h3>
-                                    <motion.div
-                                        whileHover={{ scale: 1.02 }}
-                                        transition={{ type: "spring", stiffness: 300 }}
-                                        className="aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-lg cursor-pointer"
-                                    >
-                                        <iframe
-                                            src={anime.trailer.replace("autoplay=1", "autoplay=0")}
-                                            title="Trailer"
-                                            className="w-full h-full pointer-events-none" // pointer-events-none to allow hover on parent, IF we want the card to scale. 
-                                            // Actually, pointer-events-none breaks controls. Let's just animate the container and keep controls working.
-                                            // Removing pointer-events-none to keep controls usable.
-                                            allowFullScreen
-                                        />
-                                    </motion.div>
-                                </motion.section>
+                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-white drop-shadow-2xl">
+                                {anime.title}
+                            </h1>
+                            {anime.title_english && (
+                                <h2 className="text-lg md:text-xl text-gray-300 font-medium">{anime.title_english}</h2>
                             )}
 
-                            {/* Episódios */}
-                            <motion.section
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: 0.2 }}
-                            >
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-xl font-bold flex items-center gap-2"><List className="w-5 h-5 text-primary" /> Episódios</h3>
-                                    {anime.episodesList?.length > 0 && (
-                                        <span className="text-xs font-medium text-text-secondary bg-bg-secondary px-2 py-1 rounded-lg border border-border-color">
-                                            {anime.episodesList.length} disponíveis
-                                        </span>
-                                    )}
-                                </div>
+                            <p className="text-gray-300 text-sm md:text-base leading-relaxed max-w-3xl line-clamp-3 md:line-clamp-4">
+                                {anime.synopsis}
+                            </p>
+                        </motion.div>
 
-                                {anime.episodesList && anime.episodesList.length > 0 ? (
-                                    <EpisodesList
-                                        episodes={anime.episodesList}
-                                        currentEp={currentEp}
-                                        totalEp={totalEp}
-                                        onUpdateProgress={(epNum) => {
-                                            if (user) {
-                                                updateProgress(anime.id, epNum, totalEp);
-                                                if (!libraryEntry) addToLibrary(anime, 'watching');
-                                            } else {
-                                                toast.warning("Faça login para marcar episódios!");
-                                            }
-                                        }}
-                                    />
-                                ) : (
-                                    <div className="p-8 text-center bg-bg-secondary rounded-xl border border-border-color">
-                                        <p className="text-text-secondary">Informações de episódios indisponíveis no momento.</p>
-                                    </div>
-                                )}
-                            </motion.section>
-
-                            {/* Recomendações */}
-                            <motion.section
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: 0.3 }}
-                            >
-                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Heart className="w-5 h-5 text-primary" /> Recomendações</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                    {recommendations?.slice(0, 5).map(rec => (
-                                        <Link to={`/anime/${rec.entry.mal_id}`} key={rec.entry.mal_id} className="group relative aspect-[2/3] rounded-xl overflow-hidden bg-bg-secondary" onClick={() => window.scrollTo(0, 0)}>
-                                            <img src={rec.entry.images?.jpg?.image_url} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <span className="text-xs font-bold text-white line-clamp-2">{rec.entry.title}</span>
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </motion.section>
-
-                            {/* Comentários */}
-                            <div className="pt-8 border-t border-border-color">
-                                <CommentsSection animeId={anime.id} />
-                            </div>
-
-                        </div>
-
-                        {/* ESQUERDA (Info Sidebar) --> Agora na DIREITA (Desktop) */}
-                        <motion.aside
-                            initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: 0.4 }}
-                            className="lg:col-span-3 xl:col-span-3 space-y-8 lg:sticky lg:top-24 h-fit order-1 lg:order-2"
+                        {/* Card de Ação (Desktop: Right / Mobile: Below) */}
+                        <motion.div
+                            initial={{ opacity: 0, x: 50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8, delay: 0.6 }}
+                            className="lg:col-span-3 flex flex-col justify-end order-3 lg:order-3 w-full"
                         >
-                            {/* Poster removed from here */}
-
-                            <div className="space-y-6">
-                                <h3 className="font-bold text-lg flex items-center gap-2 border-b border-border-color pb-2">
-                                    <Info className="w-5 h-5 text-primary" /> Informações
-                                </h3>
-                                <div className="space-y-3">
-                                    <InfoRow icon={Layers} label="Episódios" value={`${anime.episodes || '?'}`} />
-                                    <InfoRow icon={Clock} label="Duração" value={anime.duration?.split('per')[0]} />
-                                    <InfoRow icon={Monitor} label="Estúdio" value={anime.studios?.[0]?.name} highlight />
-                                    <InfoRow icon={Star} label="Nota Média" value={anime.score} color="text-yellow-400" />
-                                    <div className="border-t border-border-color/50 my-2" />
-                                    <InfoRow icon={Film} label="Origem" value={anime.source} />
-                                    <InfoRow icon={CheckCircle} label="Status" value={anime.status === 'Finished Airing' ? 'Completo' : 'Em Lançamento'} color={anime.status === 'Finished Airing' ? 'text-emerald-400' : 'text-blue-400'} />
-                                    <InfoRow icon={AlertCircle} label="Classificação" value={anime.rating?.split(' ')[0]} />
-                                    <InfoRow icon={Calendar} label="Exibição" value={anime.year || anime.aired?.string?.split('to')[0]} />
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                <h3 className="font-bold text-lg border-b border-border-color pb-2">Gêneros</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {anime.genres?.map(g => (
-                                        <motion.span
-                                            key={g.mal_id}
-                                            whileHover={{ scale: 1.1, backgroundColor: "var(--primary)", color: "#fff", borderColor: "var(--primary)" }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className="px-3 py-1.5 rounded-lg bg-bg-secondary border border-border-color text-xs font-medium transition-colors cursor-pointer select-none"
-                                        >
-                                            {g.name}
-                                        </motion.span>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                <h3 className="font-bold text-lg border-b border-border-color pb-2">Elenco</h3>
-                                <div className="grid grid-cols-1 gap-3">
-                                    {characters?.slice(0, 4).map(char => (
-                                        <motion.div
-                                            key={char.character.mal_id}
-                                            whileHover={{ x: 5, backgroundColor: "rgba(255,255,255,0.05)" }}
-                                            className="rounded-xl transition-colors"
-                                        >
-                                            <Link to={`/character/${char.character.mal_id}`} className="flex items-center gap-3 p-2 group">
-                                                <div className="size-10 rounded-full overflow-hidden bg-bg-secondary">
-                                                    <img src={char.character.images?.jpg?.image_url} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-bold group-hover:text-primary transition-colors line-clamp-1">{char.character.name}</span>
-                                                    <span className="text-xs text-text-secondary">{char.role}</span>
-                                                </div>
-                                            </Link>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                                <Link to="/characters" className="block text-center text-sm font-bold text-primary hover:underline">Ver todo o elenco</Link>
-                            </div>
-                        </motion.aside>
+                            <HeroActionCard
+                                anime={anime}
+                                libraryEntry={libraryEntry}
+                                status={status}
+                                handleStatusChange={handleStatusChange}
+                                handleIncrement={handleIncrement}
+                                updateProgress={updateProgress}
+                                updateRating={updateRating}
+                                toggleFavorite={toggleFavorite}
+                                currentEp={currentEp}
+                                totalEp={totalEp}
+                            />
+                        </motion.div>
                     </div>
                 </div>
+            </motion.section>
+
+            {/* --- CONTEÚDO PRINCIPAL --- */}
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+                    {/* DIREITA (Conteúdo) --> Agora na ESQUERDA (Desktop) */}
+                    <div className="lg:col-span-9 xl:col-span-9 space-y-12 order-2 lg:order-1">
+
+                        {/* Stats Grid */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5 }}
+                            className="grid grid-cols-2 md:grid-cols-4 gap-4"
+                        >
+                            <StatsCard value={`#${anime.rank || '-'}`} label="Ranking" icon={Trophy} />
+                            <StatsCard value={anime.score || '-'} label="Score" icon={Star} color="text-yellow-500" />
+                            <StatsCard value={anime.popularity || '-'} label="Popularidade" icon={Heart} color="text-red-500" />
+                            <StatsCard value={anime.members?.toLocaleString() || '-'} label="Membros" icon={Users} color="text-blue-500" />
+                        </motion.div>
+
+                        {/* Trailer */}
+                        {anime.trailer && (
+                            <motion.section
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: 0.1 }}
+                            >
+                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Film className="w-5 h-5 text-primary" /> Trailer</h3>
+                                <motion.div
+                                    whileHover={{ scale: 1.02 }}
+                                    transition={{ type: "spring", stiffness: 300 }}
+                                    className="aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-lg cursor-pointer"
+                                >
+                                    <iframe
+                                        src={anime.trailer.replace("autoplay=1", "autoplay=0")}
+                                        title="Trailer"
+                                        className="w-full h-full pointer-events-none" // pointer-events-none to allow hover on parent, IF we want the card to scale. 
+                                        // Actually, pointer-events-none breaks controls. Let's just animate the container and keep controls working.
+                                        // Removing pointer-events-none to keep controls usable.
+                                        allowFullScreen
+                                    />
+                                </motion.div>
+                            </motion.section>
+                        )}
+
+                        {/* Episódios */}
+                        <motion.section
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-xl font-bold flex items-center gap-2"><List className="w-5 h-5 text-primary" /> Episódios</h3>
+                                {anime.episodesList?.length > 0 && (
+                                    <span className="text-xs font-medium text-text-secondary bg-bg-secondary px-2 py-1 rounded-lg border border-border-color">
+                                        {anime.episodesList.length} disponíveis
+                                    </span>
+                                )}
+                            </div>
+
+                            {anime.episodesList && anime.episodesList.length > 0 ? (
+                                <EpisodesList
+                                    episodes={anime.episodesList}
+                                    currentEp={currentEp}
+                                    totalEp={totalEp}
+                                    onUpdateProgress={(epNum) => {
+                                        if (user) {
+                                            updateProgress(anime.id, epNum, totalEp);
+                                            if (!libraryEntry) addToLibrary(anime, 'watching');
+                                        } else {
+                                            toast.warning("Faça login para marcar episódios!");
+                                        }
+                                    }}
+                                />
+                            ) : (
+                                <div className="p-8 text-center bg-bg-secondary rounded-xl border border-border-color">
+                                    <p className="text-text-secondary">Informações de episódios indisponíveis no momento.</p>
+                                </div>
+                            )}
+                        </motion.section>
+
+                        {/* Recomendações */}
+                        <motion.section
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: 0.3 }}
+                        >
+                            <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Heart className="w-5 h-5 text-primary" /> Recomendações</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                {recommendations?.slice(0, 5).map(rec => (
+                                    <Link to={`/anime/${rec.entry.mal_id}`} key={rec.entry.mal_id} className="group relative aspect-[2/3] rounded-xl overflow-hidden bg-bg-secondary" onClick={() => window.scrollTo(0, 0)}>
+                                        <img src={rec.entry.images?.jpg?.image_url} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span className="text-xs font-bold text-white line-clamp-2">{rec.entry.title}</span>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        </motion.section>
+
+                        {/* Comentários */}
+                        <div className="pt-8 border-t border-border-color">
+                            <CommentsSection animeId={anime.id} />
+                        </div>
+
+                    </div>
+
+                    {/* ESQUERDA (Info Sidebar) --> Agora na DIREITA (Desktop) */}
+                    <motion.aside
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                        className="lg:col-span-3 xl:col-span-3 space-y-8 lg:sticky lg:top-24 h-fit order-1 lg:order-2"
+                    >
+                        {/* Poster removed from here */}
+
+                        <div className="space-y-6">
+                            <h3 className="font-bold text-lg flex items-center gap-2 border-b border-border-color pb-2">
+                                <Info className="w-5 h-5 text-primary" /> Informações
+                            </h3>
+                            <div className="space-y-3">
+                                <InfoRow icon={Layers} label="Episódios" value={`${anime.episodes || '?'}`} />
+                                <InfoRow icon={Clock} label="Duração" value={anime.duration?.split('per')[0]} />
+                                <InfoRow icon={Monitor} label="Estúdio" value={anime.studios?.[0]?.name} highlight />
+                                <InfoRow icon={Star} label="Nota Média" value={anime.score} color="text-yellow-400" />
+                                <div className="border-t border-border-color/50 my-2" />
+                                <InfoRow icon={Film} label="Origem" value={anime.source} />
+                                <InfoRow icon={CheckCircle} label="Status" value={anime.status === 'Finished Airing' ? 'Completo' : 'Em Lançamento'} color={anime.status === 'Finished Airing' ? 'text-emerald-400' : 'text-blue-400'} />
+                                <InfoRow icon={AlertCircle} label="Classificação" value={anime.rating?.split(' ')[0]} />
+                                <InfoRow icon={Calendar} label="Exibição" value={anime.year || anime.aired?.string?.split('to')[0]} />
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <h3 className="font-bold text-lg border-b border-border-color pb-2">Gêneros</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {anime.genres?.map(g => (
+                                    <motion.span
+                                        key={g.mal_id}
+                                        whileHover={{ scale: 1.1, backgroundColor: "var(--primary)", color: "#fff", borderColor: "var(--primary)" }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="px-3 py-1.5 rounded-lg bg-bg-secondary border border-border-color text-xs font-medium transition-colors cursor-pointer select-none"
+                                    >
+                                        {g.name}
+                                    </motion.span>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <h3 className="font-bold text-lg border-b border-border-color pb-2">Elenco</h3>
+                            <div className="grid grid-cols-1 gap-3">
+                                {characters?.slice(0, 4).map(char => (
+                                    <motion.div
+                                        key={char.character.mal_id}
+                                        whileHover={{ x: 5, backgroundColor: "rgba(255,255,255,0.05)" }}
+                                        className="rounded-xl transition-colors"
+                                    >
+                                        <Link to={`/character/${char.character.mal_id}`} className="flex items-center gap-3 p-2 group">
+                                            <div className="size-10 rounded-full overflow-hidden bg-bg-secondary">
+                                                <img src={char.character.images?.jpg?.image_url} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold group-hover:text-primary transition-colors line-clamp-1">{char.character.name}</span>
+                                                <span className="text-xs text-text-secondary">{char.role}</span>
+                                            </div>
+                                        </Link>
+                                    </motion.div>
+                                ))}
+                            </div>
+                            <Link to="/characters" className="block text-center text-sm font-bold text-primary hover:underline">Ver todo o elenco</Link>
+                        </div>
+                    </motion.aside>
+                </div>
             </div>
-        </Layout>
+        </div>
+
     );
 }
 

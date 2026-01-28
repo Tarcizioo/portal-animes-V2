@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Layout } from '@/components/layout/Layout';
+
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileStats } from '@/components/profile/ProfileStats';
 import { AchievementBadges } from '@/components/profile/AchievementBadges';
@@ -86,66 +86,67 @@ export function Profile() {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-10">
-          {/* Skeleton Profile Header */}
-          <div className="relative mb-20">
-            <Skeleton className="h-48 md:h-64 w-full rounded-2xl" />
-            <div className="absolute -bottom-16 left-8 flex items-end">
-              <div className="w-32 h-32 rounded-full border-4 border-bg-primary bg-bg-tertiary overflow-hidden">
-                <Skeleton className="w-full h-full" />
-              </div>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-24 rounded-2xl" />
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
-              <Skeleton className="h-80 rounded-2xl" />
-              <Skeleton className="h-40 rounded-2xl" />
-            </div>
-            <div className="space-y-6">
-              <Skeleton className="h-40 rounded-2xl" />
-              <Skeleton className="h-60 rounded-2xl" />
+      <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-10">
+        {/* Skeleton Profile Header */}
+        <div className="relative mb-20">
+          <Skeleton className="h-48 md:h-64 w-full rounded-2xl" />
+          <div className="absolute -bottom-16 left-8 flex items-end">
+            <div className="w-32 h-32 rounded-full border-4 border-bg-primary bg-bg-tertiary overflow-hidden">
+              <Skeleton className="w-full h-full" />
             </div>
           </div>
         </div>
-      </Layout>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-24 rounded-2xl" />
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            <Skeleton className="h-80 rounded-2xl" />
+            <Skeleton className="h-40 rounded-2xl" />
+          </div>
+          <div className="space-y-6">
+            <Skeleton className="h-40 rounded-2xl" />
+            <Skeleton className="h-60 rounded-2xl" />
+          </div>
+        </div>
+      </div>
+
     );
   }
 
   if (!user) {
     return (
-      <Layout>
-        <div className="flex-1 flex flex-col items-center justify-center p-4 min-h-[60vh]">
-          <div className="text-center space-y-6 max-w-md">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <LogIn className="w-10 h-10 text-primary" />
-            </div>
-            <h2 className="text-3xl font-bold">Faça login para acessar</h2>
-            <p className="text-gray-400">
-              Crie sua biblioteca, acompanhe seus animes favoritos e ganhe conquistas exclusivas.
-            </p>
-            <button
-              onClick={signInGoogle}
-              className="w-full py-3 px-6 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-primary/25 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
-            >
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5 bg-white rounded-full p-0.5" />
-              Entrar com Google
-            </button>
+
+      <div className="flex-1 flex flex-col items-center justify-center p-4 min-h-[60vh]">
+        <div className="text-center space-y-6 max-w-md">
+          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <LogIn className="w-10 h-10 text-primary" />
           </div>
+          <h2 className="text-3xl font-bold">Faça login para acessar</h2>
+          <p className="text-gray-400">
+            Crie sua biblioteca, acompanhe seus animes favoritos e ganhe conquistas exclusivas.
+          </p>
+          <button
+            onClick={signInGoogle}
+            className="w-full py-3 px-6 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-lg shadow-primary/25 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
+          >
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5 bg-white rounded-full p-0.5" />
+            Entrar com Google
+          </button>
         </div>
-      </Layout>
+      </div>
+
     );
   }
 
   return (
-    <Layout>
+
+    <>
       <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-10">
         <ProfileHeader
           user={user}
@@ -240,6 +241,8 @@ export function Profile() {
         library={library}
       />
 
-    </Layout>
+    </>
+
+
   );
 }

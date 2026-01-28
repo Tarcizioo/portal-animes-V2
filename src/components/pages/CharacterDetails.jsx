@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Layout } from '@/components/layout/Layout';
 import { useCharacterInfo } from '@/hooks/useCharacterInfo';
 import { useCharacterLibrary } from '@/hooks/useCharacterLibrary';
 import { useAuth } from '@/context/AuthContext';
@@ -67,27 +66,23 @@ export function CharacterDetails() {
 
     if (loading) {
         return (
-            <Layout>
-                <div className="flex h-[80vh] items-center justify-center">
-                    <Loader />
-                </div>
-            </Layout>
+            <div className="flex h-[80vh] items-center justify-center">
+                <Loader />
+            </div>
         );
     }
 
     if (!character) return (
-        <Layout>
-            <div className="flex bg-bg-primary text-text-primary items-center justify-center h-screen">
-                <p>Personagem não encontrado.</p>
-            </div>
-        </Layout>
+        <div className="flex bg-bg-primary text-text-primary items-center justify-center h-screen">
+            <p>Personagem não encontrado.</p>
+        </div>
     );
 
     const mainVoiceActors = voiceActors.filter(va => va.language === "Japanese").slice(0, 4);
     const displayVoiceActors = mainVoiceActors.length > 0 ? mainVoiceActors : voiceActors.slice(0, 4);
 
     return (
-        <Layout>
+        <>
             <ScrollToTop />
             <div className="min-h-screen bg-bg-primary text-text-primary font-sans pb-20 relative overflow-hidden">
                 <div className={`relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-12 transition-opacity duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
@@ -343,6 +338,6 @@ export function CharacterDetails() {
                     </div>
                 )}
             </div>
-        </Layout>
+        </>
     );
 }

@@ -27,23 +27,29 @@ const PageLoader = () => (
   </div>
 );
 
+import { Layout } from "@/components/layout/Layout";
+
 const AnimatedRoutes = () => {
   const location = useLocation();
 
   return (
-    <Routes location={location} key={location.pathname}>
-      <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-      <Route path="/catalog" element={<PageTransition><Catalog /></PageTransition>} />
-      <Route path="/characters" element={<PageTransition><Characters /></PageTransition>} />
-      <Route path="/character/:id" element={<PageTransition><CharacterDetails /></PageTransition>} />
-      <Route path="/anime/:id" element={<PageTransition><AnimeDetails /></PageTransition>} />
-      <Route path="/library" element={<PageTransition><Library /></PageTransition>} />
-      <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
-      <Route path="/u/:uid" element={<PageTransition><PublicProfile /></PageTransition>} />
-      <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
-      <Route path="/terms" element={<PageTransition><TermsOfUse /></PageTransition>} />
-      <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
-    </Routes>
+    <Layout>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+          <Route path="/catalog" element={<PageTransition><Catalog /></PageTransition>} />
+          <Route path="/characters" element={<PageTransition><Characters /></PageTransition>} />
+          <Route path="/character/:id" element={<PageTransition><CharacterDetails /></PageTransition>} />
+          <Route path="/anime/:id" element={<PageTransition><AnimeDetails /></PageTransition>} />
+          <Route path="/library" element={<PageTransition><Library /></PageTransition>} />
+          <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+          <Route path="/u/:uid" element={<PageTransition><PublicProfile /></PageTransition>} />
+          <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+          <Route path="/terms" element={<PageTransition><TermsOfUse /></PageTransition>} />
+          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+        </Routes>
+      </AnimatePresence>
+    </Layout>
   );
 };
 
