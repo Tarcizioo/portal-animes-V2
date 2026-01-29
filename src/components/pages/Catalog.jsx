@@ -110,7 +110,7 @@ export function Catalog() {
     }
   };
 
-  const hasActiveFilters = filters.q || filters.status || filters.genres.length > 0 || filters.year || filters.season || filters.type;
+  const hasActiveFilters = filters.q || filters.status || filters.genres.length > 0 || filters.year || filters.season || filters.type || filters.producers;
   const skeletonCount = animes.length === 0 ? 12 : 4;
 
   return (
@@ -200,6 +200,23 @@ export function Catalog() {
               <option value="special">Especiais</option>
               <option value="ona">ONAs (Internet)</option>
               <option value="music">Musical</option>
+            </select>
+          </div>
+
+          {/* Streaming / Plataforma */}
+          <div className="space-y-2">
+            <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider flex items-center gap-2"> <MonitorPlay className="w-3.5 h-3.5 text-button-accent" /> Plataforma </h3>
+            <select
+              value={filters.producers || ''}
+              onChange={(e) => updateFilter('producers', e.target.value)}
+              className="w-full bg-bg-secondary border-2 border-border-color rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-button-accent focus:ring-2 focus:ring-button-accent/10 transition-all cursor-pointer"
+            >
+              <option value="">Todas</option>
+              <option value="1977">Netflix</option>
+              <option value="1468">Crunchyroll</option>
+              <option value="102">Funimation</option>
+              <option value="417">Disney+</option>
+              <option value="1695">Hulu</option>
             </select>
           </div>
 
@@ -410,8 +427,8 @@ export function Catalog() {
           <div ref={sentinelRef} className="h-10 mt-8" />
         </div>
 
-      </div>
-    </div>
+      </div >
+    </div >
 
   );
 }

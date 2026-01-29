@@ -1,19 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 
-// Hook de Debounce Interno
-function useDebounce(value, delay) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-  return debouncedValue;
-}
-
 export function useCatalog() {
   const [animes, setAnimes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,11 +23,9 @@ export function useCatalog() {
       year: '',
       season: '',
       type: '',
+      producers: '', // Novo filtro
     };
   });
-
-  // Debounce dos filtros para evitar chamadas excessivas
-  const debouncedFilters = useDebounce(filters, 600);
 
   // Salva filtros no localStorage
   useEffect(() => {
@@ -52,7 +36,7 @@ export function useCatalog() {
     // Apenas reseta o estado local, o useEffect reagirá
     setPage(1);
     setHasMore(true);
-    setFilters({ q: '', genres: [], orderBy: 'ranking', status: '', year: '', season: '', type: '' });
+    setFilters({ q: '', genres: [], orderBy: 'ranking', status: '', year: '', season: '', type: '', producers: '' });
   }, []);
 
   const updateFilter = (key, value) => {
@@ -78,11 +62,11 @@ export function useCatalog() {
         const params = new URLSearchParams({ page: page, limit: 24, sfw: true });
         let endpoint = 'https://api.jikan.moe/v4/anime';
 
-        // Usamos debouncedFilters aqui
-        const currentFilters = debouncedFilters;
+        // Usamos filters diretamente aqui (sem debounce)
+        const currentFilters = filters;
 
         const hasTextOrGenre = currentFilters.q !== '' || currentFilters.genres.length > 0;
-        const hasAdvancedFilters = currentFilters.year || currentFilters.season || currentFilters.type;
+        const hasAdvancedFilters = currentFilters.year || currentFilters.season || currentFilters.type || currentFilters.producers;
         const isRankingMode = ['ranking', 'score'].includes(currentFilters.orderBy);
 
         // LÓGICA DE ENDPOINT
@@ -96,6 +80,7 @@ export function useCatalog() {
           if (currentFilters.status) params.append('status', currentFilters.status);
           if (currentFilters.genres.length > 0) params.append('genres', currentFilters.genres.join(','));
           if (currentFilters.type) params.append('type', currentFilters.type);
+          if (currentFilters.producers) params.append('producers', currentFilters.producers);
 
           // Lógica de Ano e Temporada
           if (currentFilters.year) {
@@ -206,7 +191,7 @@ export function useCatalog() {
     fetchCatalog();
 
     return () => { isMounted = false; controller.abort(); };
-  }, [page, debouncedFilters]); // Agora depende de debouncedFilters
+  }, [page, filters]); // Agora depende diretamente de filters
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) setPage(prev => prev + 1);
