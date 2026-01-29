@@ -2,23 +2,59 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // PERFIL E BIBLIOTECA
-    // O uso de {document=**} permite ler/gravar o documento do usuário 
-    // E TAMBÉM todas as subcoleções (como 'library')
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    // --- Helper Functions ---
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
     }
     
-    // COMENTÁRIOS
+    function isPublic(userId) {
+       // Check if the target user's profile has isPublic == true (or unavailable/default)
+       // Note: This costs 1 read per evaluation.
+       // Default behavior: If 'isPublic' field is missing, assume public? Code implies private if false.
+       // Let's assume safe default: False if missing? 
+       // Code: const isPublic = userData.isPublic !== false; (So default is TRUE/Public)
+       let userDoc = get(/databases/$(database)/documents/users/$(userId));
+       return userDoc.data.isPublic != false;
+    }
+
+    // --- USERS COLLECTION ---
+    match /users/{userId} {
+      // Allow read if Owner OR if the doc itself is public
+      // Note: for the doc itself, we can access 'resource.data' without a get() cost.
+      allow read: if isOwner(userId) || resource.data.isPublic != false;
+      allow write: if isOwner(userId);
+      
+      // SUBCOLLECTIONS
+      
+      // 1. Library (Anime/Manga List)
+      match /library/{docId} {
+        // Read: Owner OR if Parent User is Public
+        allow read: if isOwner(userId) || isPublic(userId);
+        allow write: if isOwner(userId);
+      }
+      
+      // 2. Favorites (Characters)
+      match /favorite_characters/{docId} {
+        allow read: if isOwner(userId) || isPublic(userId);
+        allow write: if isOwner(userId);
+      }
+
+      // 3. Notifications (PRIVATE - Owner Only)
+      match /notifications/{notifId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      // 4. Default catch-all for other subcollections (Private by default)
+      match /{document=**} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+    
+    // --- COMMENTS ---
     match /comments/{commentId} {
-      // Qualquer pessoa pode ler (público)
       allow read: if true;
-      
-      // Apenas logado cria
       allow create: if request.auth != null;
-      
-      // Apenas o dono deleta
-      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
   }
 }

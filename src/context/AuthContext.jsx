@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
                 await setDoc(userRef, {
                     uid: user.uid,
                     name: user.displayName,
-                    email: user.email,
+                    // email: user.email, // REMOVIDO por segurança (será lido via auth.currentUser)
                     photoURL: user.photoURL,
                     bannerURL: null,
                     createdAt: serverTimestamp(),
@@ -42,9 +42,6 @@ export function AuthProvider({ children }) {
             }
         } catch (error) {
             console.error("Erro no login Google:", error);
-            console.error("Error Code:", error.code);
-            console.error("Error Message:", error.message);
-            console.error("Error Message:", error.message);
             toast.error(`Erro ao fazer login: ${error.message}`);
             throw error;
         }
