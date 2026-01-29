@@ -1,7 +1,13 @@
-import { Star } from 'lucide-react';
+import { Star, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export function AnimeCard({ id, title, genre, image, score }) {
+export function AnimeCard({ id, title, genre, image, score, onRemove }) {
+  const handleRemove = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onRemove();
+  };
+
   return (
     <Link to={`/anime/${id}`} className="block group relative cursor-pointer">
       <div
@@ -21,6 +27,17 @@ export function AnimeCard({ id, title, genre, image, score }) {
             Ver Detalhes
           </span>
         </div>
+
+        {/* Botão Remover (Lixeira) - Só aparece se onRemove existir */}
+        {onRemove && (
+          <button
+            onClick={handleRemove}
+            className="absolute top-2 left-2 p-2 bg-red-500/20 backdrop-blur-md border border-red-500/30 rounded-lg text-red-500 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 hover:bg-red-500 hover:text-white z-10"
+            title="Remover da Biblioteca"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
 
         {/* Nota (Badge) com Glassmorphism Visual */}
         <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md border border-white/10 px-2 py-1 rounded-md flex items-center gap-1 shadow-sm">

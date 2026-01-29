@@ -1,4 +1,4 @@
-import { Star, Users, Calendar, MonitorPlay, Film, PlayCircle, CheckCircle, Clock } from 'lucide-react';
+import { Star, Users, Calendar, MonitorPlay, Film, PlayCircle, CheckCircle, Clock, Trash2, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 
@@ -65,14 +65,33 @@ export function AnimeListItem({
             {/* Content Container */}
             <div className="flex-1 flex flex-col min-w-0 py-0.5 relative z-10">
 
-                {/* Header: Title & Status */}
+                {/* Header: Title & Status (and optional Remove button) */}
                 <div className="flex items-start justify-between gap-2 mb-1">
                     <h3 className="text-base sm:text-lg font-bold text-text-primary group-hover:text-button-accent transition-colors line-clamp-2 sm:line-clamp-1 leading-tight">
                         {title}
                     </h3>
-                    <div className={clsx("hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider shrink-0", statusInfo.color)}>
-                        {StatusIcon && <StatusIcon className="w-3 h-3" />}
-                        {statusInfo.label}
+
+                    <div className="flex items-center gap-2">
+                        {/* Status Icon */}
+                        <div className={clsx("hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider shrink-0", statusInfo.color)}>
+                            {StatusIcon && <StatusIcon className="w-3 h-3" />}
+                            {statusInfo.label}
+                        </div>
+
+                        {/* Remove Button (Visible on hover in Desktop, always on mobile if enabled) */}
+                        {onRemove && (
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onRemove();
+                                }}
+                                className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors opacity-0 group-hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                                title="Remover"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        )}
                     </div>
                 </div>
 

@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/context/ToastContext';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
 import { ViewToggle } from '@/components/ui/ViewToggle';
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 
 const GENRES = [
     { id: 1, name: 'Ação' },
@@ -77,7 +78,7 @@ const itemVariants = {
 };
 
 export function Library() {
-    const { library, loading, syncLibraryData } = useAnimeLibrary();
+    const { library, loading, syncLibraryData, removeFromLibrary } = useAnimeLibrary();
     const [showMobileFilters, setShowMobileFilters] = useState(false);
 
     // --- PERSISTÊNCIA DE VIEW MODE ---
@@ -88,6 +89,19 @@ export function Library() {
 
     const [isSyncing, setIsSyncing] = useState(false);
     const { toast } = useToast();
+    const [animeToRemove, setAnimeToRemove] = useState(null);
+
+    const handleRemoveConfirm = async () => {
+        if (animeToRemove) {
+            try {
+                await removeFromLibrary(animeToRemove.id);
+                toast.success(`${animeToRemove.title} removido com sucesso.`);
+            } catch (error) {
+                toast.error("Erro ao remover anime.");
+            }
+            setAnimeToRemove(null);
+        }
+    };
 
     usePageTitle('Minha Biblioteca');
 
@@ -558,12 +572,14 @@ export function Library() {
                                         <AnimeCard
                                             key={`${anime.id}-card`}
                                             {...anime}
+                                            onRemove={() => setAnimeToRemove(anime)}
                                         />
                                     ) : (
                                         <AnimeListItem
                                             key={`${anime.id}-list`}
                                             {...anime}
                                             showPersonalProgress // Flag para mostrar progresso pessoal na lista
+                                            onRemove={() => setAnimeToRemove(anime)}
                                         />
                                     )}
                                 </motion.div>
@@ -606,6 +622,17 @@ export function Library() {
                 </div>
 
             </div>
+
+            {/* Remove Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={!!animeToRemove}
+                onClose={() => setAnimeToRemove(null)}
+                onConfirm={handleRemoveConfirm}
+                title="Remover da Biblioteca"
+                message={`Tem certeza que deseja remover "${animeToRemove?.title}" da sua biblioteca?`}
+                confirmText="Remover"
+                isDestructive
+            />
         </div>
 
     );

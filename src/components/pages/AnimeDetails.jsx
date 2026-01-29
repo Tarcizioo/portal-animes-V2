@@ -21,7 +21,7 @@ export function AnimeDetails() {
     const { anime, characters, recommendations, loading } = useAnimeInfo(id);
     const { user } = useAuth();
     const { toast } = useToast();
-    const { library, addToLibrary, incrementProgress, updateProgress, updateRating, toggleFavorite } = useAnimeLibrary();
+    const { library, addToLibrary, incrementProgress, updateProgress, updateRating, toggleFavorite, removeFromLibrary } = useAnimeLibrary();
 
     usePageTitle(anime?.title || 'Detalhes');
 
@@ -35,10 +35,20 @@ export function AnimeDetails() {
     }, [libraryEntry]);
 
     const [isVisible, setIsVisible] = useState(false);
+    const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+
     useEffect(() => {
         const timer = setTimeout(() => setIsVisible(true), 100);
         return () => clearTimeout(timer);
     }, []);
+
+    const handleRemoveConfirm = async () => {
+        if (libraryEntry) {
+            await removeFromLibrary(libraryEntry.id);
+            toast.success("Anime removido da biblioteca.");
+            setStatus('plan_to_watch'); // Reset status visual
+        }
+    };
 
     const handleStatusChange = (newStatus) => {
         setStatus(newStatus);
@@ -175,11 +185,23 @@ export function AnimeDetails() {
                                 toggleFavorite={toggleFavorite}
                                 currentEp={currentEp}
                                 totalEp={totalEp}
+                                onRemove={() => setIsRemoveModalOpen(true)}
                             />
                         </motion.div>
                     </div>
                 </div>
             </motion.section>
+
+            {/* Remove Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={isRemoveModalOpen}
+                onClose={() => setIsRemoveModalOpen(false)}
+                onConfirm={handleRemoveConfirm}
+                title="Remover da Biblioteca"
+                message={`Tem certeza que deseja remover "${anime.title}" da sua biblioteca? Todo o seu progresso será perdido.`}
+                confirmText="Remover"
+                isDestructive
+            />
 
             {/* --- CONTEÚDO PRINCIPAL --- */}
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-12">
@@ -360,15 +382,19 @@ export function AnimeDetails() {
                         </div>
                     </motion.aside>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
 
     );
 }
 
 // --- SUB-COMPONENTS ---
 
-function HeroActionCard({ anime, libraryEntry, status, handleStatusChange, handleIncrement, updateProgress, toggleFavorite, currentEp, totalEp, updateRating }) {
+
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
+import { Trash2 } from 'lucide-react';
+
+function HeroActionCard({ anime, libraryEntry, status, handleStatusChange, handleIncrement, updateProgress, toggleFavorite, currentEp, totalEp, updateRating, onRemove }) {
     if (!libraryEntry) {
         return (
             <div className="bg-bg-secondary/90 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-xl space-y-4">
@@ -394,9 +420,18 @@ function HeroActionCard({ anime, libraryEntry, status, handleStatusChange, handl
         <div className="bg-bg-secondary/90 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-xl space-y-4">
             <div className="flex items-center justify-between">
                 <span className="font-bold text-white">Editar Progresso</span>
-                <button onClick={() => toggleFavorite(anime)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                    <Heart className={`w-5 h-5 ${libraryEntry.isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
-                </button>
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={onRemove}
+                        className="p-2 hover:bg-white/10 rounded-full transition-colors group"
+                        title="Remover da Biblioteca"
+                    >
+                        <Trash2 className="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" />
+                    </button>
+                    <button onClick={() => toggleFavorite(anime)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                        <Heart className={`w-5 h-5 ${libraryEntry.isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                    </button>
+                </div>
             </div>
 
             <select
@@ -436,6 +471,8 @@ function HeroActionCard({ anime, libraryEntry, status, handleStatusChange, handl
         </div>
     );
 }
+
+
 
 function InfoRow({ icon: Icon, label, value, color, highlight }) {
     return (
