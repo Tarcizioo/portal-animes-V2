@@ -1,23 +1,45 @@
 import { useQuery } from '@tanstack/react-query';
 
 async function fetchAnimeDetails(id) {
-  // Pequeno delay preventivo apenas na primeira busca real
-  await new Promise(resolve => setTimeout(resolve, 300));
+  // Helper de delay
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
   // Helper para não quebrar tudo se uma request falhar
-  const safeFetch = (url) => fetch(url).then(res => res.ok ? res.json() : { data: [] }).catch(() => ({ data: [] }));
+  const safeFetch = async (url) => {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) {
+        if (res.status === 429) console.warn(`Rate limit hit for ${url}`);
+        return { data: [] };
+      }
+      return await res.json();
+    } catch (e) {
+      console.warn(`Error fetching ${url}:`, e);
+      return { data: [] };
+    }
+  };
 
-  const [animeRes, charJson, recJson, epJson] = await Promise.all([
-    fetch(`https://api.jikan.moe/v4/anime/${id}/full`),
-    safeFetch(`https://api.jikan.moe/v4/anime/${id}/characters`),
-    safeFetch(`https://api.jikan.moe/v4/anime/${id}/recommendations`),
-    safeFetch(`https://api.jikan.moe/v4/anime/${id}/episodes`)
-  ]);
-
-  if (!animeRes.ok) throw new Error("Falha ao carregar anime");
-
+  // 1. Core Details (Critical)
+  const animeRes = await fetch(`https://api.jikan.moe/v4/anime/${id}/full`);
+  if (!animeRes.ok) {
+    if (animeRes.status === 429) {
+      throw new Error("Muitas requisições. Tente novamente em instantes.");
+    }
+    throw new Error(`Falha ao carregar anime: ${animeRes.status}`);
+  }
   const animeJson = await animeRes.json();
-  // charJson, recJson, epJson já são os objetos JSON ou fallback { data: [] }
+
+  // 2. Characters (Wait to avoid 429)
+  await delay(600);
+  const charJson = await safeFetch(`https://api.jikan.moe/v4/anime/${id}/characters`);
+
+  // 3. Recommendations
+  await delay(600);
+  const recJson = await safeFetch(`https://api.jikan.moe/v4/anime/${id}/recommendations`);
+
+  // 4. Episodes
+  await delay(600);
+  const epJson = await safeFetch(`https://api.jikan.moe/v4/anime/${id}/episodes`);
 
   const data = animeJson.data;
 
