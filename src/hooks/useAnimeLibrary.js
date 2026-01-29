@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/services/firebase';
 import { useAuth } from '@/context/AuthContext';
+import { APP_CONFIG } from '@/constants/app';
 import {
     collection,
     query,
@@ -26,12 +27,12 @@ export function useAnimeLibrary() {
             return;
         }
 
-        const libraryRef = collection(db, 'users', user.uid, 'library');
+        const libraryRef = collection(db, 'users', user.uid, APP_CONFIG.LIBRARY.COLLECTION_NAME);
         const q = query(libraryRef);
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const animeList = snapshot.docs.map(doc => ({
-                id: parseInt(doc.id) || doc.id, // Tenta manter número para compatibilidade, mas a key do doc é string
+                id: doc.id, // ID é sempre String no Firestore
                 ...doc.data()
             }));
             setLibrary(animeList);
@@ -57,10 +58,29 @@ export function useAnimeLibrary() {
             currentEp = existingData.currentEp;
         }
 
+        // Lógica de Imagem: Pode vir direto (View Model) ou aninhado (Jikan Raw)
+        const imageUrl = anime.image || anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url || null;
+
+        // Lógica de Gêneros: Pode vir como strings (View Model) ou objetos (Jikan Raw)
+        let genres = [];
+        if (Array.isArray(anime.genres)) {
+            if (typeof anime.genres[0] === 'string') {
+                genres = anime.genres; // Já mapeado
+            } else {
+                genres = (anime.genres || []).map(g => g.name); // Mapeia objetos
+            }
+        }
+        // Se for Raw, pode ter themes/demographics
+        if (Array.isArray(anime.themes)) genres = genres.concat(anime.themes.map(t => t.name));
+        if (Array.isArray(anime.demographics)) genres = genres.concat(anime.demographics.map(d => d.name));
+
+        // Remove duplicatas de gêneros
+        genres = [...new Set(genres)];
+
         return {
-            id: Number(safeId), // Mantendo como Number no payload se possível, mas Firestore doc key é string
-            title: anime.title_english || anime.title || 'Sem Título',
-            image: anime.images?.jpg?.image_url || anime.image || null,
+            id: safeId, // ID normalizado como String
+            title: anime.title || anime.title_english || 'Sem Título',
+            image: imageUrl,
             totalEp: anime.episodes || 0,
             currentEp: currentEp,
             score: existingData.score || 0, // Nota do Usuário
@@ -68,7 +88,7 @@ export function useAnimeLibrary() {
             lastUpdated: serverTimestamp(),
 
             // Metadados Ricos
-            genres: (anime.genres || []).concat(anime.themes || [], anime.demographics || []).map(g => g.name),
+            genres: genres,
             year: anime.year || anime.aired?.prop?.from?.year || null,
             season: anime.season || null,
             type: anime.type || 'TV',
@@ -92,7 +112,7 @@ export function useAnimeLibrary() {
                 return;
             }
             const docId = String(animeId);
-            const animeRef = doc(db, 'users', user.uid, 'library', docId);
+            const animeRef = doc(db, 'users', user.uid, APP_CONFIG.LIBRARY.COLLECTION_NAME, docId);
 
             // Verificar existência
             const docSnap = await getDoc(animeRef);
@@ -118,7 +138,7 @@ export function useAnimeLibrary() {
         if (totalEp > 0 && newEp > totalEp) newEp = totalEp;
 
         try {
-            const animeRef = doc(db, 'users', user.uid, 'library', String(animeId));
+            const animeRef = doc(db, 'users', user.uid, APP_CONFIG.LIBRARY.COLLECTION_NAME, String(animeId));
             const updates = {
                 currentEp: newEp,
                 lastUpdated: serverTimestamp()
@@ -142,7 +162,7 @@ export function useAnimeLibrary() {
     const updateStatus = async (animeId, newStatus, totalEp = 0) => {
         if (!user) return;
         try {
-            const animeRef = doc(db, 'users', user.uid, 'library', String(animeId));
+            const animeRef = doc(db, 'users', user.uid, APP_CONFIG.LIBRARY.COLLECTION_NAME, String(animeId));
             const updates = {
                 status: newStatus,
                 lastUpdated: serverTimestamp()
@@ -160,7 +180,7 @@ export function useAnimeLibrary() {
     const updateRating = async (animeId, newScore) => {
         if (!user) return;
         try {
-            const animeRef = doc(db, 'users', user.uid, 'library', String(animeId));
+            const animeRef = doc(db, 'users', user.uid, APP_CONFIG.LIBRARY.COLLECTION_NAME, String(animeId));
             await updateDoc(animeRef, {
                 score: newScore,
                 lastUpdated: serverTimestamp()
@@ -174,7 +194,7 @@ export function useAnimeLibrary() {
     const removeFromLibrary = async (animeId) => {
         if (!user) return;
         try {
-            await deleteDoc(doc(db, 'users', user.uid, 'library', String(animeId)));
+            await deleteDoc(doc(db, 'users', user.uid, APP_CONFIG.LIBRARY.COLLECTION_NAME, String(animeId)));
         } catch (error) {
             console.error("Erro ao remover anime:", error);
         }
@@ -184,20 +204,21 @@ export function useAnimeLibrary() {
     const toggleFavorite = async (anime) => {
         if (!user) throw new Error("Usuário não autenticado");
 
-        const animeId = anime.id || anime.mal_id;
+        const rawId = anime.id || anime.mal_id;
+        const animeId = String(rawId);
+
         const libraryItem = library.find(item => item.id === animeId);
         const isCurrentlyFavorite = libraryItem?.isFavorite;
 
         if (!isCurrentlyFavorite) {
             const favoritesCount = library.filter(item => item.isFavorite).length;
-            if (favoritesCount >= 6) {
-                throw new Error("Você já possui 6 favoritos.");
+            if (favoritesCount >= APP_CONFIG.LIBRARY.MAX_FAVORITES) {
+                throw new Error(`Você já possui ${APP_CONFIG.LIBRARY.MAX_FAVORITES} favoritos.`);
             }
         }
 
         try {
-            const docId = String(animeId);
-            const animeRef = doc(db, 'users', user.uid, 'library', docId);
+            const animeRef = doc(db, 'users', user.uid, APP_CONFIG.LIBRARY.COLLECTION_NAME, animeId);
 
             if (!libraryItem) {
                 await addToLibrary(anime);
@@ -218,7 +239,8 @@ export function useAnimeLibrary() {
         const animesToUpdate = library.filter(anime => {
             const hasSynopsis = !!anime.synopsis;
             const hasGenerosArray = Array.isArray(anime.genres);
-            return !hasSynopsis || !hasGenerosArray;
+            const hasSafeId = typeof anime.id === 'string'; // Garante que atualize legados
+            return !hasSynopsis || !hasGenerosArray || !hasSafeId;
         });
 
         if (animesToUpdate.length === 0) return 0;
@@ -234,6 +256,7 @@ export function useAnimeLibrary() {
         const processBatch = async (batch) => {
             const promises = batch.map(async (anime) => {
                 try {
+                    // Se o ID for inválido ou numérico legado, precisamos garantir que funciona
                     const response = await fetch(`https://api.jikan.moe/v4/anime/${anime.id}/full`);
                     if (!response.ok) {
                         // Se der 429, apenas ignoramos esse item por hora para não travar tudo

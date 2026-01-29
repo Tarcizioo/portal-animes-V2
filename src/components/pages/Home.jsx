@@ -22,6 +22,7 @@ const genreCategories = [
 
 export function Home() {
   const {
+    featuredAnimes,
     heroAnime,
     popularAnimes,
     seasonalAnimes,
@@ -56,7 +57,7 @@ export function Home() {
         </>
       ) : (
         <>
-          <Hero anime={heroAnime} />
+          <Hero animes={featuredAnimes} />
 
           <AnimeCarousel
             id="popular"

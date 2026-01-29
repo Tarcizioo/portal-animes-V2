@@ -73,25 +73,59 @@ export function useJikan() {
   const popularQuery = useQuery({
     queryKey: ['popular-anime'],
     queryFn: fetchPopular,
-    staleTime: 1000 * 60 * 60 * 24, // 24 horas (Lista estática diária)
-    gcTime: 1000 * 60 * 60 * 24, // Manter em cache por 24h
+    staleTime: 1000 * 60 * 60 * 24,
+    gcTime: 1000 * 60 * 60 * 24,
   });
 
   const seasonalQuery = useQuery({
     queryKey: ['seasonal-anime'],
     queryFn: fetchSeasonal,
-    staleTime: 1000 * 60 * 60 * 24, // 24 horas (Muda raramente na temporada)
+    staleTime: 1000 * 60 * 60 * 24,
     gcTime: 1000 * 60 * 60 * 24,
   });
 
-  const heroAnime = popularQuery.data ? popularQuery.data[0] : null;
-  const popularAnimes = popularQuery.data ? popularQuery.data.slice(1) : [];
+  // Query específica para o Carousel com diversidade
+  const featuredQuery = useQuery({
+    queryKey: ['featured-anime'],
+    queryFn: async () => {
+      const [topRes, popRes, favRes] = await Promise.all([
+        fetch("https://api.jikan.moe/v4/top/anime?limit=1"), // Top Rank
+        fetch("https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=1"), // Mais Populares
+        fetch("https://api.jikan.moe/v4/top/anime?filter=favorite&limit=1"), // Mais Favoritos
+      ]);
+
+      const [topJson, popJson, favJson] = await Promise.all([
+        topRes.json(),
+        popRes.json(),
+        favRes.json()
+      ]);
+
+      const seasonalRes = await fetch("https://api.jikan.moe/v4/seasons/now?limit=1");
+      const seasonalJson = await seasonalRes.json();
+
+      let list = [
+        ...(topJson.data || []),
+        ...(popJson.data || []),
+        ...(favJson.data || []),
+        ...(seasonalJson.data || [])
+      ];
+
+      return removeDuplicates(list.map(transformData));
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
+  const heroAnime = featuredQuery.data && featuredQuery.data.length > 0 ? featuredQuery.data[0] : null;
+  const featuredAnimes = featuredQuery.data || [];
+
+  const popularAnimes = popularQuery.data || [];
   const seasonalAnimes = seasonalQuery.data || [];
 
-  const loading = popularQuery.isLoading || seasonalQuery.isLoading;
+  const loading = popularQuery.isLoading || seasonalQuery.isLoading || featuredQuery.isLoading;
 
   return {
-    heroAnime,
+    heroAnime, // Mantendo para compatibilidade caso precise
+    featuredAnimes,
     popularAnimes,
     seasonalAnimes,
     loading

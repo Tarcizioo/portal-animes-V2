@@ -1,5 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 
+// Hook de Debounce Interno
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+  return debouncedValue;
+}
+
 export function useCatalog() {
   const [animes, setAnimes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,27 +40,27 @@ export function useCatalog() {
     };
   });
 
+  // Debounce dos filtros para evitar chamadas excessivas
+  const debouncedFilters = useDebounce(filters, 600);
+
   // Salva filtros no localStorage
   useEffect(() => {
     localStorage.setItem('anime_catalog_filters', JSON.stringify(filters));
   }, [filters]);
 
-  // --- AQUI ESTÁ A MÁGICA PARA EVITAR O BUG ---
-  // Limpamos os animes IMEDIATAMENTE ao chamar essa função.
   const clearFilters = useCallback(() => {
-    setLoading(true);
+    // Apenas reseta o estado local, o useEffect reagirá
     setPage(1);
     setHasMore(true);
     setFilters({ q: '', genres: [], orderBy: 'ranking', status: '', year: '', season: '', type: '' });
   }, []);
 
   const updateFilter = (key, value) => {
-    setLoading(true);
+    // Apenas atualiza estado. Sem setLoading(true) aqui para evitar flash imediato.
     setPage(1);
     setHasMore(true);
     setFilters(prev => ({ ...prev, [key]: value }));
   };
-  // ---------------------------------------------
 
   useEffect(() => {
     let isMounted = true;
@@ -56,50 +70,55 @@ export function useCatalog() {
       try {
         setLoading(true);
 
-        // Delay para evitar bloqueio da API (429)
-        await new Promise(resolve => setTimeout(resolve, 600));
+        // Se mudou filtros e estamos na página 1, talvez queiramos limpar lista anterior 
+        // para dar feedback visual? Se não limpar, mantemos lista antiga até a nova chegar (melhor UX)
+        // Mas se a nova busca for muito diferente, pode confundir.
+        // Vamos manter a lista antiga enquanto carrega (Loading overlay deve cuidar da UX visual)
 
         const params = new URLSearchParams({ page: page, limit: 24, sfw: true });
         let endpoint = 'https://api.jikan.moe/v4/anime';
 
-        const hasTextOrGenre = filters.q !== '' || filters.genres.length > 0;
-        const hasAdvancedFilters = filters.year || filters.season || filters.type;
-        const isRankingMode = ['ranking', 'score'].includes(filters.orderBy);
+        // Usamos debouncedFilters aqui
+        const currentFilters = debouncedFilters;
+
+        const hasTextOrGenre = currentFilters.q !== '' || currentFilters.genres.length > 0;
+        const hasAdvancedFilters = currentFilters.year || currentFilters.season || currentFilters.type;
+        const isRankingMode = ['ranking', 'score'].includes(currentFilters.orderBy);
 
         // LÓGICA DE ENDPOINT
-        if (!hasTextOrGenre && !filters.status && !hasAdvancedFilters && (isRankingMode || filters.orderBy === 'popularity' || filters.orderBy === 'favorites')) {
+        if (!hasTextOrGenre && !currentFilters.status && !hasAdvancedFilters && (isRankingMode || currentFilters.orderBy === 'popularity' || currentFilters.orderBy === 'favorites')) {
           endpoint = 'https://api.jikan.moe/v4/top/anime';
-          if (filters.orderBy === 'popularity') params.append('filter', 'bypopularity');
-          if (filters.orderBy === 'favorites') params.append('filter', 'favorite');
+          if (currentFilters.orderBy === 'popularity') params.append('filter', 'bypopularity');
+          if (currentFilters.orderBy === 'favorites') params.append('filter', 'favorite');
         } else {
           endpoint = 'https://api.jikan.moe/v4/anime';
-          if (filters.q) params.append('q', filters.q);
-          if (filters.status) params.append('status', filters.status);
-          if (filters.genres.length > 0) params.append('genres', filters.genres.join(','));
-          if (filters.type) params.append('type', filters.type);
+          if (currentFilters.q) params.append('q', currentFilters.q);
+          if (currentFilters.status) params.append('status', currentFilters.status);
+          if (currentFilters.genres.length > 0) params.append('genres', currentFilters.genres.join(','));
+          if (currentFilters.type) params.append('type', currentFilters.type);
 
-          // Lógica de Ano e Temporada (Simulado com datas)
-          if (filters.year) {
-            let start = `${filters.year}-01-01`;
-            let end = `${filters.year}-12-31`;
+          // Lógica de Ano e Temporada
+          if (currentFilters.year) {
+            let start = `${currentFilters.year}-01-01`;
+            let end = `${currentFilters.year}-12-31`;
 
-            if (filters.season) {
-              switch (filters.season) {
+            if (currentFilters.season) {
+              switch (currentFilters.season) {
                 case 'winter':
-                  start = `${filters.year}-01-01`;
-                  end = `${filters.year}-03-31`;
+                  start = `${currentFilters.year}-01-01`;
+                  end = `${currentFilters.year}-03-31`;
                   break;
                 case 'spring':
-                  start = `${filters.year}-04-01`;
-                  end = `${filters.year}-06-30`;
+                  start = `${currentFilters.year}-04-01`;
+                  end = `${currentFilters.year}-06-30`;
                   break;
                 case 'summer':
-                  start = `${filters.year}-07-01`;
-                  end = `${filters.year}-09-30`;
+                  start = `${currentFilters.year}-07-01`;
+                  end = `${currentFilters.year}-09-30`;
                   break;
                 case 'fall':
-                  start = `${filters.year}-10-01`;
-                  end = `${filters.year}-12-31`;
+                  start = `${currentFilters.year}-10-01`;
+                  end = `${currentFilters.year}-12-31`;
                   break;
               }
             }
@@ -107,7 +126,7 @@ export function useCatalog() {
             params.append('end_date', end);
           }
 
-          switch (filters.orderBy) {
+          switch (currentFilters.orderBy) {
             case 'ranking':
             case 'score':
               params.append('order_by', 'score');
@@ -158,7 +177,6 @@ export function useCatalog() {
           image: anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url,
           score: anime.score || 'N/A',
           genres: anime.genres ? anime.genres.map(g => g.name).slice(0, 2).join(', ') : '',
-          // Campos extras para visualização em Lista
           synopsis: anime.synopsis,
           status: anime.status,
           members: anime.members,
@@ -168,10 +186,9 @@ export function useCatalog() {
         }));
 
         setAnimes(prev => {
-          // Se for página 1, substitui tudo. Se for scroll infinito, adiciona.
           if (page === 1) return newAnimes;
 
-          // Filtro extra de segurança para evitar duplicatas visuais
+          // Filtro para evitar duplicatas
           const combined = [...prev, ...newAnimes];
           const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
           return unique;
@@ -189,7 +206,7 @@ export function useCatalog() {
     fetchCatalog();
 
     return () => { isMounted = false; controller.abort(); };
-  }, [page, filters]);
+  }, [page, debouncedFilters]); // Agora depende de debouncedFilters
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) setPage(prev => prev + 1);

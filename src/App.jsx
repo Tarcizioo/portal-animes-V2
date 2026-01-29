@@ -22,7 +22,7 @@ import { Loader } from '@/components/ui/Loader';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 const PageLoader = () => (
-  <div className="flex items-center justify-center h-screen bg-bg-primary">
+  <div className="flex items-center justify-center w-full h-full min-h-[60vh]">
     <Loader />
   </div>
 );
@@ -34,21 +34,23 @@ const AnimatedRoutes = () => {
 
   return (
     <Layout>
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-          <Route path="/catalog" element={<PageTransition><Catalog /></PageTransition>} />
-          <Route path="/characters" element={<PageTransition><Characters /></PageTransition>} />
-          <Route path="/character/:id" element={<PageTransition><CharacterDetails /></PageTransition>} />
-          <Route path="/anime/:id" element={<PageTransition><AnimeDetails /></PageTransition>} />
-          <Route path="/library" element={<PageTransition><Library /></PageTransition>} />
-          <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
-          <Route path="/u/:uid" element={<PageTransition><PublicProfile /></PageTransition>} />
-          <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
-          <Route path="/terms" element={<PageTransition><TermsOfUse /></PageTransition>} />
-          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
-        </Routes>
-      </AnimatePresence>
+      <Suspense fallback={<PageLoader />}>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+            <Route path="/catalog" element={<PageTransition><Catalog /></PageTransition>} />
+            <Route path="/characters" element={<PageTransition><Characters /></PageTransition>} />
+            <Route path="/character/:id" element={<PageTransition><CharacterDetails /></PageTransition>} />
+            <Route path="/anime/:id" element={<PageTransition><AnimeDetails /></PageTransition>} />
+            <Route path="/library" element={<PageTransition><Library /></PageTransition>} />
+            <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+            <Route path="/u/:uid" element={<PageTransition><PublicProfile /></PageTransition>} />
+            <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+            <Route path="/terms" element={<PageTransition><TermsOfUse /></PageTransition>} />
+            <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+          </Routes>
+        </AnimatePresence>
+      </Suspense>
     </Layout>
   );
 };
@@ -57,11 +59,9 @@ function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ScrollToTop />
-      <Suspense fallback={<PageLoader />}>
-        <ErrorBoundary>
-          <AnimatedRoutes />
-        </ErrorBoundary>
-      </Suspense>
+      <ErrorBoundary>
+        <AnimatedRoutes />
+      </ErrorBoundary>
     </BrowserRouter>
   );
 }
