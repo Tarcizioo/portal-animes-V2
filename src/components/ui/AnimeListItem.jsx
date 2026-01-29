@@ -4,7 +4,7 @@ import clsx from 'clsx';
 
 export function AnimeListItem({
     id, title, image, score, synopsis, status, members, year, episodes, totalEp, type, genres,
-    showPersonalProgress, currentEp, userScore
+    showPersonalProgress, currentEp, userScore, onRemove
 }) {
     // Truncate synopsis
     const truncatedSynopsis = synopsis?.length > 200 ? synopsis.substring(0, 200) + "..." : synopsis;
@@ -140,18 +140,20 @@ export function AnimeListItem({
 
                 {/* Genres (Bottom Row) */}
                 <div className="mt-auto pt-1 flex flex-wrap gap-1">
-                    {Array.isArray(genres)
-                        ? genres.slice(0, 3).map(g => (
-                            <span key={g} className="text-[9px] sm:text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-bg-tertiary text-text-secondary border border-border-color/50">
+                    {(() => {
+                        let genresToRender = [];
+                        if (Array.isArray(genres)) {
+                            genresToRender = genres.map(g => typeof g === 'object' ? g.name : g);
+                        } else if (typeof genres === 'string') {
+                            genresToRender = genres.split(', ').filter(Boolean);
+                        }
+
+                        return genresToRender.slice(0, 3).map((g, i) => (
+                            <span key={`${g}-${i}`} className="text-[9px] sm:text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-bg-tertiary text-text-secondary border border-border-color/50">
                                 {g}
                             </span>
-                        ))
-                        : (genres || "").split(', ').filter(Boolean).slice(0, 3).map(g => (
-                            <span key={g} className="text-[9px] sm:text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-bg-tertiary text-text-secondary border border-border-color/50">
-                                {g}
-                            </span>
-                        ))
-                    }
+                        ));
+                    })()}
                 </div>
             </div>
         </Link>
