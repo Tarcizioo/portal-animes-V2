@@ -1,13 +1,14 @@
 
-import { useState } from 'react';
-import { Search, X, Bell } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { Search, X, Bell, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSearch } from '@/hooks/useSearch';
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function Header() {
     const { query, setQuery, results, setResults } = useSearch();
@@ -15,16 +16,22 @@ export function Header() {
     const [showMobileSearch, setShowMobileSearch] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const searchInputRef = useRef(null);
 
     const { unreadCount } = useNotifications();
-
-    // ... (rest of the hook logic is fine)
-
-    // Just replacing the render part for buttons mainly
     const { user } = useAuth();
     const { profile } = useUserProfile();
 
     const displayName = profile?.displayName || user?.displayName || 'Visitante';
+
+    // Focus input when mobile search opens
+    useEffect(() => {
+        if (showMobileSearch && searchInputRef.current) {
+            setTimeout(() => {
+                searchInputRef.current?.focus();
+            }, 100);
+        }
+    }, [showMobileSearch]);
 
     const handleResultClick = (result) => {
         if (result.kind === 'character') {
@@ -63,139 +70,207 @@ export function Header() {
         <header className="sticky top-0 z-40 bg-bg-primary/80 backdrop-blur-md px-4 md:px-8 py-4 flex items-center justify-between border-b border-border-color transition-colors duration-300">
 
             <div className="flex items-center gap-4 pl-12 md:pl-0">
-                <div className={`${showMobileSearch ? 'hidden md:block' : 'block'}`}>
+                <div className="block">
                     <h1 className="text-xl font-bold text-text-primary">Olá, {displayName}!! 👋</h1>
                     <p className="text-sm text-text-secondary hidden sm:block">Descubra novos animes.</p>
                 </div>
             </div>
 
             {/* NOTIFICATIONS & SEARCH CONTAINER */}
-            <div className={`flex items-center gap-4 ml-auto ${showMobileSearch ? 'w-full' : ''}`}>
+            <div className="flex items-center gap-4 ml-auto">
 
-                {/* Notification Bell (Hidden if mobile search active) */}
-                {!showMobileSearch && (
-                    <div className="relative">
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                            className="p-2 relative text-text-secondary hover:text-primary transition-colors rounded-full hover:bg-bg-tertiary"
-                        >
-                            <Bell className="w-6 h-6" />
-                            {unreadCount > 0 && (
-                                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-bg-primary animate-pulse"></span>
-                            )}
-                        </motion.button>
-                        <NotificationDropdown isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
-                    </div>
-                )}
+                {/* Notification Bell */}
+                <div className="relative">
+                    <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                        className="p-2 relative text-text-secondary hover:text-primary transition-colors rounded-full hover:bg-bg-tertiary"
+                    >
+                        <Bell className="w-6 h-6" />
+                        {unreadCount > 0 && (
+                            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-bg-primary animate-pulse"></span>
+                        )}
+                    </motion.button>
+                    <NotificationDropdown isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
+                </div>
 
-                {/* SEARCH LOGIC */}
-                {!showMobileSearch && (
-                    <div className="flex items-center gap-2 md:hidden">
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => setShowMobileSearch(true)}
-                            className="p-2 text-text-secondary hover:text-primary"
-                        >
-                            <Search className="w-6 h-6" />
-                        </motion.button>
-                    </div>
-                )}
+                {/* SEARCH TOGGLE (MOBILE ONLY) */}
+                <div className="flex items-center gap-2 md:hidden">
+                    <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setShowMobileSearch(true)}
+                        className="p-2 text-text-secondary hover:text-primary"
+                    >
+                        <Search className="w-6 h-6" />
+                    </motion.button>
+                </div>
 
-                {/* DESKTOP SEARCH */}
-                <div className={`relative group transition-all duration-300 ease-out ${showMobileSearch ? 'block flex-1 w-full' : 'hidden md:flex items-center gap-4 w-72 focus-within:w-96'}`}>
-
-                    {/* Mobile Search Overlay */}
-                    <div className={`${showMobileSearch ? 'relative w-full' : 'relative w-full'}`}>
-
-                        <div className="relative w-full">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Search className="w-5 h-5 text-text-secondary group-focus-within:text-primary transition-colors duration-300" />
-                            </div>
-                            <input
-                                type="text"
-                                value={query}
-                                onChange={(e) => {
-                                    setQuery(e.target.value);
-                                    setSelectedIndex(-1);
-                                }}
-                                onKeyDown={handleKeyDown}
-                                placeholder="Pesquisar..."
-                                autoFocus={showMobileSearch}
-                                className="block w-full pl-10 pr-10 py-2.5 border-2 border-transparent rounded-2xl bg-bg-tertiary text-text-primary focus:outline-none focus:border-primary focus:bg-bg-secondary focus:shadow-[0_0_20px_var(--shadow-color)] transition-all duration-300 shadow-sm hover:shadow-md placeholder-text-secondary/50"
-                            />
-                            {/* Mobile Close Button (Inside Input) */}
-                            {showMobileSearch && (
-                                <button onClick={() => setShowMobileSearch(false)} className="absolute inset-y-0 right-2 flex items-center p-2 text-text-secondary hover:text-primary">
-                                    <X className="w-5 h-5" />
-                                </button>
-                            )}
-
-                            {/* Results Dropdown */}
-                            {results.length > 0 && (
-                                <div className="absolute top-full mt-3 left-0 w-full bg-bg-secondary rounded-2xl shadow-2xl z-50 max-h-[70vh] overflow-y-auto border border-border-color overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                                    <div className="py-2">
-                                        {results.map((item, index) => (
-                                            <div
-                                                key={item.id}
-                                                onClick={() => handleResultClick(item)}
-                                                className={`
-                                                    flex gap-4 p-3 cursor-pointer transition-all border-l-4 relative overflow-hidden group/item
-                                                    ${index === selectedIndex ? 'bg-primary/5 border-primary pl-4' : 'border-transparent hover:bg-bg-tertiary/50 hover:pl-4'}
-                                                `}
-                                            >
-                                                {/* Poster */}
-                                                <div className="w-12 h-16 flex-shrink-0 rounded-lg overflow-hidden shadow-sm relative group-hover/item:scale-105 transition-transform duration-300">
-                                                    <img src={item.image} className="w-full h-full object-cover" alt={item.title} />
-                                                </div>
-
-                                                {/* Meta Info */}
-                                                <div className="flex flex-col justify-center min-w-0">
-                                                    <h4 className={`text-sm font-bold truncate transition-colors duration-200 ${index === selectedIndex ? 'text-primary' : 'text-text-primary group-hover/item:text-primary'}`}>
-                                                        {item.title}
-                                                    </h4>
-
-                                                    <div className="flex items-center gap-2 mt-1 text-xs text-text-secondary">
-                                                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${item.kind === 'character' ? 'bg-purple-500/10 text-purple-400' : 'bg-blue-500/10 text-blue-400'}`}>
-                                                            {item.kind === 'character' ? 'Personagem' : 'Anime'}
-                                                        </span>
-
-                                                        {item.year && item.year !== 'N/A' && (
-                                                            <span>{item.year}</span>
-                                                        )}
-                                                        {item.type && item.kind !== 'character' && (
-                                                            <>
-                                                                <span className="w-1 h-1 bg-text-secondary/30 rounded-full"></span>
-                                                                <span>{item.type}</span>
-                                                            </>
-                                                        )}
-                                                        {item.score && (
-                                                            <>
-                                                                <span className="w-1 h-1 bg-text-secondary/30 rounded-full"></span>
-                                                                <span className="flex items-center gap-1 text-yellow-500 font-medium">
-                                                                    ★ {item.score}
-                                                                </span>
-                                                            </>
-                                                        )}
-                                                    </div>
-
-                                                    {item.status && (
-                                                        <span className="text-[10px] uppercase font-bold tracking-wider text-text-secondary/30 mt-1">
-                                                            {item.status}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                {/* DESKTOP SEARCH BAR */}
+                <div className="hidden md:flex relative group items-center gap-4 w-72 focus-within:w-96 transition-all duration-300">
+                    <div className="relative w-full">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Search className="w-5 h-5 text-text-secondary group-focus-within:text-primary transition-colors duration-300" />
                         </div>
+                        <input
+                            type="text"
+                            value={query}
+                            onChange={(e) => {
+                                setQuery(e.target.value);
+                                setSelectedIndex(-1);
+                            }}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Pesquisar..."
+                            className="block w-full pl-10 pr-10 py-2.5 border-2 border-transparent rounded-2xl bg-bg-tertiary text-text-primary focus:outline-none focus:border-primary focus:bg-bg-secondary focus:shadow-[0_0_20px_var(--shadow-color)] transition-all duration-300 shadow-sm hover:shadow-md placeholder-text-secondary/50"
+                        />
+                        {/* Results Dropdown (Desktop) */}
+                        {results.length > 0 && (
+                            <div className="absolute top-full mt-3 left-0 w-full bg-bg-secondary rounded-2xl shadow-xl z-50 max-h-[60vh] overflow-y-auto border border-border-color overflow-hidden animate-in fade-in zoom-in-95 duration-200 custom-scrollbar">
+                                <div className="py-2">
+                                    {results.map((item, index) => (
+                                        <div
+                                            key={item.id}
+                                            onClick={() => handleResultClick(item)}
+                                            className={`
+                                                flex gap-4 p-3 cursor-pointer transition-all border-l-4 relative overflow-hidden group/item
+                                                ${index === selectedIndex ? 'bg-primary/5 border-primary pl-4' : 'border-transparent hover:bg-bg-tertiary/50 hover:pl-4'}
+                                            `}
+                                        >
+                                            <div className="w-10 h-14 flex-shrink-0 rounded-md overflow-hidden bg-bg-tertiary">
+                                                <img src={item.image} className="w-full h-full object-cover" alt={item.title} />
+                                            </div>
+                                            <div className="flex flex-col justify-center min-w-0">
+                                                <h4 className="text-sm font-bold truncate text-text-primary group-hover/item:text-primary">
+                                                    {item.title}
+                                                </h4>
+                                                <span className="text-xs text-text-secondary truncate">{item.kind === 'character' ? 'Personagem' : 'Anime'}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+
+
+            {/* --- MOBILE SEARCH OVERLAY (PORTAL) --- */}
+            {createPortal(
+                <AnimatePresence>
+                    {showMobileSearch && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="fixed inset-0 z-[9999] bg-bg-primary flex flex-col items-start justify-start overflow-hidden"
+                        >
+                            {/* Search Input Header */}
+                            <div className="w-full flex items-center gap-3 p-4 border-b border-border-color bg-bg-primary shrink-0 relative z-10">
+                                <button
+                                    onClick={() => setShowMobileSearch(false)}
+                                    className="p-2 -ml-2 text-text-secondary hover:text-primary rounded-full hover:bg-bg-tertiary transition-colors"
+                                >
+                                    <ArrowLeft className="w-6 h-6" />
+                                </button>
+                                
+                                <div className="flex-1 relative group">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary group-focus-within:text-primary transition-colors" />
+                                    <input
+                                        ref={searchInputRef}
+                                        type="text"
+                                        value={query}
+                                        onChange={(e) => setQuery(e.target.value)}
+                                        placeholder="Buscar animes..."
+                                        autoFocus
+                                        className="w-full bg-bg-tertiary border-2 border-transparent focus:border-primary/20 rounded-xl py-3 pl-10 pr-10 text-lg text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:bg-bg-secondary transition-all"
+                                    />
+                                    {query && (
+                                        <button 
+                                            onClick={() => setQuery('')}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-primary p-1 bg-bg-tertiary rounded-full"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Mobile Results List */}
+                            <div className="w-full flex-1 overflow-y-auto px-4 py-4 pb-safe custom-scrollbar bg-bg-primary">
+                                {results.length > 0 ? (
+                                    <div className="space-y-4">
+                                        <h3 className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">
+                                            Resultados para "{query}"
+                                        </h3>
+                                        {results.map((item, index) => (
+                                            <motion.div
+                                                key={item.id}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: index * 0.04 }}
+                                                onClick={() => handleResultClick(item)}
+                                                className="flex items-start gap-4 p-3 bg-bg-secondary/50 border border-border-color rounded-2xl active:scale-[0.98] active:bg-bg-tertiary transition-all"
+                                            >
+                                                <div className="w-16 h-24 rounded-lg overflow-hidden bg-bg-tertiary shrink-0 shadow-sm relative">
+                                                    <img src={item.image} className="w-full h-full object-cover" alt={item.title} />
+                                                </div>
+                                                <div className="flex-1 min-w-0 py-1">
+                                                    <h4 className="text-base font-bold text-text-primary leading-tight line-clamp-2 mb-1">
+                                                        {item.title}
+                                                    </h4>
+                                                    
+                                                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                                                        <span className={`px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider border ${
+                                                            item.kind === 'character' 
+                                                                ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' 
+                                                                : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                                                        }`}>
+                                                            {item.kind === 'character' ? 'Personagem' : 'Anime'}
+                                                        </span>
+                                                        {item.score && (
+                                                            <span className="flex items-center gap-1 text-xs text-yellow-500 font-bold bg-yellow-500/5 px-1.5 py-0.5 rounded border border-yellow-500/20">
+                                                                ★ {item.score}
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex items-center gap-3 text-xs text-text-secondary">
+                                                        {item.year && item.year !== 'N/A' && (
+                                                            <span>{item.year}</span>
+                                                        )}
+                                                        {item.status && (
+                                                            <span className="opacity-60">• {item.status}</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                        {/* Spacer for bottom nav/safe area */}
+                                        <div className="h-20" />
+                                    </div>
+                                ) : query.length > 2 ? (
+                                    <div className="flex flex-col items-center justify-center h-full text-text-secondary opacity-60 pb-20">
+                                        <div className="p-6 bg-bg-tertiary rounded-full mb-4">
+                                            <Search className="w-10 h-10 opacity-50" />
+                                        </div>
+                                        <p className="font-medium text-lg">Nenhum resultado</p>
+                                        <p className="text-sm opacity-70">Tente outro termo de busca</p>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-start pt-20 h-full text-text-secondary opacity-40">
+                                        <Search className="w-16 h-16 mb-4 opacity-20" />
+                                        <p className="font-medium">Digite para buscar...</p>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </header>
     );
 }
