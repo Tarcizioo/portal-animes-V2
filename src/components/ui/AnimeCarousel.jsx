@@ -52,8 +52,8 @@ export function AnimeCarousel({ animes, title, icon: Icon }) {
           }}
           breakpoints={{
             320: { slidesPerView: 2.3, spaceBetween: 16 },
-            640: { slidesPerView: 3, spaceBetween: 20 },
-            1024: { slidesPerView: 4, spaceBetween: 20 },
+            640: { slidesPerView: 3.3, spaceBetween: 20 },
+            1024: { slidesPerView: 4.3, spaceBetween: 20 },
             1280: { slidesPerView: 5.3, spaceBetween: 20 },
           }}
           className="!pb-4 !px-1"

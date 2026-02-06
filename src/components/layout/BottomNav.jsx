@@ -21,7 +21,7 @@ export function BottomNav() {
         { icon: Compass, label: 'Catálogo', path: '/catalog' },
         { icon: Library, label: 'Biblioteca', path: '/library' },
         { icon: User, label: 'Perfil', path: '/profile' },
-        { icon: Menu, label: 'Menu', action: () => setIsMenuOpen(true) }, // Menu Trigger
+        { icon: Menu, label: 'Menu', action: () => setIsMenuOpen(true) },
     ];
 
     const handleLogout = async () => {
@@ -57,7 +57,7 @@ export function BottomNav() {
 
     return (
         <>
-            {/* Modals integrated here for mobile context */}
+            {/* Modals */}
             <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
             <UserSearchModal isOpen={isUserSearchOpen} onClose={() => setIsUserSearchOpen(false)} />
 
@@ -75,25 +75,25 @@ export function BottomNav() {
                             initial={{ y: 100, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: 100, opacity: 0 }}
-                            className="bg-bg-secondary border border-border-color w-full max-w-sm rounded-2xl p-4 shadow-2xl relative overflow-hidden"
+                            className="bg-bg-primary border border-white/5 w-full max-w-sm rounded-3xl p-5 shadow-2xl relative overflow-hidden mb-safe"
                             onClick={e => e.stopPropagation()}
                         >
-                            <div className="flex items-center justify-between mb-4 pb-4 border-b border-border-color">
+                            <div className="flex items-center justify-between mb-6">
                                 <h3 className="font-bold text-lg text-text-primary">Menu</h3>
-                                <button onClick={() => setIsMenuOpen(false)} className="p-2 bg-bg-tertiary rounded-full text-text-secondary">
+                                <button onClick={() => setIsMenuOpen(false)} className="p-2 bg-transparent hover:bg-bg-secondary rounded-full text-text-secondary hover:text-text-primary transition-colors">
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3 mb-4">
+                            <div className="grid grid-cols-2 gap-3 mb-6">
                                 {menuItems.map((item, idx) => (
                                     <button
                                         key={idx}
                                         onClick={item.onClick}
-                                        className="flex flex-col items-center justify-center gap-2 p-4 bg-bg-tertiary hover:bg-bg-primary rounded-xl border border-transparent hover:border-border-color transition-all active:scale-95"
+                                        className="flex flex-col items-center justify-center gap-3 p-4 bg-bg-secondary/30 hover:bg-bg-secondary rounded-2xl border border-transparent hover:border-white/5 transition-all active:scale-95 group"
                                     >
-                                        <div className={`p-3 rounded-full ${item.bg} ${item.color}`}>
-                                            <item.icon className="w-6 h-6" />
+                                        <div className={`p-3.5 rounded-2xl bg-bg-primary shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                                            <item.icon className={`w-6 h-6 ${item.color}`} />
                                         </div>
                                         <span className="text-sm font-medium text-text-primary">{item.label}</span>
                                     </button>
@@ -102,9 +102,9 @@ export function BottomNav() {
 
                             <button
                                 onClick={handleLogout}
-                                className="w-full py-3 flex items-center justify-center gap-2 text-red-400 font-bold bg-red-500/10 hover:bg-red-500/20 rounded-xl transition-colors"
+                                className="w-full py-4 flex items-center justify-center gap-2 text-red-400 font-bold bg-bg-secondary/30 hover:bg-red-500/10 rounded-2xl transition-colors border border-transparent active:scale-98"
                             >
-                                <LogOut className="w-4 h-4" /> Sair da Conta
+                                <LogOut className="w-5 h-5" /> Sair da Conta
                             </button>
                         </motion.div>
                     </motion.div>
@@ -113,37 +113,53 @@ export function BottomNav() {
 
             {/* Bottom Navigation Bar */}
             <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden pb-safe">
-                <div className="bg-bg-primary/80 dark:bg-black/80 backdrop-blur-2xl border-t border-border-color shadow-[0_-4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)]">
-                    <nav className="flex justify-around items-center h-16 px-2">
+                {/* Gradient Line Top */}
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-border-color to-transparent opacity-50" />
+                
+                <div className="bg-bg-primary/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl px-2">
+                    <nav className="flex justify-around items-center h-[72px]">
                         {navItems.map((item) => {
-                            const isActive = item.path ? location.pathname === item.path : isMenuOpen; // Highlight Menu if open
+                            const isActive = item.path ? location.pathname === item.path : isMenuOpen;
 
                             return (
                                 <button
                                     key={item.label}
                                     onClick={() => item.action ? item.action() : navigate(item.path)}
-                                    className="relative flex flex-col items-center justify-center w-full h-full gap-1 group"
+                                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                                    className="relative flex flex-col items-center justify-center w-full h-full gap-1 group outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none bg-transparent border-none p-0"
                                 >
-                                    {isActive && !isMenuOpen && item.path && ( // Only show indicator for routes, not menu toggle
+                                    {/* Active Indicator (Top Glow) */}
+                                    {isActive && !isMenuOpen && item.path && (
                                         <motion.div
                                             layoutId="bottomNavIndicator"
-                                            className="absolute -top-[1px] w-12 h-[2px] bg-primary shadow-[0_0_10px_var(--color-primary)]"
+                                            className="absolute -top-[1px] w-10 h-[3px] rounded-b-full bg-primary shadow-[0_4px_12px_-2px_var(--color-primary)]"
+                                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                         />
                                     )}
 
+                                    {/* Icon Container */}
                                     <div className={clsx(
-                                        "p-1.5 rounded-xl transition-all duration-300",
-                                        isActive ? "text-primary bg-primary/10" : "text-text-secondary group-hover:text-text-primary"
+                                        "p-2 rounded-2xl transition-all duration-300 relative",
+                                        isActive ? "text-primary" : "text-text-secondary group-hover:text-text-primary"
                                     )}>
+                                        {/* Active Soft Background Glow */}
+                                        {isActive && (
+                                            <div className="absolute inset-0 bg-primary/10 rounded-2xl blur-sm" />
+                                        )}
+                                        
                                         <item.icon
                                             strokeWidth={isActive ? 2.5 : 2}
-                                            className={clsx("w-6 h-6 transition-transform duration-300", isActive && "scale-110")}
+                                            className={clsx(
+                                                "w-6 h-6 transition-all duration-300 relative z-10", 
+                                                isActive ? "scale-110 translate-y-[-2px]" : "group-active:scale-90"
+                                            )}
                                         />
                                     </div>
 
+                                    {/* Label */}
                                     <span className={clsx(
-                                        "text-[10px] font-medium transition-colors duration-300",
-                                        isActive ? "text-primary" : "text-text-secondary"
+                                        "text-[10px] font-medium transition-all duration-300",
+                                        isActive ? "text-primary font-bold translate-y-[-2px]" : "text-text-secondary/70"
                                     )}>
                                         {item.label}
                                     </span>

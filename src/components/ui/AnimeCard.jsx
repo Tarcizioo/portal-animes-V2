@@ -22,8 +22,8 @@ export function AnimeCard({ id, title, genre, image, score, onRemove }) {
         />
 
         {/* Overlay com Gradiente e Glassmorphism */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-          <span className="text-white text-sm font-bold opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+          <span className="text-white text-sm font-bold opacity-0 md:group-hover:opacity-100 transform translate-y-4 md:group-hover:translate-y-0 transition-all duration-300 delay-75 hidden md:block">
             Ver Detalhes
           </span>
         </div>
@@ -32,7 +32,12 @@ export function AnimeCard({ id, title, genre, image, score, onRemove }) {
         {onRemove && (
           <button
             onClick={handleRemove}
-            className="absolute top-2 left-2 p-2 bg-red-500/20 backdrop-blur-md border border-red-500/30 rounded-lg text-red-500 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-2 group-hover:translate-x-0 hover:bg-red-500 hover:text-white z-10"
+            className="absolute top-2 left-2 p-2 rounded-lg backdrop-blur-md border transition-all z-10 shadow-lg
+              opacity-100 md:opacity-0 md:group-hover:opacity-100 
+              bg-black/60 border-white/10 text-white/90
+              md:bg-red-500/20 md:border-red-500/30 md:text-red-500
+              md:transform md:-translate-x-2 md:group-hover:translate-x-0
+              hover:bg-red-500 hover:border-red-500 hover:text-white"
             title="Remover da Biblioteca"
           >
             <Trash2 className="w-4 h-4" />

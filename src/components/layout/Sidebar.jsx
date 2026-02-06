@@ -67,7 +67,7 @@ export function Sidebar() {
         isCollapsed ? "w-20" : "w-72"
       )}>
 
-        {/* 1. LOGO COM O RAIO ⚡ */}
+        {/* 1. LOGO  */}
         <div className={`p-4 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} transition-all duration-300`}>
           <Link to="/" className={`flex items-center gap-2 text-2xl font-black text-primary tracking-tighter group transition-all duration-300 ${isCollapsed ? 'justify-center w-full' : ''}`}>
             <div className="w-10 h-10 bg-transparent transition-colors rounded-full flex items-center justify-center shrink-0 overflow-hidden">
