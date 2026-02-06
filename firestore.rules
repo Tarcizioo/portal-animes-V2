@@ -1,60 +1,113 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // --- HELPER FUNCTIONS ---
     
-    // --- Helper Functions ---
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if the user is accessing their own data
     function isOwner(userId) {
-      return request.auth != null && request.auth.uid == userId;
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Validate String Length
+    function isValidString(text, min, max) {
+      return text is string && text.size() >= min && text.size() <= max;
+    }
+
+    // Validate Optional String (allows null or string within limits)
+    function isOptionalString(text, max) {
+      return text == null || (text is string && text.size() <= max);
+    }
+
+    // Validate Integer Range
+    function isValidInt(num, min, max) {
+      return num is int && num >= min && num <= max;
+    }
+
+    // Validate Enum (Check if value is in a list)
+    function matchesOneOf(value, options) {
+      return value in options;
+    }
+
+    // Check specifically if the document itself is public (for users)
+    // Note: Checks the 'isPublic' boolean field on the resource being read.
+    function isResourcePublic() {
+      return resource.data.isPublic != false;
     }
     
-    function isPublic(userId) {
-       // Check if the target user's profile has isPublic == true (or unavailable/default)
-       // Note: This costs 1 read per evaluation.
-       // Default behavior: If 'isPublic' field is missing, assume public? Code implies private if false.
-       // Let's assume safe default: False if missing? 
-       // Code: const isPublic = userData.isPublic !== false; (So default is TRUE/Public)
+    // Check if a specific user's profile is public (requires a get() call)
+    function isUserPublic(userId) {
        let userDoc = get(/databases/$(database)/documents/users/$(userId));
        return userDoc.data.isPublic != false;
     }
 
     // --- USERS COLLECTION ---
     match /users/{userId} {
-      // Allow read if Owner OR if the doc itself is public
-      // Note: for the doc itself, we can access 'resource.data' without a get() cost.
-      allow read: if isOwner(userId) || resource.data.isPublic != false;
-      allow write: if isOwner(userId);
+      // READ: Owner can read everything. Others can read if profile is Not Private.
+      allow read: if isOwner(userId) || isResourcePublic();
       
-      // SUBCOLLECTIONS
-      
+      // WRITE: Only Owner can update their profile.
+      // SCHEMA: strict validation for crucial fields.
+      allow write: if isOwner(userId) 
+                   && isValidString(request.resource.data.name, 1, 50)
+                   && isOptionalString(request.resource.data.bio, 250);
+
+      // --- SUBCOLLECTIONS ---
+
       // 1. Library (Anime/Manga List)
       match /library/{docId} {
-        // Read: Owner OR if Parent User is Public
-        allow read: if isOwner(userId) || isPublic(userId);
-        allow write: if isOwner(userId);
+        // READ: Owner OR if Parent User Profile is Public
+        allow read: if isOwner(userId) || isUserPublic(userId);
+        
+        // WRITE: Only Owner
+        allow write: if isOwner(userId)
+                     && (request.resource.data.score == null || isValidInt(request.resource.data.score, 0, 10))
+                     && (request.resource.data.status == null || matchesOneOf(request.resource.data.status, ['watching', 'completed', 'plan_to_watch', 'dropped', 'paused']))
+                     && (request.resource.data.currentEp == null || request.resource.data.currentEp >= 0);
       }
       
-      // 2. Favorites (Characters)
+      // 2. Favorite Characters
       match /favorite_characters/{docId} {
-        allow read: if isOwner(userId) || isPublic(userId);
-        allow write: if isOwner(userId);
+        allow read: if isOwner(userId) || isUserPublic(userId);
+        allow write: if isOwner(userId) 
+                     && isValidString(request.resource.data.name, 1, 100);
       }
 
-      // 3. Notifications (PRIVATE - Owner Only)
+      // 3. Notifications (PRIVATE)
       match /notifications/{notifId} {
         allow read, write: if isOwner(userId);
       }
       
-      // 4. Default catch-all for other subcollections (Private by default)
+      // Default: Private
       match /{document=**} {
         allow read, write: if isOwner(userId);
       }
     }
     
-    // --- COMMENTS ---
+    // --- COMMENTS --
     match /comments/{commentId} {
+      // READ: Public
       allow read: if true;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // CREATE: Authenticated users, MUST use their own Auth UID
+      allow create: if isAuthenticated()
+                    && request.resource.data.userId == request.auth.uid
+                    && isValidString(request.resource.data.content, 1, 500)
+                    && request.resource.data.createdAt == request.time;
+                    
+      // UPDATE/DELETE: Only the author can modify/delete
+      // Note: We don't typically allow updating comment CONTENT in this app, but if we did/do:
+      allow update: if isAuthenticated() 
+                    && resource.data.userId == request.auth.uid
+                    && request.resource.data.userId == request.auth.uid // Cannot change ownership
+                    && isValidString(request.resource.data.content, 1, 500);
+
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
   }
 }
