@@ -22,7 +22,7 @@ function ToggleOption({ active, onClick, icon: Icon, label }) {
         <button
             onClick={onClick}
             className={clsx(
-                "relative flex items-center justify-center px-4 py-2 rounded-lg transition-all z-10",
+                "relative flex items-center justify-center px-4 py-2 rounded-lg transition-all z-10 bg-transparent border-none",
                 active ? "text-text-primary" : "text-text-secondary hover:text-text-primary hover:bg-white/5"
             )}
             title={label}

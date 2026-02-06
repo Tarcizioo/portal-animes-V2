@@ -5,6 +5,7 @@ import { CharacterCard } from '@/components/ui/CharacterCard';
 import { LayoutGrid, List, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { CharacterListItem } from '@/components/ui/CharacterListItem';
+import { ViewToggle } from '@/components/ui/ViewToggle';
 
 export function Characters() {
     const { characters, loading, loadMore, hasMore } = useCharacters();
@@ -50,21 +51,15 @@ export function Characters() {
                     </div>
 
                     {/* View Toggles */}
-                    <div className="flex items-center gap-1 bg-bg-secondary p-1.5 rounded-xl border border-border-color self-start md:self-auto shadow-sm">
-                        <button
-                            onClick={() => setViewMode('grid')}
-                            className={`p-2.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-bg-tertiary text-primary shadow-sm ring-1 ring-border-color' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/50'}`}
-                            title="Visualização em Grade"
-                        >
-                            <LayoutGrid className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={() => setViewMode('list')}
-                            className={`p-2.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-bg-tertiary text-primary shadow-sm ring-1 ring-border-color' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary/50'}`}
-                            title="Visualização em Lista"
-                        >
-                            <List className="w-5 h-5" />
-                        </button>
+                    <div className="self-start md:self-auto">
+                        <ViewToggle
+                            value={viewMode}
+                            onChange={setViewMode}
+                            options={[
+                                { value: 'grid', label: '', icon: LayoutGrid },
+                                { value: 'list', label: '', icon: List },
+                            ]}
+                        />
                     </div>
                 </div>
 
