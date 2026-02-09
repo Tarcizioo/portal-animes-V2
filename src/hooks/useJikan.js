@@ -5,7 +5,9 @@ const currentYear = new Date().getFullYear();
 const transformData = (anime) => ({
   id: anime.mal_id,
   title: anime.title_english || anime.title,
-  image: anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url,
+  image: anime.images?.webp?.large_image_url || anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url,
+  smallImage: anime.images?.webp?.image_url || anime.images?.jpg?.image_url,
+  images: anime.images, // Preserving full object for component flexibility
   year: anime.year || anime.aired?.prop?.from?.year || currentYear,
   score: anime.score || 'N/A',
   isNew: anime.airing || (anime.year >= currentYear - 1),

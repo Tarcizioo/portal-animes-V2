@@ -212,6 +212,7 @@ export function Hero({ animes = [] }) {
           <button
             key={idx}
             onClick={() => setCurrentIndex(idx)}
+            aria-label={`Ir para o slide ${idx + 1}`}
             className={`h-1.5 rounded-full transition-all duration-500 ${idx === currentIndex ? "w-12 bg-white" : "w-4 bg-white/30 hover:bg-white/60 focus:bg-white/60"
               }`}
           />
