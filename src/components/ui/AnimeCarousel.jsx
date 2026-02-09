@@ -60,7 +60,7 @@ export function AnimeCarousel({ animes, title, icon: Icon }) {
         >
           {animes.map((anime) => (
             <SwiperSlide key={anime.id}>
-              <AnimeCard {...anime} />
+              <AnimeCard {...anime} image={anime.smallImage || anime.image} />
             </SwiperSlide>
           ))}
         </Swiper>

@@ -388,11 +388,13 @@ export function Catalog() {
                     <AnimeCard
                       key={`${anime.id}-${filters.orderBy}-card`}
                       {...anime}
+                      image={anime.smallImage || anime.image}
                     />
                   ) : (
                     <AnimeListItem
                       key={`${anime.id}-${filters.orderBy}-list`}
                       {...anime}
+                      image={anime.smallImage || anime.image}
                     />
                   )}
                 </motion.div>

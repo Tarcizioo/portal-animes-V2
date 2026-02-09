@@ -4,7 +4,7 @@ import logoDetails from '@/assets/logo.png';
 
 export function Footer() {
     return (
-        <footer className="mt-auto border-t border-border-color bg-bg-secondary/30 backdrop-blur-sm pt-12 pb-8">
+        <footer className="mt-auto border-t border-border-color bg-bg-secondary/30 backdrop-blur-sm pt-12 pb-8 min-h-[300px]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                     {/* Brand Column */}

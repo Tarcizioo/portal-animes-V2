@@ -80,7 +80,8 @@ export function Hero({ animes = [] }) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8 }}
-          className="absolute inset-0 z-0"
+          transition={{ duration: 0.8 }}
+          className="absolute inset-0 z-0 will-change-[opacity]"
         >
           {/* Background Image */}
           <div className="absolute inset-0 overflow-hidden bg-[#121214]">
@@ -113,7 +114,7 @@ export function Hero({ animes = [] }) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.5, delay: isFirstRender.current ? 0 : 0.2 }}
-            className="hidden md:block flex-shrink-0 w-[300px] aspect-[2/3] rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] border-2 border-white/10 group-hover:border-white/30 transition-all"
+            className="hidden md:block flex-shrink-0 w-[300px] aspect-[2/3] rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] border-2 border-white/10 group-hover:border-white/30 transition-all will-change-[opacity,transform]"
           >
             <img
               src={anime.smallImage || anime.images?.webp?.image_url || anime.image}

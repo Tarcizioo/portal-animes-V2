@@ -86,6 +86,7 @@ export function Header() {
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
                         className="p-2 relative text-text-secondary hover:text-primary transition-colors rounded-full hover:bg-bg-tertiary"
+                        aria-label="Abrir notificações"
                     >
                         <Bell className="w-6 h-6" />
                         {unreadCount > 0 && (
@@ -102,6 +103,7 @@ export function Header() {
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setShowMobileSearch(true)}
                         className="p-2 text-text-secondary hover:text-primary"
+                        aria-label="Abrir busca"
                     >
                         <Search className="w-6 h-6" />
                     </motion.button>
@@ -172,6 +174,7 @@ export function Header() {
                                 <button
                                     onClick={() => setShowMobileSearch(false)}
                                     className="p-2 -ml-2 text-text-secondary hover:text-primary rounded-full hover:bg-bg-tertiary transition-colors"
+                                    aria-label="Fechar busca"
                                 >
                                     <ArrowLeft className="w-6 h-6" />
                                 </button>
@@ -191,6 +194,7 @@ export function Header() {
                                         <button 
                                             onClick={() => setQuery('')}
                                             className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-primary p-1 bg-bg-tertiary rounded-full"
+                                            aria-label="Limpar busca"
                                         >
                                             <X className="w-4 h-4" />
                                         </button>

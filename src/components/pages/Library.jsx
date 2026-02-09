@@ -573,11 +573,13 @@ export function Library() {
                                             key={`${anime.id}-card`}
                                             {...anime}
                                             onRemove={() => setAnimeToRemove(anime)}
+                                            image={anime.smallImage || anime.image}
                                         />
                                     ) : (
                                         <AnimeListItem
                                             key={`${anime.id}-list`}
                                             {...anime}
+                                            image={anime.smallImage || anime.image}
                                             showPersonalProgress // Flag para mostrar progresso pessoal na lista
                                             onRemove={() => setAnimeToRemove(anime)}
                                         />
