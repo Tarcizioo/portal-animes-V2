@@ -88,8 +88,10 @@ export function Hero({ animes = [] }) {
               initial={isFirstRender.current ? { scale: 1.05, filter: "blur(0px)" } : { scale: 1.1, filter: "blur(10px)" }}
               animate={{ scale: 1.05, filter: "blur(0px)" }}
               transition={{ duration: 8, ease: "linear" }}
-              src={anime.images?.jpg?.large_image_url || anime.image}
+              src={anime.images?.webp?.large_image_url || anime.image}
               alt={anime.title}
+              width="1920"
+              height="1080"
               fetchPriority={isFirstRender.current ? "high" : "auto"}
               loading={isFirstRender.current ? "eager" : "lazy"}
               className="w-full h-full object-cover opacity-60 md:opacity-80 will-change-transform"
@@ -114,8 +116,10 @@ export function Hero({ animes = [] }) {
             className="hidden md:block flex-shrink-0 w-[300px] aspect-[2/3] rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] border-2 border-white/10 group-hover:border-white/30 transition-all"
           >
             <img
-              src={anime.images?.jpg?.large_image_url || anime.image}
+              src={anime.smallImage || anime.images?.webp?.image_url || anime.image}
               alt={anime.title}
+              width="300"
+              height="450"
               className="w-full h-full object-cover"
             />
           </motion.div>
