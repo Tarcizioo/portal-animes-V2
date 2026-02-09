@@ -53,12 +53,7 @@ export function Hero({ animes = [] }) {
     }
   };
 
-  const categories = [
-    { icon: Award, label: "Top Ranking", color: "text-yellow-400" },
-    { icon: TrendingUp, label: "Mais Popular", color: "text-blue-400" },
-    { icon: Heart, label: "Favorito dos Fãs", color: "text-red-400" },
-    { icon: Calendar, label: "Destaque da Temporada", color: "text-green-400" }
-  ];
+
 
   /* Loading State */
   if (safeAnimes.length === 0) {
@@ -75,7 +70,7 @@ export function Hero({ animes = [] }) {
       {/* --- CAROUSEL ANIMATION WRAPPER --- */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={anime.id} 
+          key={anime.uniqueId || anime.id} 
           initial={isFirstRender.current ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -107,7 +102,7 @@ export function Hero({ animes = [] }) {
         {/* POSTER (Left Side) */}
         <AnimatePresence mode="wait">
           <motion.div
-            key={anime.id}
+            key={anime.uniqueId || anime.id}
             initial={isFirstRender.current ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
@@ -129,7 +124,7 @@ export function Hero({ animes = [] }) {
 
           <AnimatePresence mode="wait">
             <motion.div
-              key={anime.id}
+              key={anime.uniqueId || anime.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -138,13 +133,22 @@ export function Hero({ animes = [] }) {
             >
               {/* Badges */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                {/* Dynamic Label Badge */}
                 {(() => {
-                  const safeCategory = categories[currentIndex] || categories[0];
-                  if (!safeCategory) return null;
-                  const Icon = safeCategory.icon;
+                  if (!anime.heroLabel) return null;
+                  
+                  const iconMap = {
+                    "Award": Award,
+                    "TrendingUp": TrendingUp,
+                    "Heart": Heart,
+                    "Calendar": Calendar
+                  };
+                  
+                  const IconComponent = iconMap[anime.heroIcon] || Award;
+
                   return (
-                    <span className={`bg-black/40 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${safeCategory.color} shadow-lg`}>
-                      <Icon className="w-3.5 h-3.5" /> {safeCategory.label}
+                    <span className={`bg-black/30 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${anime.heroColor || "text-white"}`}>
+                      <IconComponent className="w-3.5 h-3.5" /> {anime.heroLabel}
                     </span>
                   );
                 })()}

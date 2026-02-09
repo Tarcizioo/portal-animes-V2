@@ -88,14 +88,14 @@ export function useJikan() {
 
   // Query específica para o Carousel com diversidade
   const featuredQuery = useQuery({
-    queryKey: ['featured-anime'],
+    queryKey: ['featured-anime-v5'],
     queryFn: async () => {
-
+      // Fetch more items to ensure we can find unique ones
       const [topRes, popRes, favRes, seasonalRes] = await Promise.all([
-        fetch("https://api.jikan.moe/v4/top/anime?limit=1"), // Top Rank
-        fetch("https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=1"), // Mais Populares
-        fetch("https://api.jikan.moe/v4/top/anime?filter=favorite&limit=1"), // Mais Favoritos
-        fetch("https://api.jikan.moe/v4/seasons/now?limit=1") // Seasonal (moved to parallel)
+        fetch("https://api.jikan.moe/v4/top/anime?limit=20"), 
+        fetch("https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=20"), 
+        fetch("https://api.jikan.moe/v4/top/anime?filter=favorite&limit=20"), 
+        fetch("https://api.jikan.moe/v4/seasons/now?limit=20") 
       ]);
 
       const [topJson, popJson, favJson, seasonalJson] = await Promise.all([
@@ -105,14 +105,58 @@ export function useJikan() {
         seasonalRes.json()
       ]);
 
-      let list = [
-        ...(topJson.data || []),
-        ...(popJson.data || []),
-        ...(favJson.data || []),
-        ...(seasonalJson.data || [])
-      ];
+      const seenIds = new Set();
+      const finalHeroList = [];
 
-      return removeDuplicates(list.map(transformData));
+      // Helper to pick unused anime
+      const pickUnused = (list, label, color, iconType) => {
+        const candidate = list.find(a => !seenIds.has(a.mal_id));
+        if (candidate) {
+          seenIds.add(candidate.mal_id);
+          const transformed = transformData(candidate);
+          return { ...transformed, heroLabel: label, heroColor: color, heroIcon: iconType };
+        }
+        return null;
+      };
+
+      // Helper to process each category with fallback
+      const processCategory = (list, label, color, iconType, fallbackIdPrefix) => {
+        let selected = pickUnused(list, label, color, iconType);
+        
+        // Fallback: If no unique item found, force the first item with a unique ID
+        if (!selected && list.length > 0) {
+           const fallback = list[0];
+           const transformed = transformData(fallback);
+           selected = {
+             ...transformed,
+             uniqueId: `${fallbackIdPrefix}-${fallback.mal_id}`,
+             heroLabel: label,
+             heroColor: color,
+             heroIcon: iconType
+           };
+        }
+        return selected;
+      };
+
+      // 1. Top Ranking
+      const topAnime = processCategory(topJson.data || [], "Top Ranking", "text-yellow-400", "Award", "top");
+      if (topAnime) finalHeroList.push(topAnime);
+
+      // 2. Mais Popular
+      const popAnime = processCategory(popJson.data || [], "Mais Popular", "text-blue-400", "TrendingUp", "pop");
+      if (popAnime) finalHeroList.push(popAnime);
+
+      // 3. Favorito dos Fãs
+      const favAnime = processCategory(favJson.data || [], "Favorito dos Fãs", "text-red-400", "Heart", "fav");
+      if (favAnime) finalHeroList.push(favAnime);
+
+      // 4. Destaque da Temporada
+      const seasonalAnime = processCategory(seasonalJson.data || [], "Destaque da Temporada", "text-green-400", "Calendar", "seasonal");
+      if (seasonalAnime) finalHeroList.push(seasonalAnime);
+
+      console.log("Featured Hero List generated:", finalHeroList);
+
+      return finalHeroList;
     },
     staleTime: 1000 * 60 * 60 * 24,
   });
