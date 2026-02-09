@@ -88,20 +88,20 @@ export function useJikan() {
   const featuredQuery = useQuery({
     queryKey: ['featured-anime'],
     queryFn: async () => {
-      const [topRes, popRes, favRes] = await Promise.all([
+
+      const [topRes, popRes, favRes, seasonalRes] = await Promise.all([
         fetch("https://api.jikan.moe/v4/top/anime?limit=1"), // Top Rank
         fetch("https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=1"), // Mais Populares
         fetch("https://api.jikan.moe/v4/top/anime?filter=favorite&limit=1"), // Mais Favoritos
+        fetch("https://api.jikan.moe/v4/seasons/now?limit=1") // Seasonal (moved to parallel)
       ]);
 
-      const [topJson, popJson, favJson] = await Promise.all([
+      const [topJson, popJson, favJson, seasonalJson] = await Promise.all([
         topRes.json(),
         popRes.json(),
-        favRes.json()
+        favRes.json(),
+        seasonalRes.json()
       ]);
-
-      const seasonalRes = await fetch("https://api.jikan.moe/v4/seasons/now?limit=1");
-      const seasonalJson = await seasonalRes.json();
 
       let list = [
         ...(topJson.data || []),

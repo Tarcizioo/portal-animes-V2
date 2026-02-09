@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Info, Plus, Star, PlayCircle, TrendingUp, Calendar, Heart, Award } from 'lucide-react';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
@@ -6,13 +6,24 @@ import { useToast } from '@/context/ToastContext';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const MotionLink = motion.create(Link);
+const MotionLink = motion(Link);
 
 export function Hero({ animes = [] }) {
   const { library, addToLibrary } = useAnimeLibrary();
   const { user } = useAuth();
   const { toast } = useToast();
   const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // Optimization: Track first render to skip initial fade-in for LCP
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    // Small timeout to ensure the first paint happens without animation, then enable future animations
+    const timer = setTimeout(() => {
+      isFirstRender.current = false;
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Se não houver array ou estiver vazio, previne erro
   const safeAnimes = Array.isArray(animes) ? animes : [];
@@ -64,8 +75,8 @@ export function Hero({ animes = [] }) {
       {/* --- CAROUSEL ANIMATION WRAPPER --- */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={anime.id} // Key muda = Força nova animação de entrada/saída
-          initial={{ opacity: 0 }}
+          key={anime.id} 
+          initial={isFirstRender.current ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8 }}
@@ -74,12 +85,14 @@ export function Hero({ animes = [] }) {
           {/* Background Image */}
           <div className="absolute inset-0 overflow-hidden bg-[#121214]">
             <motion.img
-              initial={{ scale: 1.1, filter: "blur(10px)" }}
+              initial={isFirstRender.current ? { scale: 1.05, filter: "blur(0px)" } : { scale: 1.1, filter: "blur(10px)" }}
               animate={{ scale: 1.05, filter: "blur(0px)" }}
-              transition={{ duration: 8, ease: "linear" }} // Zoom lento contínuo
+              transition={{ duration: 8, ease: "linear" }}
               src={anime.images?.jpg?.large_image_url || anime.image}
               alt={anime.title}
-              className="w-full h-full object-cover opacity-60 md:opacity-80"
+              fetchPriority={isFirstRender.current ? "high" : "auto"}
+              loading={isFirstRender.current ? "eager" : "lazy"}
+              className="w-full h-full object-cover opacity-60 md:opacity-80 will-change-transform"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#121214] via-[#121214]/40 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#121214] via-[#121214]/60 to-transparent" />
@@ -94,10 +107,10 @@ export function Hero({ animes = [] }) {
         <AnimatePresence mode="wait">
           <motion.div
             key={anime.id}
-            initial={{ opacity: 0, x: -50 }}
+            initial={isFirstRender.current ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: isFirstRender.current ? 0 : 0.2 }}
             className="hidden md:block flex-shrink-0 w-[300px] aspect-[2/3] rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] border-2 border-white/10 group-hover:border-white/30 transition-all"
           >
             <img
@@ -120,7 +133,6 @@ export function Hero({ animes = [] }) {
               transition={{ duration: 0.5 }}
               className="space-y-6"
             >
-              {/* Badges */}
               {/* Badges */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
                 {(() => {

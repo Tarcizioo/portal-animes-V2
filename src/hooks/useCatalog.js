@@ -159,7 +159,7 @@ export function useCatalog() {
         const newAnimes = data.map(anime => ({
           id: anime.mal_id,
           title: anime.title_english || anime.title,
-          image: anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url,
+          image: anime.images?.jpg?.image_url || anime.images?.jpg?.large_image_url,
           score: anime.score || 'N/A',
           genres: anime.genres ? anime.genres.map(g => g.name).slice(0, 2).join(', ') : '',
           synopsis: anime.synopsis,
