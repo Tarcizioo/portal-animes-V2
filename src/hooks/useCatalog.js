@@ -1,12 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 export function useCatalog() {
+  const [searchParams] = useSearchParams();
   const [animes, setAnimes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
   const [filters, setFilters] = useState(() => {
+    // 1. Check URL Params first (High Priority)
+    const genreParam = searchParams.get('genre');
+    if (genreParam) {
+      return {
+        q: '',
+        genres: [parseInt(genreParam)], // Force only this genre
+        orderBy: 'ranking',
+        status: '',
+        year: '',
+        season: '',
+        type: '',
+        producers: '',
+      };
+    }
+
+    // 2. Fallback to LocalStorage
     const saved = localStorage.getItem('anime_catalog_filters');
     if (saved) {
       try {

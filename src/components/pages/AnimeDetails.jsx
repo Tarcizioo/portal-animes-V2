@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import {
     Star, Clock, Users, Trophy, Play, CheckCircle, Plus, Heart, Share2,
     Calendar, Monitor, Globe, Film, List, MessageSquare, ThumbsUp, Reply,
-    ChevronDown, ArrowRight, PlayCircle, Layers, Mic2, Info, AlertCircle
+    ChevronDown, ArrowRight, PlayCircle, Layers, Mic2, Info, AlertCircle, ZoomIn, X
 } from 'lucide-react';
 
 import { useAnimeInfo } from '@/hooks/useAnimeInfo';
@@ -36,6 +36,7 @@ export function AnimeDetails() {
 
     const [isVisible, setIsVisible] = useState(false);
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+    const [isZoomOpen, setIsZoomOpen] = useState(false);
 
     useEffect(() => {
         const timer = setTimeout(() => setIsVisible(true), 100);
@@ -123,8 +124,14 @@ export function AnimeDetails() {
                             transition={{ duration: 0.8, delay: 0.2 }}
                             className="lg:col-span-3 xl:col-span-2 order-2 lg:order-1 flex justify-center lg:block mb-6 lg:mb-0"
                         >
-                            <div className="w-48 sm:w-64 lg:w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-bg-secondary relative group">
-                                <img src={anime.image} alt={anime.title} className="w-full h-full object-cover" />
+                            <div
+                                onClick={() => setIsZoomOpen(true)}
+                                className="w-48 sm:w-64 lg:w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-bg-secondary relative group cursor-zoom-in"
+                            >
+                                <img src={anime.image} alt={anime.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <ZoomIn className="w-12 h-12 text-white drop-shadow-lg" />
+                                </div>
                             </div>
                         </motion.div>
 
@@ -320,7 +327,7 @@ export function AnimeDetails() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: 0.4 }}
-                        className="lg:col-span-3 xl:col-span-3 space-y-8 lg:sticky lg:top-24 h-fit order-1 lg:order-2"
+                        className="lg:col-span-3 xl:col-span-3 space-y-8 h-fit order-1 lg:order-2"
                     >
                         {/* Poster removed from here */}
 
@@ -345,14 +352,13 @@ export function AnimeDetails() {
                             <h3 className="font-bold text-lg border-b border-border-color pb-2">Gêneros</h3>
                             <div className="flex flex-wrap gap-2">
                                 {anime.genres?.map(g => (
-                                    <motion.span
+                                    <Link
                                         key={g.mal_id}
-                                        whileHover={{ scale: 1.1, backgroundColor: "var(--primary)", color: "#fff", borderColor: "var(--primary)" }}
-                                        whileTap={{ scale: 0.95 }}
-                                        className="px-3 py-1.5 rounded-lg bg-bg-secondary border border-border-color text-xs font-medium transition-colors cursor-pointer select-none"
+                                        to={`/catalog?genre=${g.mal_id}`}
+                                        className="px-3 py-1.5 rounded-lg bg-bg-secondary border border-border-color text-xs font-medium transition-colors hover:bg-primary hover:text-white hover:border-primary"
                                     >
                                         {g.name}
-                                    </motion.span>
+                                    </Link>
                                 ))}
                             </div>
                         </div>
@@ -383,6 +389,33 @@ export function AnimeDetails() {
                     </motion.aside>
                 </div>
             </div >
+            {/* Image Zoom Modal */}
+            <AnimatePresence>
+                {isZoomOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsZoomOpen(false)}
+                        className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 cursor-zoom-out"
+                    >
+                        <motion.img
+                            initial={{ scale: 0.9 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0.9 }}
+                            src={anime.images?.webp?.large_image_url || anime.images?.jpg?.large_image_url || anime.image}
+                            alt={anime.title}
+                            className="max-w-full max-h-screen object-contain rounded-lg shadow-2xl"
+                        />
+                        <button
+                            onClick={() => setIsZoomOpen(false)}
+                            className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+                        >
+                            <X className="w-8 h-8" />
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div >
 
     );

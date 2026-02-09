@@ -79,8 +79,6 @@ export function Hero({ animes = [] }) {
           initial={isFirstRender.current ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
-          transition={{ duration: 0.8 }}
           className="absolute inset-0 z-0 will-change-[opacity]"
         >
           {/* Background Image */}
