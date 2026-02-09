@@ -338,7 +338,16 @@ export function AnimeDetails() {
                             <div className="space-y-3">
                                 <InfoRow icon={Layers} label="Episódios" value={`${anime.episodes || '?'}`} />
                                 <InfoRow icon={Clock} label="Duração" value={anime.duration?.split('per')[0]} />
-                                <InfoRow icon={Monitor} label="Estúdio" value={anime.studios?.[0]?.name} highlight />
+                                <InfoRow 
+                                    icon={Monitor} 
+                                    label="Estúdio" 
+                                    value={anime.studios?.[0] ? (
+                                        <Link to={`/studio/${anime.studios[0].mal_id}`} className="hover:underline">
+                                            {anime.studios[0].name}
+                                        </Link>
+                                    ) : '-'} 
+                                    highlight 
+                                />
                                 <InfoRow icon={Star} label="Nota Média" value={anime.score} color="text-yellow-400" />
                                 <div className="border-t border-border-color/50 my-2" />
                                 <InfoRow icon={Film} label="Origem" value={anime.source} />

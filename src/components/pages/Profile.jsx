@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileStats } from '@/components/profile/ProfileStats';
@@ -11,15 +12,17 @@ import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 import { useCharacterLibrary } from '@/hooks/useCharacterLibrary';
+import { useFavoriteStudios } from '@/hooks/useFavoriteStudios';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { LogIn, Hash, Link as LinkIcon } from 'lucide-react';
+import { LogIn, Hash, Link as LinkIcon, Monitor, X } from 'lucide-react';
 
 export function Profile() {
   const { user, signInGoogle, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading, updateProfileData } = useUserProfile();
   const { library } = useAnimeLibrary();
   const { characterLibrary } = useCharacterLibrary();
+  const { favoriteStudios, toggleFavorite } = useFavoriteStudios();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
@@ -185,6 +188,47 @@ export function Profile() {
                   ))
                 ) : (
                   <p className="text-sm text-gray-500 italic">Nenhum gênero adicionado.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Estúdios Favoritos */}
+            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
+              <h3 className="font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                <Monitor className="w-4 h-4 text-primary" /> Estúdios Favoritos
+              </h3>
+              <div className="grid grid-cols-3 gap-3">
+                {favoriteStudios && favoriteStudios.length > 0 ? (
+                  favoriteStudios.slice(0, 3).map(studio => (
+                    <Link 
+                      key={studio.mal_id} 
+                      to={`/studio/${studio.mal_id}`}
+                      className="group relative flex flex-col items-center bg-bg-tertiary rounded-xl p-2 border border-transparent hover:border-primary transition-all overflow-hidden"
+                    >
+                      <div className="w-full aspect-square bg-white rounded-lg mb-2 flex items-center justify-center p-2 relative">
+                         {studio.image ? (
+                           <img src={studio.image} alt={studio.name} className="max-w-full max-h-full object-contain" />
+                         ) : (
+                           <Monitor className="w-8 h-8 text-gray-300" />
+                         )}
+                         <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                toggleFavorite(studio);
+                            }}
+                            className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all"
+                            title="Deixar de seguir"
+                         >
+                             <X className="w-3 h-3" />
+                         </button>
+                      </div>
+                      <span className="text-[10px] sm:text-xs font-bold text-center line-clamp-1 group-hover:text-primary transition-colors w-full">
+                        {studio.name}
+                      </span>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="col-span-3 text-sm text-gray-500 italic">Nenhum estúdio seguido.</p>
                 )}
               </div>
             </div>
