@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { db } from '@/services/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { doc, onSnapshot, updateDoc, setDoc } from 'firebase/firestore';
+import { useToast } from '@/context/ToastContext';
 
 export function useUserProfile() {
     const { user } = useAuth();
+    const { toast } = useToast();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -38,8 +40,10 @@ export function useUserProfile() {
         const userRef = doc(db, 'users', user.uid);
         try {
             await setDoc(userRef, newData, { merge: true });
+            toast.success("Perfil atualizado com sucesso!", "Salvo");
         } catch (error) {
             console.error("Erro ao atualizar perfil:", error);
+            toast.error("Erro ao salvar perfil.", "Erro");
             throw error;
         }
     };

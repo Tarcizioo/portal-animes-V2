@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { db } from '@/services/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { APP_CONFIG } from '@/constants/app';
+import { useToast } from '@/context/ToastContext'; // Import Toast
 import {
     collection,
     query,
@@ -16,6 +17,7 @@ import {
 
 export function useAnimeLibrary() {
     const { user } = useAuth();
+    const { toast } = useToast(); // Use Toast
     const [library, setLibrary] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -39,6 +41,7 @@ export function useAnimeLibrary() {
             setLoading(false);
         }, (error) => {
             console.error("Erro ao buscar biblioteca:", error);
+            // toast.error("Erro ao carregar biblioteca.", "Erro de Conexão"); // Optional: might be spammy on load
             setLoading(false);
         });
 
@@ -103,7 +106,10 @@ export function useAnimeLibrary() {
 
     // 2. Adicionar Anime (ou Atualizar)
     const addToLibrary = async (anime, status = 'plan_to_watch') => {
-        if (!user) return;
+        if (!user) {
+            toast.warning("Faça login para adicionar à biblioteca.", "Login Necessário");
+            return;
+        }
 
         try {
             const animeId = anime.mal_id || anime.id;
@@ -122,9 +128,16 @@ export function useAnimeLibrary() {
             const animeData = mapAnimeData(anime, existingData, status);
 
             await setDoc(animeRef, animeData, { merge: true });
+            
+            if (!exists) {
+                toast.success("Anime adicionado à biblioteca!", "Sucesso");
+            } else {
+               // toast.info("Informações do anime atualizadas.", "Atualizado"); // Maybe too frequent
+            }
 
         } catch (error) {
             console.error("Erro ao adicionar anime:", error);
+            toast.error("Erro ao adicionar anime.", "Erro");
             throw error;
         }
     };
@@ -146,11 +159,13 @@ export function useAnimeLibrary() {
 
             if (totalEp > 0 && newEp === totalEp) {
                 updates.status = 'completed';
+                toast.success("Anime concluído! 🎉", "Parabéns");
             }
 
             await updateDoc(animeRef, updates);
         } catch (error) {
             console.error("Erro ao atualizar progresso:", error);
+             toast.error("Falha ao salvar progresso.", "Erro");
         }
     };
 
@@ -171,8 +186,10 @@ export function useAnimeLibrary() {
                 updates.currentEp = totalEp;
             }
             await updateDoc(animeRef, updates);
+            toast.success("Status atualizado.", "Biblioteca");
         } catch (error) {
             console.error("Erro ao atualizar status:", error);
+            toast.error("Erro ao atualizar status.", "Erro");
         }
     };
 
@@ -185,8 +202,11 @@ export function useAnimeLibrary() {
                 score: newScore,
                 lastUpdated: serverTimestamp()
             });
+            // Toast removed for rating to be unobtrusive or maybe just subtle
+            // toast.success("Nota salva!", "Avaliação");
         } catch (error) {
             console.error("Erro ao atualizar nota:", error);
+            toast.error("Erro ao salvar nota.", "Erro");
         }
     };
 
@@ -195,8 +215,10 @@ export function useAnimeLibrary() {
         if (!user) return;
         try {
             await deleteDoc(doc(db, 'users', user.uid, APP_CONFIG.LIBRARY.COLLECTION_NAME, String(animeId)));
+            toast.info("Anime removido da biblioteca.", "Removido");
         } catch (error) {
             console.error("Erro ao remover anime:", error);
+            toast.error("Erro ao remover anime.", "Erro");
         }
     };
 
@@ -213,7 +235,9 @@ export function useAnimeLibrary() {
         if (!isCurrentlyFavorite) {
             const favoritesCount = library.filter(item => item.isFavorite).length;
             if (favoritesCount >= APP_CONFIG.LIBRARY.MAX_FAVORITES) {
-                throw new Error(`Você já possui ${APP_CONFIG.LIBRARY.MAX_FAVORITES} favoritos.`);
+                const msg = `Você já possui ${APP_CONFIG.LIBRARY.MAX_FAVORITES} favoritos.`;
+                toast.error(msg, "Limite Atingido");
+                throw new Error(msg);
             }
         }
 
@@ -223,11 +247,15 @@ export function useAnimeLibrary() {
             if (!libraryItem) {
                 await addToLibrary(anime);
                 await updateDoc(animeRef, { isFavorite: true });
+                toast.success("Adicionado aos Favoritos!", "Favoritou");
             } else {
                 await updateDoc(animeRef, { isFavorite: !isCurrentlyFavorite });
+                 if (!isCurrentlyFavorite) toast.success("Adicionado aos Favoritos!", "Favoritou");
+                 else toast.info("Removido dos Favoritos.", "Desfavoritou");
             }
         } catch (error) {
             console.error("Erro ao alterar favorito:", error);
+            toast.error("Erro ao alterar favorito.", "Erro");
             throw error;
         }
     };
@@ -244,6 +272,8 @@ export function useAnimeLibrary() {
         });
 
         if (animesToUpdate.length === 0) return 0;
+        
+        toast.info(`Sincronizando ${animesToUpdate.length} animes...`, "Manutenção");
 
         let processed = 0;
         const total = animesToUpdate.length;
@@ -288,6 +318,8 @@ export function useAnimeLibrary() {
                 await new Promise(r => setTimeout(r, delayBetweenRequests));
             }
         }
+        
+        toast.success("Sincronização concluída!", "Sucesso");
     };
 
     return {

@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { db, auth } from '@/services/firebase';
 import { doc, setDoc, deleteDoc, onSnapshot, collection, query, getDocs } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { toast } from 'sonner';
+import { useToast } from '@/context/ToastContext';
 
 export function useFavoriteStudios(studioId = null) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
   const [favoriteStudios, setFavoriteStudios] = useState([]);
   const [user, setUser] = useState(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -53,12 +54,12 @@ export function useFavoriteStudios(studioId = null) {
 
   const toggleFavorite = async (studioData) => {
     if (!user) {
-      toast.error("Você precisa estar logado para seguir estúdios!");
+      toast.error("Você precisa estar logado para seguir estúdios!", "Login Necessário");
       return;
     }
 
     if (!isFavorite && favoriteStudios.length >= 3) {
-      toast.error("Você só pode seguir até 3 estúdios!");
+      toast.error("Você só pode seguir até 3 estúdios!", "Limite Atingido");
       return;
     }
 
@@ -67,7 +68,7 @@ export function useFavoriteStudios(studioId = null) {
     try {
       if (isFavorite) {
         await deleteDoc(docRef);
-        toast.success("Deixou de seguir o estúdio.");
+        toast.info("Deixou de seguir o estúdio.", "Removido");
       } else {
         await setDoc(docRef, {
           name: studioData.titles?.[0]?.title || studioData.title,
@@ -76,11 +77,11 @@ export function useFavoriteStudios(studioId = null) {
           mal_id: studioData.mal_id,
           addedAt: new Date().toISOString()
         });
-        toast.success("Estúdio seguido com sucesso!");
+        toast.success("Estúdio seguido com sucesso!", "Favorito");
       }
     } catch (error) {
       console.error("Erro ao atualizar favoritos:", error);
-      toast.error("Erro ao atualizar. Tente novamente.");
+      toast.error("Erro ao atualizar. Tente novamente.", "Falha");
     }
   };
 
