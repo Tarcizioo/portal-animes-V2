@@ -128,7 +128,7 @@ export function AnimeDetails() {
                                 onClick={() => setIsZoomOpen(true)}
                                 className="w-48 sm:w-64 lg:w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-bg-secondary relative group cursor-zoom-in"
                             >
-                                <img src={anime.image} alt={anime.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                <img src={anime.images?.jpg?.large_image_url || anime.image} alt={anime.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <ZoomIn className="w-12 h-12 text-white drop-shadow-lg" />
                                 </div>
@@ -305,7 +305,7 @@ export function AnimeDetails() {
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {recommendations?.slice(0, 5).map(rec => (
                                     <Link to={`/anime/${rec.entry.mal_id}`} key={rec.entry.mal_id} className="group relative aspect-[2/3] rounded-xl overflow-hidden bg-bg-secondary" onClick={() => window.scrollTo(0, 0)}>
-                                        <img src={rec.entry.images?.jpg?.image_url} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                        <img src={rec.entry.images?.webp?.image_url || rec.entry.images?.jpg?.image_url} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <span className="text-xs font-bold text-white line-clamp-2">{rec.entry.title}</span>
                                         </div>

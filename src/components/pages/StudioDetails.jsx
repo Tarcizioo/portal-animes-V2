@@ -294,9 +294,9 @@ export function StudioDetails() {
                }>
                     {animes.map(anime => (
                         viewMode === 'grid' ? (
-                            <AnimeCard key={anime.id} {...anime} image={anime.smallImage || anime.image} />
+                            <AnimeCard key={anime.id} {...anime} image={anime.image} />
                         ) : (
-                            <AnimeListItem key={anime.id} {...anime} image={anime.smallImage || anime.image} />
+                            <AnimeListItem key={anime.id} {...anime} image={anime.image} />
                         )
                     ))}
                </div>

@@ -71,7 +71,7 @@ export function useCharacterLibrary() {
                 const charData = {
                     id: charId,
                     name: character.name,
-                    image: character.images?.jpg?.image_url || character.image,
+                    image: character.images?.webp?.large_image_url || character.images?.jpg?.large_image_url || character.images?.jpg?.image_url || character.image,
                     addedAt: serverTimestamp()
                     // Podemos adicionar 'about' ou outros campos se quisermos cachear
                 };

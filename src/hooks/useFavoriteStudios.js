@@ -72,7 +72,7 @@ export function useFavoriteStudios(studioId = null) {
       } else {
         await setDoc(docRef, {
           name: studioData.titles?.[0]?.title || studioData.title,
-          image: studioData.images?.jpg?.image_url,
+          image: studioData.images?.webp?.large_image_url || studioData.images?.jpg?.large_image_url || studioData.images?.jpg?.image_url,
           url: studioData.url,
           mal_id: studioData.mal_id,
           addedAt: new Date().toISOString()

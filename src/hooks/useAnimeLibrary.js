@@ -61,8 +61,13 @@ export function useAnimeLibrary() {
             currentEp = existingData.currentEp;
         }
 
-        // Lógica de Imagem: Pode vir direto (View Model) ou aninhado (Jikan Raw)
-        const imageUrl = anime.image || anime.images?.jpg?.image_url || anime.images?.jpg?.large_image_url || null;
+        // Lógica de Imagem: Prioiriza Full HD (Large) -> Standard -> Fallback
+        const imageUrl = anime.images?.webp?.large_image_url || 
+                         anime.images?.jpg?.large_image_url || 
+                         anime.images?.webp?.image_url || 
+                         anime.images?.jpg?.image_url || 
+                         anime.image || 
+                         null;
 
         // Lógica de Gêneros: Pode vir como strings (View Model) ou objetos (Jikan Raw)
         let genres = [];

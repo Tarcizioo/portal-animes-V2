@@ -7,7 +7,7 @@ export function CharacterCard({ character, rank }) {
             {/* Imagem */}
             <div className="aspect-[3/4] overflow-hidden relative">
                 <img
-                    src={character.images?.jpg?.image_url}
+                    src={character.images?.webp?.image_url || character.images?.jpg?.image_url}
                     alt={character.name}
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
