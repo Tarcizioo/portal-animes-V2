@@ -183,12 +183,17 @@ export function CharacterDetails() {
 
                             {/* Dubladores (Voice Actors) */}
                             <div>
-                                <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                                    <Mic2 className="w-6 h-6 text-primary" /> Dubladores
-                                </h3>
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-2xl font-bold flex items-center gap-3">
+                                        <Mic2 className="w-6 h-6 text-primary" /> Dubladores
+                                    </h3>
+                                    <Link to="/pessoas" className="text-sm font-bold text-primary hover:text-white hover:bg-primary px-4 py-2 rounded-xl transition-all border border-primary/20 hover:border-transparent">
+                                        Ver Top Pessoas
+                                    </Link>
+                                </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                                     {displayVoiceActors.map((va, idx) => (
-                                        <div key={`${va.person.mal_id}-${idx}`} className="flex items-center gap-4 p-4 rounded-2xl bg-bg-secondary border border-border-color hover:border-primary/50 hover:bg-bg-tertiary transition-all group">
+                                        <Link to={`/person/${va.person.mal_id}`} key={`${va.person.mal_id}-${idx}`} className="flex items-center gap-4 p-4 rounded-2xl bg-bg-secondary border border-border-color hover:border-primary/50 hover:bg-bg-tertiary transition-all group">
                                             <div
                                                 className="w-16 h-16 rounded-full bg-cover bg-center shrink-0 border-2 border-white/10 group-hover:border-primary transition-all shadow-md"
                                                 style={{ backgroundImage: `url('${va.person.images?.jpg?.image_url}')` }}
@@ -197,7 +202,7 @@ export function CharacterDetails() {
                                                 <h4 className="text-base font-bold text-text-primary truncate group-hover:text-primary transition-colors">{va.person.name}</h4>
                                                 <span className="text-xs font-bold text-text-secondary uppercase tracking-wider bg-black/20 px-2 py-0.5 rounded-full">{va.language}</span>
                                             </div>
-                                        </div>
+                                        </Link>
                                     ))}
                                     {voiceActors.length === 0 && <span className="text-gray-500 italic">Nenhum dublador registrado.</span>}
                                 </div>

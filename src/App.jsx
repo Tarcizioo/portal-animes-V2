@@ -11,6 +11,8 @@ const Catalog = lazy(() => import('@/components/pages/Catalog').then(module => (
 const Profile = lazy(() => import('@/components/pages/Profile').then(module => ({ default: module.Profile })));
 const Characters = lazy(() => import('@/components/pages/Characters').then(module => ({ default: module.Characters })));
 const CharacterDetails = lazy(() => import('@/components/pages/CharacterDetails').then(module => ({ default: module.CharacterDetails })));
+const VoiceActors = lazy(() => import('@/components/pages/VoiceActors').then(module => ({ default: module.VoiceActors })));
+const PersonDetails = lazy(() => import('@/components/pages/PersonDetails').then(module => ({ default: module.PersonDetails })));
 const StudioDetails = lazy(() => import('@/components/pages/StudioDetails').then(module => ({ default: module.StudioDetails })));
 const PrivacyPolicy = lazy(() => import('@/components/pages/PrivacyPolicy').then(module => ({ default: module.PrivacyPolicy })));
 const TermsOfUse = lazy(() => import('@/components/pages/TermsOfUse').then(module => ({ default: module.TermsOfUse })));
@@ -41,6 +43,8 @@ const AnimatedRoutes = () => {
             <Route path="/" element={<PageTransition><Home /></PageTransition>} />
             <Route path="/catalog" element={<PageTransition><Catalog /></PageTransition>} />
             <Route path="/characters" element={<PageTransition><Characters /></PageTransition>} />
+            <Route path="/pessoas" element={<PageTransition><VoiceActors /></PageTransition>} />
+            <Route path="/person/:id" element={<PageTransition><PersonDetails /></PageTransition>} />
             <Route path="/character/:id" element={<PageTransition><CharacterDetails /></PageTransition>} />
             <Route path="/studio/:id" element={<PageTransition><StudioDetails /></PageTransition>} />
             <Route path="/anime/:id" element={<PageTransition><AnimeDetails /></PageTransition>} />

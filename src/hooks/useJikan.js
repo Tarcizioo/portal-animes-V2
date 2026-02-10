@@ -53,6 +53,59 @@ const fetchTopCharacters = async () => {
   return json.data || [];
 };
 
+const fetchTopPeople = async () => {
+  const response = await fetch("https://api.jikan.moe/v4/top/people?limit=25");
+  if (!response.ok) throw new Error("Erro na API Top People");
+  const json = await response.json();
+  return json.data || [];
+};
+
+const fetchPersonFull = async (id) => {
+  const [detailsRes, voicesRes, picturesRes] = await Promise.all([
+    fetch(`https://api.jikan.moe/v4/people/${id}`),
+    fetch(`https://api.jikan.moe/v4/people/${id}/voices`),
+    fetch(`https://api.jikan.moe/v4/people/${id}/pictures`)
+  ]);
+
+  if (!detailsRes.ok) throw new Error("Erro ao buscar detalhes da pessoa");
+  
+  const detailsJson = await detailsRes.json();
+  const voicesJson = voicesRes.ok ? await voicesRes.json() : { data: [] };
+  const picturesJson = picturesRes.ok ? await picturesRes.json() : { data: [] };
+
+  return {
+    person: detailsJson.data,
+    voices: voicesJson.data || [],
+    pictures: picturesJson.data || []
+  };
+};
+
+export function usePersonInfo(id) {
+  const query = useQuery({
+    queryKey: ['person-info', id],
+    queryFn: () => fetchPersonFull(id),
+    staleTime: 1000 * 60 * 60 * 24,
+    enabled: !!id,
+  });
+
+  return {
+    person: query.data?.person,
+    voices: query.data?.voices || [],
+    pictures: query.data?.pictures || [],
+    loading: query.isLoading,
+    error: query.error
+  };
+}
+
+export function useTopPeople() {
+  return useQuery({
+    queryKey: ['top-people'],
+    queryFn: fetchTopPeople,
+    staleTime: 1000 * 60 * 60 * 24, // 24 horas
+    gcTime: 1000 * 60 * 60 * 24,
+  });
+}
+
 export function useTopCharacters() {
   return useQuery({
     queryKey: ['top-characters'],
