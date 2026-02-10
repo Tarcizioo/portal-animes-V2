@@ -60,18 +60,31 @@ const fetchTopPeople = async () => {
   return json.data || [];
 };
 
+const fetchWithRetry = async (url, retries = 3, delay = 1000) => {
+  for (let i = 0; i < retries; i++) {
+    const response = await fetch(url);
+    if (response.status !== 429) {
+      return response;
+    }
+    await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+  }
+  return fetch(url); // Final attempt
+};
+
 const fetchPersonFull = async (id) => {
-  const [detailsRes, voicesRes, picturesRes] = await Promise.all([
-    fetch(`https://api.jikan.moe/v4/people/${id}`),
-    fetch(`https://api.jikan.moe/v4/people/${id}/voices`),
-    fetch(`https://api.jikan.moe/v4/people/${id}/pictures`)
+  // Fetch details first (critical)
+  const detailsRes = await fetchWithRetry(`https://api.jikan.moe/v4/people/${id}`);
+  if (!detailsRes.ok) throw new Error("Erro ao buscar detalhes da pessoa");
+  const detailsJson = await detailsRes.json();
+
+  // Fetch optional data in parallel, allowing failures
+  const [voicesRes, picturesRes] = await Promise.allSettled([
+    fetchWithRetry(`https://api.jikan.moe/v4/people/${id}/voices`, 2),
+    fetchWithRetry(`https://api.jikan.moe/v4/people/${id}/pictures`, 2)
   ]);
 
-  if (!detailsRes.ok) throw new Error("Erro ao buscar detalhes da pessoa");
-  
-  const detailsJson = await detailsRes.json();
-  const voicesJson = voicesRes.ok ? await voicesRes.json() : { data: [] };
-  const picturesJson = picturesRes.ok ? await picturesRes.json() : { data: [] };
+  const voicesJson = voicesRes.status === 'fulfilled' && voicesRes.value.ok ? await voicesRes.value.json() : { data: [] };
+  const picturesJson = picturesRes.status === 'fulfilled' && picturesRes.value.ok ? await picturesRes.value.json() : { data: [] };
 
   return {
     person: detailsJson.data,
@@ -122,6 +135,49 @@ export function useGenreAnime(genreId, enabled = false) {
     staleTime: 1000 * 60 * 60,
     enabled: enabled,
   });
+}
+
+const fetchCharacterFull = async (id) => {
+  // Fetch details first (critical)
+  const detailsRes = await fetchWithRetry(`https://api.jikan.moe/v4/characters/${id}/full`);
+  if (!detailsRes.ok) throw new Error("Erro ao buscar detalhes do personagem");
+  const detailsJson = await detailsRes.json();
+
+  // Fetch optional data in parallel
+  const [animeRes, voiceRes, picturesRes] = await Promise.allSettled([
+    fetchWithRetry(`https://api.jikan.moe/v4/characters/${id}/anime`, 2),
+    fetchWithRetry(`https://api.jikan.moe/v4/characters/${id}/voices`, 2),
+    fetchWithRetry(`https://api.jikan.moe/v4/characters/${id}/pictures`, 2)
+  ]);
+
+  const animeJson = animeRes.status === 'fulfilled' && animeRes.value.ok ? await animeRes.value.json() : { data: [] };
+  const voiceJson = voiceRes.status === 'fulfilled' && voiceRes.value.ok ? await voiceRes.value.json() : { data: [] };
+  const picturesJson = picturesRes.status === 'fulfilled' && picturesRes.value.ok ? await picturesRes.value.json() : { data: [] };
+
+  return {
+    character: detailsJson.data,
+    animeography: animeJson.data || [],
+    voiceActors: voiceJson.data || [],
+    pictures: picturesJson.data || []
+  };
+};
+
+export function useCharacterInfo(id) {
+  const query = useQuery({
+    queryKey: ['character-info', id],
+    queryFn: () => fetchCharacterFull(id),
+    staleTime: 1000 * 60 * 60 * 24,
+    enabled: !!id,
+  });
+
+  return {
+    character: query.data?.character,
+    animeography: query.data?.animeography || [],
+    voiceActors: query.data?.voiceActors || [],
+    pictures: query.data?.pictures || [],
+    loading: query.isLoading,
+    error: query.error
+  };
 }
 
 export function useJikan() {

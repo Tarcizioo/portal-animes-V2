@@ -237,18 +237,6 @@ export function CharacterDetails() {
                                             <ImageIcon className="w-5 h-5" /> Galeria <span className="text-xs bg-bg-secondary px-2 py-0.5 rounded-full text-text-secondary">{pictures.length}</span>
                                         </button>
                                     </div>
-
-                                    {/* View Toggle (Only visible in Anime tab) */}
-                                    {activeTab === 'anime' && (
-                                        <ViewToggle
-                                            value={viewMode}
-                                            onChange={setViewMode}
-                                            options={[
-                                                { value: 'grid', label: null, icon: LayoutGrid },
-                                                { value: 'list', label: null, icon: List },
-                                            ]}
-                                        />
-                                    )}
                                 </div>
 
                                 {/* Tab Content */}
@@ -265,56 +253,37 @@ export function CharacterDetails() {
                                                 {animeography.length === 0 ? (
                                                     <p className="text-text-secondary text-center py-20 italic">Ops! Nenhuma participação encontrada.</p>
                                                 ) : (
-                                                    <>
-                                                     {viewMode === 'grid' ? (
-                                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
-                                                            {animeography.map((entry, idx) => (
-                                                                <Link
-                                                                    to={`/anime/${entry.anime.mal_id}`}
-                                                                    key={`${entry.anime.mal_id}-${idx}`}
-                                                                    className="block group relative"
-                                                                >
-                                                                    <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-white/5 group-hover:border-primary/50 transition-all">
-                                                                        <img
-                                                                            src={entry.anime.images?.jpg?.image_url}
-                                                                            alt={entry.anime.title}
-                                                                            loading="lazy"
-                                                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                                        />
-                                                                        <div className="absolute top-1.5 right-1.5">
-                                                                            <span className={clsx(
-                                                                                "text-[10px] font-black px-2 py-1 rounded-md shadow-sm backdrop-blur-md uppercase tracking-wide",
-                                                                                entry.role === 'Main'
-                                                                                    ? "bg-primary text-white"
-                                                                                    : "bg-black/60 text-gray-200"
-                                                                            )}>
-                                                                                {entry.role === 'Main' ? 'MAIN' : 'SUPP'}
-                                                                            </span>
-                                                                        </div>
+                                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                                                        {animeography.map((entry, idx) => (
+                                                            <Link
+                                                                to={`/anime/${entry.anime.mal_id}`}
+                                                                key={`${entry.anime.mal_id}-${idx}`}
+                                                                className="block group relative"
+                                                            >
+                                                                <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-white/5 group-hover:border-primary/50 transition-all">
+                                                                    <img
+                                                                        src={entry.anime.images?.jpg?.image_url}
+                                                                        alt={entry.anime.title}
+                                                                        loading="lazy"
+                                                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                                    />
+                                                                    <div className="absolute top-1.5 right-1.5">
+                                                                        <span className={clsx(
+                                                                            "text-[10px] font-black px-2 py-1 rounded-md shadow-sm backdrop-blur-md uppercase tracking-wide",
+                                                                            entry.role === 'Main'
+                                                                                ? "bg-primary text-white"
+                                                                                : "bg-black/60 text-gray-200"
+                                                                        )}>
+                                                                            {entry.role === 'Main' ? 'MAIN' : 'SUPP'}
+                                                                        </span>
                                                                     </div>
-                                                                    <h4 className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors line-clamp-2 mt-3 leading-tight">
-                                                                        {entry.anime.title}
-                                                                    </h4>
-                                                                </Link>
-                                                            ))}
-                                                        </div>
-                                                     ) : (
-                                                         <div className="space-y-3">
-                                                             {animeography.map((entry, idx) => (
-                                                                 <AnimeListItem 
-                                                                     key={`${entry.anime.mal_id}-${idx}`}
-                                                                     id={entry.anime.mal_id}
-                                                                     title={entry.anime.title}
-                                                                     image={entry.anime.images?.jpg?.large_image_url}
-                                                                     score={null}
-                                                                     synopsis={null}
-                                                                     year={entry.anime.year}
-                                                                     role={entry.role}
-                                                                 />
-                                                             ))}
-                                                         </div>
-                                                     )}
-                                                    </>
+                                                                </div>
+                                                                <h4 className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors line-clamp-2 mt-3 leading-tight">
+                                                                    {entry.anime.title}
+                                                                </h4>
+                                                            </Link>
+                                                        ))}
+                                                    </div>
                                                 )}
                                             </motion.div>
                                         ) : (
