@@ -4,12 +4,15 @@ import { useCharacterInfo } from '@/hooks/useCharacterInfo';
 import { useCharacterLibrary } from '@/hooks/useCharacterLibrary';
 import { useAuth } from '@/context/AuthContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { Heart, Mic2, Film, User, Image as ImageIcon, X, ChevronRight, ArrowLeft, Info, Star } from 'lucide-react';
+import { Heart, Mic2, Film, User, Image as ImageIcon, X, ChevronRight, Info, LayoutGrid, List } from 'lucide-react';
 import { clsx } from 'clsx';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 import { Loader } from '@/components/ui/Loader';
-import { ReusableCarousel } from '@/components/ui/ReusableCarousel';
 import { useToast } from '@/context/ToastContext';
+import { ViewToggle } from '@/components/ui/ViewToggle';
+import { AnimeListItem } from '@/components/ui/AnimeListItem';
+import { ImageModal } from '@/components/ui/ImageModal';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function CharacterDetails() {
     const { id } = useParams();
@@ -20,6 +23,12 @@ export function CharacterDetails() {
     const [isAboutExpanded, setIsAboutExpanded] = useState(false);
     const [favLoading, setFavLoading] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);
+    
+    // UI State
+    const [activeTab, setActiveTab] = useState('anime');
+    const [viewMode, setViewMode] = useState('grid');
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [isVisible, setIsVisible] = useState(false);
 
     const isFavorite = character ? isCharacterFavorite(character.id) : false;
 
@@ -54,10 +63,6 @@ export function CharacterDetails() {
         if (num > 1000) return (num / 1000).toFixed(1) + 'k';
         return num.toString();
     };
-
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [isGalleryOpen, setIsGalleryOpen] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         const timer = setTimeout(() => setIsVisible(true), 100);
@@ -208,74 +213,140 @@ export function CharacterDetails() {
                                 </div>
                             </div>
 
-                            {/* Filmografia (Carousel) */}
-                            <div className="bg-bg-secondary/20 p-6 rounded-3xl border border-white/5">
-                                <ReusableCarousel
-                                    title="Filmografia"
-                                    icon={Film}
-                                    items={animeography}
-                                    renderItem={(entry) => (
-                                        <Link
-                                            to={`/anime/${entry.anime.mal_id}`}
-                                            className="block w-[140px] md:w-[160px] group relative"
-                                        >
-                                            <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-white/5 group-hover:border-primary/50 transition-all">
-                                                <img
-                                                    src={entry.anime.images?.jpg?.image_url}
-                                                    alt={entry.anime.title}
-                                                    loading="lazy"
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                />
-                                                <div className="absolute top-1.5 right-1.5">
-                                                    <span className={clsx(
-                                                        "text-[10px] font-black px-2 py-1 rounded-md shadow-sm backdrop-blur-md uppercase tracking-wide",
-                                                        entry.role === 'Main'
-                                                            ? "bg-primary text-white"
-                                                            : "bg-black/60 text-gray-200"
-                                                    )}>
-                                                        {entry.role === 'Main' ? 'MAIN' : 'SUPP'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <h4 className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors line-clamp-2 mt-3 leading-tight">
-                                                {entry.anime.title}
-                                            </h4>
-                                        </Link>
-                                    )}
-                                />
-                            </div>
-
-                            {/* Gallery */}
-                            <div>
-                                <div className="flex items-center justify-between mb-6">
-                                    <h3 className="text-2xl font-bold flex items-center gap-3">
-                                        <ImageIcon className="w-6 h-6 text-primary" /> Galeria
-                                    </h3>
-                                    {pictures.length > 4 && (
+                            {/* TABS: Filmography & Gallery */}
+                            <div className="space-y-6">
+                                {/* Tab Navigation */}
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10 pb-4">
+                                    <div className="flex items-center gap-6">
                                         <button
-                                            onClick={() => setIsGalleryOpen(true)}
-                                            className="text-sm font-bold text-primary hover:text-white hover:bg-primary px-4 py-2 rounded-xl transition-all border border-primary/20 hover:border-transparent"
+                                            onClick={() => setActiveTab('anime')}
+                                            className={clsx(
+                                                "text-xl font-bold flex items-center gap-2 transition-colors pb-2 -mb-4 border-b-2",
+                                                activeTab === 'anime' ? "text-primary border-primary" : "text-text-secondary border-transparent hover:text-white"
+                                            )}
                                         >
-                                            Ver Tudo ({pictures.length})
+                                            <Film className="w-5 h-5" /> Filmografia <span className="text-xs bg-bg-secondary px-2 py-0.5 rounded-full text-text-secondary">{animeography.length}</span>
                                         </button>
+                                        <button
+                                            onClick={() => setActiveTab('gallery')}
+                                            className={clsx(
+                                                "text-xl font-bold flex items-center gap-2 transition-colors pb-2 -mb-4 border-b-2",
+                                                activeTab === 'gallery' ? "text-primary border-primary" : "text-text-secondary border-transparent hover:text-white"
+                                            )}
+                                        >
+                                            <ImageIcon className="w-5 h-5" /> Galeria <span className="text-xs bg-bg-secondary px-2 py-0.5 rounded-full text-text-secondary">{pictures.length}</span>
+                                        </button>
+                                    </div>
+
+                                    {/* View Toggle (Only visible in Anime tab) */}
+                                    {activeTab === 'anime' && (
+                                        <ViewToggle
+                                            value={viewMode}
+                                            onChange={setViewMode}
+                                            options={[
+                                                { value: 'grid', label: null, icon: LayoutGrid },
+                                                { value: 'list', label: null, icon: List },
+                                            ]}
+                                        />
                                     )}
                                 </div>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    {pictures.slice(0, 4).map((pic, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="aspect-square rounded-2xl overflow-hidden cursor-pointer group relative border border-white/5 hover:border-primary/50 transition-all shadow-md hover:shadow-primary/20"
-                                            onClick={() => setSelectedImage(pic.jpg.image_url)}
-                                        >
-                                            <img
-                                                src={pic.jpg.image_url}
-                                                alt="Character gallery"
-                                                loading="lazy"
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                            />
-                                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        </div>
-                                    ))}
+
+                                {/* Tab Content */}
+                                <div className="min-h-[400px]">
+                                    <AnimatePresence mode="wait">
+                                        {activeTab === 'anime' ? (
+                                            <motion.div
+                                                key="anime"
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -10 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                {animeography.length === 0 ? (
+                                                    <p className="text-text-secondary text-center py-20 italic">Ops! Nenhuma participação encontrada.</p>
+                                                ) : (
+                                                    <>
+                                                     {viewMode === 'grid' ? (
+                                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                                                            {animeography.map((entry, idx) => (
+                                                                <Link
+                                                                    to={`/anime/${entry.anime.mal_id}`}
+                                                                    key={`${entry.anime.mal_id}-${idx}`}
+                                                                    className="block group relative"
+                                                                >
+                                                                    <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-white/5 group-hover:border-primary/50 transition-all">
+                                                                        <img
+                                                                            src={entry.anime.images?.jpg?.image_url}
+                                                                            alt={entry.anime.title}
+                                                                            loading="lazy"
+                                                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                                        />
+                                                                        <div className="absolute top-1.5 right-1.5">
+                                                                            <span className={clsx(
+                                                                                "text-[10px] font-black px-2 py-1 rounded-md shadow-sm backdrop-blur-md uppercase tracking-wide",
+                                                                                entry.role === 'Main'
+                                                                                    ? "bg-primary text-white"
+                                                                                    : "bg-black/60 text-gray-200"
+                                                                            )}>
+                                                                                {entry.role === 'Main' ? 'MAIN' : 'SUPP'}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <h4 className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors line-clamp-2 mt-3 leading-tight">
+                                                                        {entry.anime.title}
+                                                                    </h4>
+                                                                </Link>
+                                                            ))}
+                                                        </div>
+                                                     ) : (
+                                                         <div className="space-y-3">
+                                                             {animeography.map((entry, idx) => (
+                                                                 <AnimeListItem 
+                                                                     key={`${entry.anime.mal_id}-${idx}`}
+                                                                     id={entry.anime.mal_id}
+                                                                     title={entry.anime.title}
+                                                                     image={entry.anime.images?.jpg?.large_image_url}
+                                                                     score={null}
+                                                                     synopsis={null}
+                                                                     year={entry.anime.year}
+                                                                     role={entry.role}
+                                                                 />
+                                                             ))}
+                                                         </div>
+                                                     )}
+                                                    </>
+                                                )}
+                                            </motion.div>
+                                        ) : (
+                                            <motion.div
+                                                key="gallery"
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -10 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+                                            >
+                                                {pictures.map((pic, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className="aspect-[2/3] rounded-xl overflow-hidden cursor-pointer group relative border border-white/5 hover:border-primary/50 transition-all shadow-md hover:shadow-primary/20"
+                                                        onClick={() => setSelectedImage(pic.jpg.image_url)}
+                                                    >
+                                                        <img
+                                                            src={pic.jpg.image_url}
+                                                            alt="Character gallery"
+                                                            loading="lazy"
+                                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                        />
+                                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                            <ImageIcon className="w-8 h-8 text-white drop-shadow-md" />
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                                {pictures.length === 0 && <p className="text-text-secondary col-span-full italic py-10 text-center">Nenhuma foto extra disponível.</p>}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             </div>
 
@@ -283,65 +354,13 @@ export function CharacterDetails() {
                     </div>
                 </div>
 
-                {/* --- MODALS --- */}
-
-                {/* GALLERY MODAL */}
-                {isGalleryOpen && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 animate-in fade-in duration-200 p-4">
-                        <div className="w-full h-full flex flex-col max-w-7xl mx-auto bg-bg-primary rounded-3xl overflow-hidden shadow-2xl border border-white/10">
-                            <div className="flex justify-between items-center p-6 border-b border-border-color bg-bg-secondary">
-                                <h2 className="text-2xl font-bold text-text-primary flex items-center gap-2"><ImageIcon className="w-6 h-6 text-primary" /> Galeria Completa</h2>
-                                <button
-                                    onClick={() => setIsGalleryOpen(false)}
-                                    className="p-2 bg-bg-tertiary hover:bg-red-500 hover:text-white rounded-full text-text-primary transition-colors"
-                                >
-                                    <X className="w-6 h-6" />
-                                </button>
-                            </div>
-                            <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-bg-secondary">
-                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                                    {pictures.map((pic, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="aspect-[2/3] rounded-xl overflow-hidden cursor-pointer group relative border border-white/10 hover:border-primary transition-all shadow-lg hover:shadow-primary/20"
-                                            onClick={() => setSelectedImage(pic.jpg.image_url)}
-                                        >
-                                            <img
-                                                src={pic.jpg.image_url}
-                                                alt="Gallery full"
-                                                loading="lazy"
-                                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* SINGLE IMAGE MODAL */}
-                {selectedImage && (
-                    <div
-                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 animate-in fade-in duration-200"
-                        onClick={() => setSelectedImage(null)}
-                    >
-                        <img
-                            src={selectedImage}
-                            alt="Full size"
-                            className="max-w-full max-h-[90vh] rounded-2xl shadow-2xl object-contain border-4 border-white/10"
-                        />
-                        <button
-                            className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-red-500 rounded-full text-white transition-colors backdrop-blur-md"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedImage(null);
-                            }}
-                        >
-                            <X className="w-8 h-8" />
-                        </button>
-                    </div>
-                )}
+                {/* Image Modal */}
+                <ImageModal 
+                    isOpen={!!selectedImage}
+                    onClose={() => setSelectedImage(null)}
+                    imageUrl={selectedImage}
+                    altText="Character Image"
+                />
             </div>
         </>
     );

@@ -4,7 +4,7 @@ import clsx from 'clsx';
 
 export function AnimeListItem({
     id, title, image, score, synopsis, status, members, year, episodes, totalEp, type, genres,
-    showPersonalProgress, currentEp, userScore, onRemove
+    showPersonalProgress, currentEp, userScore, onRemove, role
 }) {
     // Truncate synopsis
     const truncatedSynopsis = synopsis?.length > 200 ? synopsis.substring(0, 200) + "..." : synopsis;
@@ -72,11 +72,23 @@ export function AnimeListItem({
                     </h3>
 
                     <div className="flex items-center gap-2">
+                        {/* Role Badge (Custom for Character Details) */}
+                        {role && (
+                            <span className={clsx(
+                                "hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider shrink-0",
+                                role === 'Main' ? "bg-primary text-white" : "bg-bg-tertiary text-text-secondary border border-border-color"
+                            )}>
+                                {role === 'Main' ? 'MAIN' : 'SUPP'}
+                            </span>
+                        )}
+
                         {/* Status Icon */}
-                        <div className={clsx("hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider shrink-0", statusInfo.color)}>
-                            {StatusIcon && <StatusIcon className="w-3 h-3" />}
-                            {statusInfo.label}
-                        </div>
+                        {status && (
+                            <div className={clsx("hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider shrink-0", statusInfo.color)}>
+                                {StatusIcon && <StatusIcon className="w-3 h-3" />}
+                                {statusInfo.label}
+                            </div>
+                        )}
 
                         {/* Remove Button (Visible on hover in Desktop, always on mobile if enabled) */}
                         {onRemove && (
@@ -95,11 +107,21 @@ export function AnimeListItem({
                     </div>
                 </div>
 
-                {/* Mobile Status (Compact) */}
-                <div className="sm:hidden flex mb-1.5">
-                    <span className={clsx("text-[10px] font-bold uppercase px-1.5 py-0.5 rounded border flex items-center gap-1", statusInfo.color)}>
-                        {statusInfo.label}
-                    </span>
+                {/* Mobile Status / Role (Compact) */}
+                <div className="sm:hidden flex mb-1.5 gap-2">
+                     {role && (
+                        <span className={clsx(
+                            "text-[10px] font-black uppercase px-1.5 py-0.5 rounded flex items-center gap-1",
+                            role === 'Main' ? "bg-primary text-white" : "bg-bg-tertiary text-text-secondary border border-border-color"
+                        )}>
+                            {role === 'Main' ? 'MAIN' : 'SUPP'}
+                        </span>
+                    )}
+                    {status && (
+                        <span className={clsx("text-[10px] font-bold uppercase px-1.5 py-0.5 rounded border flex items-center gap-1", statusInfo.color)}>
+                            {statusInfo.label}
+                        </span>
+                    )}
                 </div>
 
                 {/* Meta Row */}
@@ -132,9 +154,9 @@ export function AnimeListItem({
                 )}
 
                 {/* Synopsis (Non-Library or if space permits) */}
-                {!showPersonalProgress && (
+                {!showPersonalProgress && truncatedSynopsis && (
                     <p className="text-text-secondary text-xs leading-relaxed mb-auto line-clamp-2 hidden sm:block">
-                        {truncatedSynopsis || "Sem sinopse."}
+                        {truncatedSynopsis}
                     </p>
                 )}
 
