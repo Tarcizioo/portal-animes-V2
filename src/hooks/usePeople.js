@@ -48,29 +48,15 @@ export function useTopPeople() {
     return useInfiniteQuery({
         queryKey: ['top-people-infinite'],
         queryFn: async ({ pageParam }) => {
-             console.log("useTopPeople: queryFn called with pageParam:", pageParam);
-             // Ensure pageParam is valid, default to 1 if not
              const page = pageParam || 1;
-             try {
-                const json = await jikanApi.getTopPeople(`?page=${page}&limit=25`);
-                console.log(`useTopPeople: fetched page ${page}`, json);
-                return json;
-             } catch (error) {
-                 console.error("useTopPeople: fetch error", error);
-                 throw error;
-             }
+             const json = await jikanApi.getTopPeople(`?page=${page}&limit=25`);
+             return json;
         },
         initialPageParam: 1,
-        getNextPageParam: (lastPage, allPages) => {
-            console.log("useTopPeople: getNextPageParam called", { lastPage, allPages });
+        getNextPageParam: (lastPage) => {
             const pagination = lastPage?.pagination;
-            if (!pagination?.has_next_page) {
-                console.log("useTopPeople: No next page");
-                return undefined;
-            }
-            const nextPage = (pagination.current_page || 0) + 1;
-            console.log("useTopPeople: Next page is", nextPage);
-            return nextPage;
+            if (!pagination?.has_next_page) return undefined;
+            return (pagination.current_page || 0) + 1;
         },
         staleTime: STALE_TIME_24H,
         gcTime: STALE_TIME_24H,
