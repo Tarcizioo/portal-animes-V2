@@ -87,7 +87,7 @@ export function useAnimeInfo(id) {
     queryKey: ['anime', id],
     queryFn: () => fetchAnimeDetails(id),
     staleTime: 1000 * 60 * 60, // 1 hora de cache (evita chamadas repetidas)
-    enabled: !!id,             // Só busca se tiver ID
+    enabled: !!id && id !== 'undefined',             // Só busca se tiver ID válido
     retry: 1,                  // Tenta apenas mais 1 vez se falhar
   });
 

@@ -108,7 +108,7 @@ export function AnimeSidebar({ anime, characters, staff }) {
             )}
 
             {mainStaff.length > 0 && (
-                <Link to={`/anime/${anime.mal_id}/staff`} className="block text-center text-sm font-bold text-primary hover:underline mt-4">
+                <Link to={`/anime/${anime.id}/staff`} className="block text-center text-sm font-bold text-primary hover:underline mt-4">
                     Ver toda a equipe
                 </Link>
             )}
