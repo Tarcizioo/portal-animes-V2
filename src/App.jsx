@@ -7,6 +7,7 @@ import { PageTransition } from '@/components/layout/PageTransition';
 // Lazy loading pages
 const Home = lazy(() => import('@/components/pages/Home').then(module => ({ default: module.Home })));
 const AnimeDetails = lazy(() => import('@/components/pages/AnimeDetails').then(module => ({ default: module.AnimeDetails })));
+const AnimeStaff = lazy(() => import('@/components/pages/AnimeStaff').then(module => ({ default: module.AnimeStaff })));
 const Catalog = lazy(() => import('@/components/pages/Catalog').then(module => ({ default: module.Catalog })));
 const Profile = lazy(() => import('@/components/pages/Profile').then(module => ({ default: module.Profile })));
 const Characters = lazy(() => import('@/components/pages/Characters').then(module => ({ default: module.Characters })));
@@ -43,11 +44,12 @@ const AnimatedRoutes = () => {
             <Route path="/" element={<PageTransition><Home /></PageTransition>} />
             <Route path="/catalog" element={<PageTransition><Catalog /></PageTransition>} />
             <Route path="/characters" element={<PageTransition><Characters /></PageTransition>} />
-            <Route path="/pessoas" element={<PageTransition><VoiceActors /></PageTransition>} />
+            <Route path="/people" element={<PageTransition><VoiceActors /></PageTransition>} />
             <Route path="/person/:id" element={<PageTransition><PersonDetails /></PageTransition>} />
             <Route path="/character/:id" element={<PageTransition><CharacterDetails /></PageTransition>} />
             <Route path="/studio/:id" element={<PageTransition><StudioDetails /></PageTransition>} />
             <Route path="/anime/:id" element={<PageTransition><AnimeDetails /></PageTransition>} />
+            <Route path="/anime/:id/staff" element={<PageTransition><AnimeStaff /></PageTransition>} />
             <Route path="/library" element={<PageTransition><Library /></PageTransition>} />
             <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
             <Route path="/u/:uid" element={<PageTransition><PublicProfile /></PageTransition>} />

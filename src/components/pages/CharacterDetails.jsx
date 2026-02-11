@@ -192,7 +192,7 @@ export function CharacterDetails() {
                                     <h3 className="text-2xl font-bold flex items-center gap-3">
                                         <Mic2 className="w-6 h-6 text-primary" /> Dubladores
                                     </h3>
-                                    <Link to="/pessoas" className="text-sm font-bold text-primary hover:text-white hover:bg-primary px-4 py-2 rounded-xl transition-all border border-primary/20 hover:border-transparent">
+                                    <Link to="/people" className="text-sm font-bold text-primary hover:text-white hover:bg-primary px-4 py-2 rounded-xl transition-all border border-primary/20 hover:border-transparent">
                                         Ver Top Pessoas
                                     </Link>
                                 </div>

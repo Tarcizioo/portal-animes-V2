@@ -41,6 +41,10 @@ async function fetchAnimeDetails(id) {
   await delay(600);
   const epJson = await safeFetch(`https://api.jikan.moe/v4/anime/${id}/episodes`);
 
+  // 5. Staff
+  await delay(600);
+  const staffJson = await safeFetch(`https://api.jikan.moe/v4/anime/${id}/staff`);
+
   const data = animeJson.data;
 
   const formattedAnime = {
@@ -73,7 +77,8 @@ async function fetchAnimeDetails(id) {
   return {
     anime: formattedAnime,
     characters: charJson.data || [],
-    recommendations: recJson.data || []
+    recommendations: recJson.data || [],
+    staff: staffJson.data || []
   };
 }
 
@@ -90,6 +95,7 @@ export function useAnimeInfo(id) {
     anime: data?.anime || null,
     characters: data?.characters || [],
     recommendations: data?.recommendations || [],
+    staff: data?.staff || [],
     loading: isLoading,
     error
   };

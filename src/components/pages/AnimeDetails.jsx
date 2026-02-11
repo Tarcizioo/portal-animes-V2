@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
-    Star, Clock, Users, Trophy, Play, CheckCircle, Plus, Heart, Share2,
-    Calendar, Monitor, Globe, Film, List, MessageSquare, ThumbsUp, Reply,
-    ChevronDown, ArrowRight, PlayCircle, Layers, Mic2, Info, AlertCircle, ZoomIn, X
+    Star, Users, Trophy, Heart, Film, List, ZoomIn, X
 } from 'lucide-react';
 
 import { useAnimeInfo } from '@/hooks/useAnimeInfo';
@@ -21,11 +19,12 @@ import { HeroActionCard } from '@/components/anime/HeroActionCard';
 import { InfoRow } from '@/components/anime/InfoRow';
 import { StatsCard } from '@/components/anime/StatsCard';
 import { EpisodesList } from '@/components/anime/EpisodesList';
+import { AnimeSidebar } from '@/components/anime/AnimeSidebar';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 
 export function AnimeDetails() {
     const { id } = useParams();
-    const { anime, characters, recommendations, loading } = useAnimeInfo(id);
+    const { anime, characters, recommendations, staff, loading } = useAnimeInfo(id);
     const { user } = useAuth();
     const { toast } = useToast();
     const { library, addToLibrary, incrementProgress, updateProgress, updateRating, toggleFavorite, removeFromLibrary } = useAnimeLibrary();
@@ -222,6 +221,7 @@ export function AnimeDetails() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
                     {/* DIREITA (Conteúdo) --> Agora na ESQUERDA (Desktop) */}
+                    {/* DIREITA (Conteúdo) --> Agora na ESQUERDA (Desktop) */}
                     <div className="lg:col-span-9 xl:col-span-9 space-y-12 order-2 lg:order-1">
 
                         {/* Stats Grid */}
@@ -329,80 +329,7 @@ export function AnimeDetails() {
                     </div>
 
                     {/* ESQUERDA (Info Sidebar) --> Agora na DIREITA (Desktop) */}
-                    <motion.aside
-                        initial={{ opacity: 0, x: 20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
-                        className="lg:col-span-3 xl:col-span-3 space-y-8 h-fit order-1 lg:order-2"
-                    >
-                        {/* Poster removed from here */}
-
-                        <div className="space-y-6">
-                            <h3 className="font-bold text-lg flex items-center gap-2 border-b border-border-color pb-2">
-                                <Info className="w-5 h-5 text-primary" /> Informações
-                            </h3>
-                            <div className="space-y-3">
-                                <InfoRow icon={Layers} label="Episódios" value={`${anime.episodes || '?'}`} />
-                                <InfoRow icon={Clock} label="Duração" value={anime.duration?.split('per')[0]} />
-                                <InfoRow 
-                                    icon={Monitor} 
-                                    label="Estúdio" 
-                                    value={anime.studios?.[0] ? (
-                                        <Link to={`/studio/${anime.studios[0].mal_id}`} className="hover:underline">
-                                            {anime.studios[0].name}
-                                        </Link>
-                                    ) : '-'} 
-                                    highlight 
-                                />
-                                <InfoRow icon={Star} label="Nota Média" value={anime.score} color="text-yellow-400" />
-                                <div className="border-t border-border-color/50 my-2" />
-                                <InfoRow icon={Film} label="Origem" value={anime.source} />
-                                <InfoRow icon={CheckCircle} label="Status" value={anime.status === 'Finished Airing' ? 'Completo' : 'Em Lançamento'} color={anime.status === 'Finished Airing' ? 'text-emerald-400' : 'text-blue-400'} />
-                                <InfoRow icon={AlertCircle} label="Classificação" value={anime.rating?.split(' ')[0]} />
-                                <InfoRow icon={Calendar} label="Exibição" value={anime.year || anime.aired?.string?.split('to')[0]} />
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <h3 className="font-bold text-lg border-b border-border-color pb-2">Gêneros</h3>
-                            <div className="flex flex-wrap gap-2">
-                                {anime.genres?.map(g => (
-                                    <Link
-                                        key={g.mal_id}
-                                        to={`/catalog?genre=${g.mal_id}`}
-                                        className="px-3 py-1.5 rounded-lg bg-bg-secondary border border-border-color text-xs font-medium transition-colors hover:bg-primary hover:text-white hover:border-primary"
-                                    >
-                                        {g.name}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <h3 className="font-bold text-lg border-b border-border-color pb-2">Elenco</h3>
-                            <div className="grid grid-cols-1 gap-3">
-                                {characters?.slice(0, 4).map(char => (
-                                    <motion.div
-                                        key={char.character.mal_id}
-                                        whileHover={{ x: 5, backgroundColor: "rgba(255,255,255,0.05)" }}
-                                        className="rounded-xl transition-colors"
-                                    >
-                                        <Link to={`/character/${char.character.mal_id}`} className="flex items-center gap-3 p-2 group">
-                                            <div className="size-10 rounded-full overflow-hidden bg-bg-secondary">
-                                                <img src={char.character.images?.jpg?.image_url} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-bold group-hover:text-primary transition-colors line-clamp-1">{char.character.name}</span>
-                                                <span className="text-xs text-text-secondary">{char.role}</span>
-                                            </div>
-                                        </Link>
-                                    </motion.div>
-                                ))}
-                            </div>
-                            <Link to="/characters" className="block text-center text-sm font-bold text-primary hover:underline">Ver todo o elenco</Link>
-                        </div>
-                    </motion.aside>
+                    <AnimeSidebar anime={anime} characters={characters} staff={staff} />
                 </div>
             </div >
             {/* Image Zoom Modal */}

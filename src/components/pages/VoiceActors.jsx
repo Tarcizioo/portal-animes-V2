@@ -2,6 +2,7 @@ import { useTopPeople } from '@/hooks/usePeople';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { VoiceActorCard } from '@/components/ui/VoiceActorCard';
 import { Loader } from '@/components/ui/Loader';
+import { Link } from 'react-router-dom';
 import { Mic2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
