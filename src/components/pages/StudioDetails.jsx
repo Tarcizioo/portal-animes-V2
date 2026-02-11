@@ -8,6 +8,7 @@ import { Loader } from '@/components/ui/Loader';
 import { Monitor, Calendar, Globe, MapPin, ExternalLink, ChevronRight, Grid, List, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AnimeListItem } from '@/components/ui/AnimeListItem';
+import { BackButton } from '@/components/ui/BackButton';
 
 export function StudioDetails() {
   const { id } = useParams();
@@ -142,6 +143,9 @@ export function StudioDetails() {
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary font-sans pb-20 pt-24 px-6 md:px-12 max-w-[1600px] mx-auto">
+      <div className="mb-6">
+        <BackButton />
+      </div>
       
       {/* Header */}
       <div className="flex flex-col md:flex-row gap-8 items-start mb-12">

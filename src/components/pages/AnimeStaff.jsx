@@ -4,6 +4,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { Loader } from '@/components/ui/Loader';
 import { ArrowLeft, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { BackButton } from '@/components/ui/BackButton';
 
 export function AnimeStaff() {
     const { id } = useParams();
@@ -34,13 +35,9 @@ export function AnimeStaff() {
                 
                 {/* Header */}
                 <div className="mb-8 md:mb-12">
-                    <button 
-                        onClick={() => navigate(-1)} 
-                        className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors mb-6 group"
-                    >
-                        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                        <span className="font-medium">Voltar para o Anime</span>
-                    </button>
+                    <div className="mb-6">
+                        <BackButton label="Voltar para o Anime" />
+                    </div>
 
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div>

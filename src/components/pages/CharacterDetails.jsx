@@ -13,6 +13,7 @@ import { ViewToggle } from '@/components/ui/ViewToggle';
 import { AnimeListItem } from '@/components/ui/AnimeListItem';
 import { ImageModal } from '@/components/ui/ImageModal';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BackButton } from '@/components/ui/BackButton';
 
 export function CharacterDetails() {
     const { id } = useParams();
@@ -91,6 +92,9 @@ export function CharacterDetails() {
             <ScrollToTop />
             <div className="min-h-screen bg-bg-primary text-text-primary font-sans pb-20 relative overflow-hidden">
                 <div className={`relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-12 transition-opacity duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+                    <div className="mb-6">
+                        <BackButton />
+                    </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
