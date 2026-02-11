@@ -4,7 +4,7 @@ import { Hero } from "@/components/home/Hero";
 import { AnimeCarousel } from '@/components/ui/AnimeCarousel';
 import { LazyAnimeCarousel } from '@/components/home/LazyAnimeCarousel';
 
-import { useJikan } from '@/hooks/useJikan';
+import { useHomeContent } from '@/hooks/useAnimeDiscovery';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { SkeletonHero } from '@/components/ui/SkeletonHero';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
@@ -27,7 +27,7 @@ export function Home() {
     popularAnimes,
     seasonalAnimes,
     loading
-  } = useJikan();
+  } = useHomeContent();
 
   usePageTitle('Início');
 
@@ -57,7 +57,7 @@ export function Home() {
         </>
       ) : (
         <>
-          <Hero animes={featuredAnimes} />
+          <Hero animes={featuredAnimes || []} />
 
           <AnimeCarousel
             id="popular"
@@ -89,3 +89,4 @@ export function Home() {
 
   );
 }
+

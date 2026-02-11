@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { jikanApi } from '@/services/api';
 
 export function useCharacters() {
     const [characters, setCharacters] = useState([]);
@@ -8,20 +9,17 @@ export function useCharacters() {
 
     useEffect(() => {
         let isMounted = true;
-        const controller = new AbortController();
 
         async function fetchCharacters() {
             try {
                 setLoading(true);
 
-                // Delay para evitar bloqueio da API (429) e melhorar UX do skeleton
-                await new Promise(resolve => setTimeout(resolve, 600));
+                // Delay para evitar bloqueio da API (429) e melhorar UX do skeleton (if needed, but api.js handles basic rate limits)
+                // Keeping a small delay for UI smoothness if desired, or relying on api.js
+                // await new Promise(resolve => setTimeout(resolve, 600)); 
 
-                const response = await fetch(`https://api.jikan.moe/v4/top/characters?page=${page}&limit=25`, { signal: controller.signal });
+                const json = await jikanApi.getTopCharacters(`?page=${page}&limit=25`);
 
-                if (!response.ok) throw new Error(`Status: ${response.status}`);
-
-                const json = await response.json();
                 if (!isMounted) return;
 
                 const data = json.data || [];
@@ -40,7 +38,7 @@ export function useCharacters() {
                 setHasMore(pagination.has_next_page || (data.length > 0 && data.length >= 25));
 
             } catch (error) {
-                if (error.name !== 'AbortError') console.error("Erro fetch characters:", error);
+                 console.error("Erro fetch characters:", error);
             } finally {
                 if (isMounted) setLoading(false);
             }
@@ -48,7 +46,7 @@ export function useCharacters() {
 
         fetchCharacters();
 
-        return () => { isMounted = false; controller.abort(); };
+        return () => { isMounted = false; };
     }, [page]);
 
     const loadMore = useCallback(() => {
@@ -57,3 +55,4 @@ export function useCharacters() {
 
     return { characters, loading, loadMore, hasMore };
 }
+

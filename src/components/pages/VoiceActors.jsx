@@ -1,4 +1,4 @@
-import { useTopPeople } from '@/hooks/useJikan';
+import { useTopPeople } from '@/hooks/usePeople';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { VoiceActorCard } from '@/components/ui/VoiceActorCard';
 import { Loader } from '@/components/ui/Loader';

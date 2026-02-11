@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { usePersonInfo } from '@/hooks/useJikan';
+import { usePersonInfo } from '@/hooks/usePeople';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { Loader } from '@/components/ui/Loader';
 import { Heart, Info, Mic2, ChevronDown, Trophy, Images } from 'lucide-react';

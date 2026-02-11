@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { AnimeCarousel } from '@/components/ui/AnimeCarousel';
-import { useGenreAnime } from '@/hooks/useJikan';
+import { useGenreAnime } from '@/hooks/useAnimeDiscovery';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
 
 export function LazyAnimeCarousel({ id, title, icon: Icon, genreId }) {
