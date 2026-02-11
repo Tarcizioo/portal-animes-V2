@@ -322,9 +322,7 @@ export function Catalog() {
               >
                 <Filter className="w-5 h-5" />
               </button>
-              <span className="text-base text-text-secondary">
-                Encontrados: <strong className="text-text-primary text-lg">{animes.length}</strong> animes
-              </span>
+
             </div>
 
             <div className="flex items-center gap-3 w-full sm:w-auto">
