@@ -45,15 +45,6 @@ export function VoiceActorCard({ person, index }) {
             <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
             {person.favorites?.toLocaleString()}
           </div>
-          
-          <a 
-            href={person.url} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-xs font-bold text-primary hover:underline"
-          >
-            MAL Profile
-          </a>
         </div>
       </div>
     </div>

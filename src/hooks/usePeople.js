@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { jikanApi } from '@/services/api';
 
 const STALE_TIME_24H = 1000 * 60 * 60 * 24;
@@ -45,11 +45,32 @@ export function usePersonInfo(id) {
 }
 
 export function useTopPeople() {
-    return useQuery({
-        queryKey: ['top-people'],
-        queryFn: async () => {
-             const json = await jikanApi.getTopPeople('?limit=25');
-             return json.data || [];
+    return useInfiniteQuery({
+        queryKey: ['top-people-infinite'],
+        queryFn: async ({ pageParam }) => {
+             console.log("useTopPeople: queryFn called with pageParam:", pageParam);
+             // Ensure pageParam is valid, default to 1 if not
+             const page = pageParam || 1;
+             try {
+                const json = await jikanApi.getTopPeople(`?page=${page}&limit=25`);
+                console.log(`useTopPeople: fetched page ${page}`, json);
+                return json;
+             } catch (error) {
+                 console.error("useTopPeople: fetch error", error);
+                 throw error;
+             }
+        },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, allPages) => {
+            console.log("useTopPeople: getNextPageParam called", { lastPage, allPages });
+            const pagination = lastPage?.pagination;
+            if (!pagination?.has_next_page) {
+                console.log("useTopPeople: No next page");
+                return undefined;
+            }
+            const nextPage = (pagination.current_page || 0) + 1;
+            console.log("useTopPeople: Next page is", nextPage);
+            return nextPage;
         },
         staleTime: STALE_TIME_24H,
         gcTime: STALE_TIME_24H,
