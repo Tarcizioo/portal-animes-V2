@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, X, Bell, ArrowLeft } from 'lucide-react';
+import { Search, X, Bell, ArrowLeft, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSearch } from '@/hooks/useSearch';
 import { useAuth } from '@/context/AuthContext';
@@ -11,7 +11,7 @@ import { NotificationDropdown } from '@/components/notifications/NotificationDro
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function Header() {
-    const { query, setQuery, results, setResults } = useSearch();
+    const { query, setQuery, type, setType, results, setResults } = useSearch();
     const navigate = useNavigate();
     const [showMobileSearch, setShowMobileSearch] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -36,6 +36,8 @@ export function Header() {
     const handleResultClick = (result) => {
         if (result.kind === 'character') {
             navigate(`/character/${result.id}`);
+        } else if (result.kind === 'person') {
+            navigate(`/person/${result.id}`);
         } else {
             navigate(`/anime/${result.id}`);
         }
@@ -44,6 +46,7 @@ export function Header() {
         setSelectedIndex(-1);
         setShowMobileSearch(false);
     };
+
 
     const handleKeyDown = (e) => {
         if (results.length === 0) return;
@@ -110,8 +113,24 @@ export function Header() {
                 </div>
 
                 {/* DESKTOP SEARCH BAR */}
-                <div className="hidden md:flex relative group items-center gap-4 w-72 focus-within:w-96 transition-all duration-300">
-                    <div className="relative w-full">
+                <div className="hidden md:flex relative group items-center gap-2 w-auto transition-all duration-300">
+                    
+                    {/* Search Type Selector */}
+                    <div className="relative">
+                        <select 
+                            value={type}
+                            onChange={(e) => setType(e.target.value)}
+                            className="appearance-none bg-bg-tertiary border-2 border-transparent hover:border-border-color rounded-xl py-2.5 pl-3 pr-8 text-sm font-medium text-text-primary focus:outline-none focus:border-primary cursor-pointer transition-all"
+                        >
+                            <option value="all">Todos</option>
+                            <option value="anime">Animes</option>
+                            <option value="character">Personagens</option>
+                            <option value="person">Pessoas</option>
+                        </select>
+                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" />
+                    </div>
+
+                    <div className="relative w-96 focus-within:w-[32rem] transition-all duration-300">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <Search className="w-5 h-5 text-text-secondary group-focus-within:text-primary transition-colors duration-300" />
                         </div>
@@ -146,7 +165,9 @@ export function Header() {
                                                 <h4 className="text-sm font-bold truncate text-text-primary group-hover/item:text-primary">
                                                     {item.title}
                                                 </h4>
-                                                <span className="text-xs text-text-secondary truncate">{item.kind === 'character' ? 'Personagem' : 'Anime'}</span>
+                                                <span className="text-xs text-text-secondary truncate">
+                                                    {item.kind === 'character' ? 'Personagem' : item.kind === 'person' ? 'Pessoa' : 'Anime'}
+                                                </span>
                                             </div>
                                         </div>
                                     ))}
@@ -202,6 +223,28 @@ export function Header() {
                                 </div>
                             </div>
 
+                            {/* Mobile Filters */}
+                            <div className="w-full flex items-center gap-2 px-4 py-2 bg-bg-primary border-b border-border-color overflow-x-auto no-scrollbar">
+                                {[
+                                    { value: 'all', label: 'Todos' },
+                                    { value: 'anime', label: 'Animes' },
+                                    { value: 'character', label: 'Personagens' },
+                                    { value: 'person', label: 'Pessoas' }
+                                ].map((t) => (
+                                    <button
+                                        key={t.value}
+                                        onClick={() => setType(t.value)}
+                                        className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors whitespace-nowrap ${
+                                            type === t.value 
+                                            ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                                            : 'bg-bg-tertiary text-text-secondary hover:bg-bg-secondary'
+                                        }`}
+                                    >
+                                        {t.label}
+                                    </button>
+                                ))}
+                            </div>
+
                             {/* Mobile Results List */}
                             <div className="w-full flex-1 overflow-y-auto px-4 py-4 pb-safe custom-scrollbar bg-bg-primary">
                                 {results.length > 0 ? (
@@ -232,7 +275,7 @@ export function Header() {
                                                                 ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' 
                                                                 : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
                                                         }`}>
-                                                            {item.kind === 'character' ? 'Personagem' : 'Anime'}
+                                                            {item.kind === 'character' ? 'Personagem' : item.kind === 'person' ? 'Pessoa' : 'Anime'}
                                                         </span>
                                                         {item.score && (
                                                             <span className="flex items-center gap-1 text-xs text-yellow-500 font-bold bg-yellow-500/5 px-1.5 py-0.5 rounded border border-yellow-500/20">

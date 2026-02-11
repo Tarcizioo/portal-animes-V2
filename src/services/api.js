@@ -67,4 +67,9 @@ export const jikanApi = {
     getTopCharacters: (params = '') => apiFetch(`/top/characters${params}`),
     
     getGenreAnime: (genreId) => apiFetch(`/anime?genres=${genreId}&order_by=score&sort=desc`),
+
+    // Search
+    searchAnime: (query, limit=5) => apiFetch(`/anime?q=${query}&limit=${limit}&order_by=members&sort=desc`),
+    searchCharacters: (query, limit=5) => apiFetch(`/characters?q=${query}&limit=${limit}&order_by=favorites&sort=desc`),
+    searchPeople: (query, limit=5) => apiFetch(`/people?q=${query}&limit=${limit}&order_by=favorites&sort=desc`),
 };
