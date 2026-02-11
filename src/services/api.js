@@ -54,6 +54,7 @@ export const jikanApi = {
     getAnimeVideos: (id) => apiFetch(`/anime/${id}/videos`),
     
     getPersonById: (id) => apiFetch(`/people/${id}`),
+    getPersonAnime: (id) => apiFetch(`/people/${id}/anime`),
     getPersonVoices: (id) => apiFetch(`/people/${id}/voices`),
     getPersonPictures: (id) => apiFetch(`/people/${id}/pictures`),
     getTopPeople: (params = '') => apiFetch(`/top/people${params}`),

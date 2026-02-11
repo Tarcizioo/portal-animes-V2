@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { usePersonInfo } from '@/hooks/usePeople';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { Loader } from '@/components/ui/Loader';
@@ -11,16 +11,21 @@ import { BackButton } from '@/components/ui/BackButton';
 
 export function PersonDetails() {
   const { id } = useParams();
-  const { person, voices, pictures, loading } = usePersonInfo(id);
+  const { person, voices, pictures, animePositions, loading } = usePersonInfo(id);
   const [visibleVoices, setVisibleVoices] = useState(20);
+  const [visiblePositions, setVisiblePositions] = useState(20);
   const [activeTab, setActiveTab] = useState('roles');
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
   usePageTitle(person?.name || 'Detalhes da Pessoa');
 
-  const handleShowMore = () => {
+  const handleShowMoreVoices = () => {
     setVisibleVoices(prev => prev + 20);
+  };
+
+  const handleShowMorePositions = () => {
+    setVisiblePositions(prev => prev + 20);
   };
 
   if (loading) {
@@ -39,9 +44,8 @@ export function PersonDetails() {
     );
   }
 
-  // Ordenar por popularidade do anime ou personagem seria ideal, mas a API retorna um mix.
-  // Vamos assumir que a API já retorna em alguma ordem relevante ou apenas listar.
   const displayedVoices = voices.slice(0, visibleVoices);
+  const displayedPositions = animePositions.slice(0, visiblePositions);
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary font-sans pb-20">
@@ -132,22 +136,28 @@ export function PersonDetails() {
 
             {/* Content Tabs */}
             <div className="space-y-6">
-               <div className="flex items-center gap-6 border-b border-white/10 pb-1">
+               <div className="flex items-center gap-6 border-b border-white/10 pb-1 overflow-x-auto">
                   <button 
                     onClick={() => setActiveTab('roles')}
-                    className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 ${activeTab === 'roles' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
+                    className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === 'roles' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
                   >
-                    <Mic2 className="w-5 h-5" /> Dublagens & Papéis <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{voices.length}</span>
+                    <Mic2 className="w-5 h-5" /> Dublagens <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{voices.length}</span>
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('staff')}
+                    className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === 'staff' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
+                  >
+                    <Trophy className="w-5 h-5" /> Produções <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{animePositions.length}</span>
                   </button>
                   <button 
                     onClick={() => setActiveTab('photos')}
-                    className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 ${activeTab === 'photos' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
+                    className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === 'photos' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
                   >
                     <Images className="w-5 h-5" /> Fotos <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{pictures.length}</span>
                   </button>
                </div>
                 
-                {activeTab === 'roles' ? (
+                {activeTab === 'roles' && (
                   <>
                     {voices.length > 0 ? (
                       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -170,7 +180,7 @@ export function PersonDetails() {
                     {voices.length > visibleVoices && (
                       <div className="flex justify-center pt-4">
                         <button 
-                          onClick={handleShowMore}
+                          onClick={handleShowMoreVoices}
                           className="px-6 py-3 bg-bg-secondary border border-primary/30 text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all flex items-center gap-2"
                         >
                           Carregar Mais <ChevronDown className="w-5 h-5" />
@@ -178,7 +188,61 @@ export function PersonDetails() {
                       </div>
                     )}
                   </>
-                ) : (
+                )}
+
+                {activeTab === 'staff' && (
+                  <>
+                    {animePositions.length > 0 ? (
+                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                        {displayedPositions.map((pos, idx) => (
+                          <motion.div
+                            key={`${pos.anime.mal_id}-${idx}`}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.3 }}
+                            className="flex bg-bg-secondary rounded-xl overflow-hidden border border-border-color hover:border-primary/50 transition-all duration-300 group h-24 relative"
+                          >
+                            {/* Anime Image */}
+                            <Link to={`/anime/${pos.anime.mal_id}`} className="w-20 shrink-0 relative overflow-hidden">
+                                <img 
+                                src={pos.anime.images?.jpg?.image_url} 
+                                alt={pos.anime.title}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                loading="lazy"
+                                />
+                            </Link>
+                            
+                            {/* Info */}
+                            <div className="flex-1 p-3 flex flex-col justify-center min-w-0">
+                                <Link to={`/anime/${pos.anime.mal_id}`} className="text-sm font-bold text-text-primary hover:text-primary transition-colors line-clamp-1 mb-1">
+                                {pos.anime.title}
+                                </Link>
+                                <span className="text-xs text-text-secondary">
+                                Cargo: <span className="text-primary font-medium">{pos.position}</span>
+                                </span>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-text-secondary italic">Nenhum registro de produção encontrado.</p>
+                    )}
+
+                    {animePositions.length > visiblePositions && (
+                      <div className="flex justify-center pt-4">
+                        <button 
+                          onClick={handleShowMorePositions}
+                          className="px-6 py-3 bg-bg-secondary border border-primary/30 text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all flex items-center gap-2"
+                        >
+                          Carregar Mais <ChevronDown className="w-5 h-5" />
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {activeTab === 'photos' && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {pictures.map((pic, idx) => (
                       <motion.div

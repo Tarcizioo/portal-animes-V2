@@ -8,18 +8,21 @@ const fetchPersonFull = async (id) => {
     const detailsJson = await jikanApi.getPersonById(id);
     
     // Fetch optional data in parallel
-    const [voicesRes, picturesRes] = await Promise.allSettled([
+    const [voicesRes, picturesRes, animeRes] = await Promise.allSettled([
         jikanApi.getPersonVoices(id),
-        jikanApi.getPersonPictures(id)
+        jikanApi.getPersonPictures(id),
+        jikanApi.getPersonAnime(id)
     ]);
 
     const voicesJson = voicesRes.status === 'fulfilled' ? voicesRes.value : { data: [] };
     const picturesJson = picturesRes.status === 'fulfilled' ? picturesRes.value : { data: [] };
+    const animeJson = animeRes.status === 'fulfilled' ? animeRes.value : { data: [] };
 
     return {
         person: detailsJson.data,
         voices: voicesJson.data || [],
-        pictures: picturesJson.data || []
+        pictures: picturesJson.data || [],
+        animePositions: animeJson.data || []
     };
 };
 
@@ -35,6 +38,7 @@ export function usePersonInfo(id) {
         person: query.data?.person,
         voices: query.data?.voices || [],
         pictures: query.data?.pictures || [],
+        animePositions: query.data?.animePositions || [],
         loading: query.isLoading,
         error: query.error
     };
