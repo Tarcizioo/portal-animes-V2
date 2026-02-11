@@ -220,12 +220,12 @@ export function CharacterDetails() {
                             {/* TABS: Filmography & Gallery */}
                             <div className="space-y-6">
                                 {/* Tab Navigation */}
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10 pb-4">
-                                    <div className="flex items-center gap-6">
+                                <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-2 border-b border-white/10 pb-2">
+                                    <div className="flex items-center gap-3">
                                         <button
                                             onClick={() => setActiveTab('anime')}
                                             className={clsx(
-                                                "text-xl font-bold flex items-center gap-2 transition-colors pb-2 -mb-4 border-b-2",
+                                                "text-lg font-bold flex items-center gap-2 transition-colors pb-2 -mb-2.5 border-b-2",
                                                 activeTab === 'anime' ? "text-primary border-primary" : "text-text-secondary border-transparent hover:text-white"
                                             )}
                                         >
@@ -234,7 +234,7 @@ export function CharacterDetails() {
                                         <button
                                             onClick={() => setActiveTab('gallery')}
                                             className={clsx(
-                                                "text-xl font-bold flex items-center gap-2 transition-colors pb-2 -mb-4 border-b-2",
+                                                "text-lg font-bold flex items-center gap-2 transition-colors pb-2 -mb-2.5 border-b-2",
                                                 activeTab === 'gallery' ? "text-primary border-primary" : "text-text-secondary border-transparent hover:text-white"
                                             )}
                                         >

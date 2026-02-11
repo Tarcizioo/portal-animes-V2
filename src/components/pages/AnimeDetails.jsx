@@ -218,6 +218,16 @@ export function AnimeDetails() {
 
             {/* --- CONTEÚDO PRINCIPAL --- */}
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-12">
+                {/* MOBILE STATS (Visible only on mobile/tablet) */}
+                <div className="lg:hidden mb-8">
+                     <div className="grid grid-cols-2 gap-3">
+                        <StatsCard value={`#${anime.rank || '-'}`} label="Ranking" icon={Trophy} />
+                        <StatsCard value={anime.score || '-'} label="Score" icon={Star} color="text-yellow-500" />
+                        <StatsCard value={anime.popularity || '-'} label="Popularidade" icon={Heart} color="text-red-500" />
+                        <StatsCard value={anime.members?.toLocaleString() || '-'} label="Membros" icon={Users} color="text-blue-500" />
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
                     {/* DIREITA (Conteúdo) --> Agora na ESQUERDA (Desktop) */}
@@ -230,7 +240,7 @@ export function AnimeDetails() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.5 }}
-                            className="grid grid-cols-2 md:grid-cols-4 gap-4"
+                            className="hidden lg:grid grid-cols-2 md:grid-cols-4 gap-4"
                         >
                             <StatsCard value={`#${anime.rank || '-'}`} label="Ranking" icon={Trophy} />
                             <StatsCard value={anime.score || '-'} label="Score" icon={Star} color="text-yellow-500" />
