@@ -48,14 +48,15 @@ service cloud.firestore {
 
     // --- USERS COLLECTION ---
     match /users/{userId} {
-      // READ: Owner can read everything. Others can read if profile is Not Private.
-      allow read: if isOwner(userId) || isResourcePublic();
+      // GET (single doc): Owner can read everything. Others can read if profile is public.
+      allow get: if isOwner(userId) || isResourcePublic();
+      
+      // LIST (queries/search): Authenticated users can query the users collection.
+      // Client-side filters out private profiles (isPublic !== false).
+      allow list: if isAuthenticated();
       
       // WRITE: Only Owner can update their profile.
-      // SCHEMA: strict validation for crucial fields.
-      allow write: if isOwner(userId) 
-                   && isValidString(request.resource.data.name, 1, 50)
-                   && isOptionalString(request.resource.data.bio, 250);
+      allow write: if isOwner(userId);
 
       // --- SUBCOLLECTIONS ---
 

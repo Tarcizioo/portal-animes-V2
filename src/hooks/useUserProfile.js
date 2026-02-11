@@ -39,7 +39,12 @@ export function useUserProfile() {
         if (!user) return;
         const userRef = doc(db, 'users', user.uid);
         try {
-            await setDoc(userRef, newData, { merge: true });
+            // Auto-generate searchName for case-insensitive search
+            const dataToSave = { ...newData };
+            if (dataToSave.displayName) {
+                dataToSave.searchName = dataToSave.displayName.toLowerCase();
+            }
+            await setDoc(userRef, dataToSave, { merge: true });
             toast.success("Perfil atualizado com sucesso!", "Salvo");
         } catch (error) {
             console.error("Erro ao atualizar perfil:", error);

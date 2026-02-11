@@ -28,7 +28,8 @@ export function AuthProvider({ children }) {
             if (!snapshot.exists()) {
                 await setDoc(userRef, {
                     uid: user.uid,
-                    name: user.displayName,
+                    displayName: user.displayName,
+                    searchName: user.displayName?.toLowerCase() || '',
                     // email: user.email, // REMOVIDO por segurança (será lido via auth.currentUser)
                     photoURL: user.photoURL,
                     bannerURL: null,

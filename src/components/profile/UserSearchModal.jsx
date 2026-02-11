@@ -15,7 +15,7 @@ export function UserSearchModal({ isOpen, onClose }) {
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedTerm(searchTerm);
-        }, 500);
+        }, 300);
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
@@ -31,7 +31,7 @@ export function UserSearchModal({ isOpen, onClose }) {
     // Search logic
     useEffect(() => {
         async function searchUsers() {
-            if (debouncedTerm.length < 3) {
+            if (debouncedTerm.length < 2) {
                 setResults([]);
                 return;
             }
@@ -39,26 +39,36 @@ export function UserSearchModal({ isOpen, onClose }) {
             setLoading(true);
             try {
                 const usersRef = collection(db, 'users');
+                const term = debouncedTerm.toLowerCase();
+                const capitalizedTerm = debouncedTerm.charAt(0).toUpperCase() + debouncedTerm.slice(1).toLowerCase();
 
-                // Heurística de Case Insensitive (Semi-fix):
-                // Como o Firestore é Case Sensitive, e a maioria dos nomes começa com Maiúscula,
-                // vamos capitalizar a primeira letra da busca.
-                // Idealmente, salvaríamos um campo 'searchName' em minúsculo no banco.
-                const term = debouncedTerm.charAt(0).toUpperCase() + debouncedTerm.slice(1).toLowerCase();
+                // Run all queries in parallel to find users across different field formats
+                const [searchNameSnap, displayNameSnap, nameSnap] = await Promise.all([
+                    // 1. searchName (lowercase) — new users
+                    getDocs(query(usersRef, where('searchName', '>=', term), where('searchName', '<=', term + '\uf8ff'), limit(20))),
+                    // 2. displayName — users who edited their profile
+                    getDocs(query(usersRef, where('displayName', '>=', capitalizedTerm), where('displayName', '<=', capitalizedTerm + '\uf8ff'), limit(20))),
+                    // 3. name — old users (original field)
+                    getDocs(query(usersRef, where('name', '>=', capitalizedTerm), where('name', '<=', capitalizedTerm + '\uf8ff'), limit(20))),
+                ]);
 
-                const q = query(
-                    usersRef,
-                    where('displayName', '>=', term),
-                    where('displayName', '<=', term + '\uf8ff'),
-                    limit(20)
-                );
+                // Merge and deduplicate by uid
+                const seen = new Set();
+                const allUsers = [];
 
-                const snapshot = await getDocs(q);
-                const users = snapshot.docs
-                    .map(doc => ({ uid: doc.id, ...doc.data() }))
-                    .filter(u => u.isPublic !== false);
+                [searchNameSnap, displayNameSnap, nameSnap].forEach(snap => {
+                    snap.docs.forEach(doc => {
+                        if (!seen.has(doc.id)) {
+                            seen.add(doc.id);
+                            const data = { uid: doc.id, ...doc.data() };
+                            if (data.isPublic !== false) {
+                                allUsers.push(data);
+                            }
+                        }
+                    });
+                });
 
-                setResults(users);
+                setResults(allUsers);
             } catch (error) {
                 console.error("Error searching users:", error);
             } finally {
@@ -125,7 +135,7 @@ export function UserSearchModal({ isOpen, onClose }) {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2">
                                         <h4 className="font-bold text-text-primary truncate group-hover:text-primary transition-colors">
-                                            {user.displayName || "Usuário"}
+                                            {user.displayName || user.name || "Usuário"}
                                         </h4>
                                         {user.isPublic === false && (
                                             <span className="px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 text-[10px] font-bold uppercase tracking-wider border border-red-500/20">
@@ -140,7 +150,7 @@ export function UserSearchModal({ isOpen, onClose }) {
                                 <ArrowRight className="w-5 h-5 text-text-secondary opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                             </Link>
                         ))
-                    ) : debouncedTerm.length >= 3 ? (
+                    ) : debouncedTerm.length >= 2 ? (
                         <div className="text-center py-12">
                             <p className="text-text-secondary text-lg font-medium">Nenhum usuário encontrado</p>
                             <p className="text-sm text-text-secondary/60 mt-1">Tente buscar por outro nome</p>
