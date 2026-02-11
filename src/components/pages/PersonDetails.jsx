@@ -136,25 +136,27 @@ export function PersonDetails() {
 
             {/* Content Tabs */}
             <div className="space-y-6">
-               <div className="flex items-center gap-6 border-b border-white/10 pb-1 overflow-x-auto">
-                  <button 
-                    onClick={() => setActiveTab('roles')}
-                    className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === 'roles' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
-                  >
-                    <Mic2 className="w-5 h-5" /> Dublagens <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{voices.length}</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveTab('staff')}
-                    className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === 'staff' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
-                  >
-                    <Trophy className="w-5 h-5" /> Produções <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{animePositions.length}</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveTab('photos')}
-                    className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === 'photos' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
-                  >
-                    <Images className="w-5 h-5" /> Fotos <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{pictures.length}</span>
-                  </button>
+               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-1">
+                   <div className="flex items-center gap-6 overflow-x-auto pb-1 sm:pb-0">
+                      <button 
+                        onClick={() => setActiveTab('roles')}
+                        className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === 'roles' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
+                      >
+                        <Mic2 className="w-5 h-5" /> Dublagens <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{voices.length}</span>
+                      </button>
+                      <button 
+                        onClick={() => setActiveTab('staff')}
+                        className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === 'staff' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
+                      >
+                        <Trophy className="w-5 h-5" /> Produções <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{animePositions.length}</span>
+                      </button>
+                      <button 
+                        onClick={() => setActiveTab('photos')}
+                        className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === 'photos' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
+                      >
+                        <Images className="w-5 h-5" /> Fotos <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{pictures.length}</span>
+                      </button>
+                   </div>
                </div>
                 
                 {activeTab === 'roles' && (
@@ -222,6 +224,7 @@ export function PersonDetails() {
                                 Cargo: <span className="text-primary font-medium">{pos.position}</span>
                                 </span>
                             </div>
+
                           </motion.div>
                         ))}
                       </div>
