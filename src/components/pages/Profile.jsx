@@ -90,7 +90,7 @@ export function Profile() {
   if (loading) {
     return (
 
-      <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-10">
+      <div className="p-3 md:p-8 max-w-7xl mx-auto space-y-4 md:space-y-8 pb-10">
         {/* Skeleton Profile Header */}
         <div className="relative mb-20">
           <Skeleton className="h-48 md:h-64 w-full rounded-2xl" />
@@ -150,7 +150,7 @@ export function Profile() {
   return (
 
     <>
-      <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-10">
+      <div className="p-3 md:p-8 max-w-7xl mx-auto space-y-4 md:space-y-8 pb-10">
         <ProfileHeader
           user={user}
           profile={profile}
@@ -160,8 +160,8 @@ export function Profile() {
 
         <ProfileStats />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
+          <div className="lg:col-span-2 space-y-4 md:space-y-8">
             <FavoritesWidget
               animeFavorites={sortedFavorites}
               characterFavorites={sortedCharFavorites}
@@ -173,11 +173,11 @@ export function Profile() {
             <AchievementBadges />
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-3 md:space-y-6">
             {/* Gêneros Favoritos */}
-            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
-              <h3 className="font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-                <Hash className="w-4 h-4 text-primary" /> Gêneros Favoritos
+            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl md:rounded-2xl p-4 md:p-6">
+              <h3 className="font-bold text-[var(--text-primary)] mb-3 md:mb-4 flex items-center gap-2 text-sm md:text-base">
+                <Hash className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> Gêneros Favoritos
               </h3>
               <div className="flex flex-wrap gap-2">
                 {profile?.favoriteGenres && profile.favoriteGenres.length > 0 ? (
@@ -193,9 +193,9 @@ export function Profile() {
             </div>
 
             {/* Estúdios Favoritos */}
-            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
-              <h3 className="font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-                <Monitor className="w-4 h-4 text-primary" /> Estúdios Favoritos
+            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl md:rounded-2xl p-4 md:p-6">
+              <h3 className="font-bold text-[var(--text-primary)] mb-3 md:mb-4 flex items-center gap-2 text-sm md:text-base">
+                <Monitor className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> Estúdios Favoritos
               </h3>
               <div className="grid grid-cols-3 gap-3">
                 {favoriteStudios && favoriteStudios.length > 0 ? (
@@ -234,9 +234,9 @@ export function Profile() {
             </div>
 
             {/* Conexões */}
-            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
-              <h3 className="font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-                <LinkIcon className="w-4 h-4 text-primary" /> Conexões
+            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl md:rounded-2xl p-4 md:p-6">
+              <h3 className="font-bold text-[var(--text-primary)] mb-3 md:mb-4 flex items-center gap-2 text-sm md:text-base">
+                <LinkIcon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> Conexões
               </h3>
               <ul className="space-y-3 text-sm text-gray-400">
                 {profile?.connections?.discord ? (

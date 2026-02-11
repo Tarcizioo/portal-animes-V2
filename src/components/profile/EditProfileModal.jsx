@@ -195,13 +195,13 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-            <div className="bg-[var(--bg-secondary)] w-full max-w-2xl rounded-2xl border border-[var(--border-color)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+            <div className="bg-[var(--bg-secondary)] w-full max-w-2xl rounded-t-2xl md:rounded-2xl border border-[var(--border-color)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] md:max-h-[90vh] mb-16 md:mb-0">
 
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
-                    <h2 className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
-                        <Edit2 className="w-5 h-5 text-primary" /> Editar Perfil
+                <div className="flex items-center justify-between p-4 md:p-6 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
+                    <h2 className="text-lg md:text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+                        <Edit2 className="w-4 h-4 md:w-5 md:h-5 text-primary" /> Editar Perfil
                     </h2>
                     <button onClick={onClose} className="p-2 hover:bg-[var(--bg-primary)]/10 rounded-full transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
                         <X className="w-5 h-5" />
@@ -209,7 +209,7 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
                 </div>
 
                 {/* Body - Scrollable */}
-                <div className="overflow-y-auto p-6 space-y-8 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+                <div className="overflow-y-auto p-4 md:p-6 space-y-6 md:space-y-8 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
 
                     {/* 1. Imagens */}
                     <section className="space-y-4">
@@ -421,11 +421,11 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)] flex justify-end gap-3">
-                    <button onClick={onClose} className="px-6 py-2.5 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-primary)]/10 hover:text-[var(--text-primary)] transition-all font-medium">
+                <div className="p-4 md:p-6 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)] flex justify-end gap-2 md:gap-3">
+                    <button onClick={onClose} className="px-4 md:px-6 py-2 md:py-2.5 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-primary)]/10 hover:text-[var(--text-primary)] transition-all font-medium text-sm md:text-base">
                         Cancelar
                     </button>
-                    <button disabled={uploading} onClick={handleSubmit} className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold hover:bg-primary-hover shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button disabled={uploading} onClick={handleSubmit} className="px-4 md:px-6 py-2 md:py-2.5 rounded-xl bg-primary text-white font-bold hover:bg-primary-hover shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base">
                         {uploading ? (
                             <>Uploading...</>
                         ) : (

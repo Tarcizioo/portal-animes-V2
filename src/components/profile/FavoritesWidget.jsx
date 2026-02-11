@@ -173,15 +173,15 @@ export function FavoritesWidget({
     };
 
     return (
-        <div className="bg-bg-secondary border border-border-color rounded-2xl p-6 relative overflow-hidden">
+        <div className="bg-bg-secondary border border-border-color rounded-2xl p-4 md:p-6 relative overflow-hidden">
 
             {/* Decorative Background */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 relative z-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-6 mb-4 md:mb-8 relative z-10">
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 md:gap-4">
                     {/* Modern Tab Switcher */}
                     <ViewToggle
                         value={activeTab}
@@ -235,7 +235,7 @@ export function FavoritesWidget({
             {/* Grid Area */}
             {readOnly ? (
                 // Static View
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 relative z-10">
+                <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4 relative z-10">
                     {localItems.map((item) => (
                         <FavoriteCard key={item.id} item={item} type={type} />
                     ))}
@@ -254,7 +254,7 @@ export function FavoritesWidget({
                     onDragStart={(e) => setActiveId(e.active.id)}
                     onDragEnd={handleDragEnd}
                 >
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 relative z-10">
+                    <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4 relative z-10">
                         <SortableContext items={localItems.map(i => i.id)} strategy={rectSortingStrategy}>
                             {localItems.map((item) => (
                                 <SortableFavoriteItem key={item.id} item={item} type={type} isEditing={isEditing} />
