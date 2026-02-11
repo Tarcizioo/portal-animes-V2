@@ -5,6 +5,7 @@ import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 export function usePublicProfile(userId) {
     const [profile, setProfile] = useState(null);
     const [library, setLibrary] = useState([]);
+    const [characterFavorites, setCharacterFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -37,17 +38,25 @@ export function usePublicProfile(userId) {
                     return;
                 }
 
-                // 2. Buscar Biblioteca do Usuário (Subcoleção 'library')
-                const libraryRef = collection(db, 'users', userId, 'library');
-                const librarySnap = await getDocs(libraryRef);
+                // 3. Buscar Biblioteca e Favoritos em paralelo
+                const [librarySnap, charFavSnap] = await Promise.all([
+                    getDocs(collection(db, 'users', userId, 'library')),
+                    getDocs(collection(db, 'users', userId, 'favorite_characters')),
+                ]);
 
                 const libraryData = librarySnap.docs.map(doc => ({
                     id: parseInt(doc.id),
                     ...doc.data()
                 }));
 
+                const charFavData = charFavSnap.docs.map(doc => ({
+                    id: parseInt(doc.id),
+                    ...doc.data()
+                }));
+
                 setProfile(userData);
                 setLibrary(libraryData);
+                setCharacterFavorites(charFavData);
 
             } catch (err) {
                 console.error("Erro ao carregar perfil público:", err);
@@ -60,5 +69,5 @@ export function usePublicProfile(userId) {
         fetchPublicData();
     }, [userId]);
 
-    return { profile, library, loading, error };
+    return { profile, library, characterFavorites, loading, error };
 }

@@ -6,7 +6,7 @@ import { BadgesModal } from './BadgesModal';
 import clsx from 'clsx';
 import { BADGES } from '@/constants/badges';
 
-export function AchievementBadges() {
+export function AchievementBadges({ readOnly = false }) {
   const { unlockedBadges, lockedBadges } = useAchievements();
   const { profile } = useUserProfile();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,14 +40,16 @@ export function AchievementBadges() {
           </div>
         </div>
 
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--bg-primary)] hover:bg-primary/20 hover:text-primary text-[var(--text-secondary)] transition-all group border border-transparent hover:border-primary/30"
-          title="Gerenciar Conquistas"
-        >
-          <span className="text-xs font-bold uppercase tracking-wider">Editar</span>
-          <Edit2 className="w-4 h-4" />
-        </button>
+        {!readOnly && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--bg-primary)] hover:bg-primary/20 hover:text-primary text-[var(--text-secondary)] transition-all group border border-transparent hover:border-primary/30"
+            title="Gerenciar Conquistas"
+          >
+            <span className="text-xs font-bold uppercase tracking-wider">Editar</span>
+            <Edit2 className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Barra de Progresso Total (Compacta) */}
@@ -91,8 +93,8 @@ export function AchievementBadges() {
           </div>
         )}
 
-        {/* Slot "Adicionar" se tiver menos de 3 */}
-        {displayBadges.length < 3 && unlockedBadges.length > displayBadges.length && (
+        {/* Slot "Adicionar" se tiver menos de 3 (only in edit mode) */}
+        {!readOnly && displayBadges.length < 3 && unlockedBadges.length > displayBadges.length && (
           <button
             onClick={() => setIsModalOpen(true)}
             className="flex flex-col items-center justify-center p-3 rounded-xl border border-[var(--border-color)] border-dashed hover:border-primary/50 hover:bg-primary/5 transition-all group"
@@ -103,10 +105,12 @@ export function AchievementBadges() {
         )}
       </div>
 
-      <BadgesModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      {!readOnly && (
+        <BadgesModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

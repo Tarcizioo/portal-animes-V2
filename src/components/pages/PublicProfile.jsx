@@ -14,7 +14,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 
 export function PublicProfile() {
     const { uid } = useParams();
-    const { profile, library, loading, error } = usePublicProfile(uid);
+    const { profile, library, characterFavorites, loading, error } = usePublicProfile(uid);
 
     usePageTitle(profile ? `Perfil de ${profile.displayName}` : 'Perfil Público');
 
@@ -99,8 +99,8 @@ export function PublicProfile() {
                         {/* Widget de Favoritos (Read-Only) */}
                         <FavoritesWidget
                             animeFavorites={sortedFavorites}
-                            characterFavorites={[]} // TODO: Buscar favoritos de char se quiser
-                            readOnly={true} // [NEW] Adicionar suporte a readOnly no Widget
+                            characterFavorites={characterFavorites}
+                            readOnly={true}
                         />
 
                         <AchievementBadges readOnly={true} />
