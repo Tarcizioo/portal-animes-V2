@@ -33,7 +33,7 @@ export function useUserProfile() {
         });
 
         return () => unsubscribe();
-    }, [user]);
+    }, [user?.uid]);
 
     const updateProfileData = async (newData) => {
         if (!user) return;

@@ -1,31 +1,24 @@
 import { useState, useEffect } from 'react';
-import { db, auth } from '@/services/firebase';
+import { db } from '@/services/firebase';
 import { doc, setDoc, deleteDoc, onSnapshot, collection, query, getDocs } from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
+import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 
 export function useFavoriteStudios(studioId = null) {
+  const { user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
   const [favoriteStudios, setFavoriteStudios] = useState([]);
-  const [user, setUser] = useState(null);
   const { toast } = useToast();
-
-  useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      if (!currentUser) {
-        setLoading(false);
-        setFavoriteStudios([]);
-        setIsFavorite(false);
-      }
-    });
-    return () => unsubscribeAuth();
-  }, []);
 
   // Check if specific studio is favorite
   useEffect(() => {
-    if (!user || !studioId) return;
+    if (!user || !studioId) {
+      setLoading(false);
+      setFavoriteStudios([]);
+      setIsFavorite(false);
+      return;
+    }
 
     const docRef = doc(db, 'users', user.uid, 'followed_studios', String(studioId));
     const unsubscribe = onSnapshot(docRef, (doc) => {
@@ -34,7 +27,7 @@ export function useFavoriteStudios(studioId = null) {
     });
 
     return () => unsubscribe();
-  }, [user, studioId]);
+  }, [user?.uid, studioId]);
 
   // Fetch all favorite studios
   useEffect(() => {
@@ -50,7 +43,7 @@ export function useFavoriteStudios(studioId = null) {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user?.uid]);
 
   const toggleFavorite = async (studioData) => {
     if (!user) {

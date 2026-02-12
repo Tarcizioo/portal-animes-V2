@@ -29,21 +29,19 @@ async function fetchAnimeDetails(id) {
   }
   const animeJson = await animeRes.json();
 
-  // 2. Characters (Wait to avoid 429)
+  // 2. Batch paralelo: Characters + Recommendations
   await delay(600);
-  const charJson = await safeFetch(`https://api.jikan.moe/v4/anime/${id}/characters`);
+  const [charJson, recJson] = await Promise.all([
+    safeFetch(`https://api.jikan.moe/v4/anime/${id}/characters`),
+    safeFetch(`https://api.jikan.moe/v4/anime/${id}/recommendations`)
+  ]);
 
-  // 3. Recommendations
+  // 3. Batch paralelo: Episodes + Staff
   await delay(600);
-  const recJson = await safeFetch(`https://api.jikan.moe/v4/anime/${id}/recommendations`);
-
-  // 4. Episodes
-  await delay(600);
-  const epJson = await safeFetch(`https://api.jikan.moe/v4/anime/${id}/episodes`);
-
-  // 5. Staff
-  await delay(600);
-  const staffJson = await safeFetch(`https://api.jikan.moe/v4/anime/${id}/staff`);
+  const [epJson, staffJson] = await Promise.all([
+    safeFetch(`https://api.jikan.moe/v4/anime/${id}/episodes`),
+    safeFetch(`https://api.jikan.moe/v4/anime/${id}/staff`)
+  ]);
 
   const data = animeJson.data;
 

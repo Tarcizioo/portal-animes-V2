@@ -68,8 +68,8 @@ export const jikanApi = {
     
     getGenreAnime: (genreId) => apiFetch(`/anime?genres=${genreId}&order_by=score&sort=desc`),
 
-    // Search
-    searchAnime: (query, limit=5) => apiFetch(`/anime?q=${query}&limit=${limit}&order_by=members&sort=desc`),
-    searchCharacters: (query, limit=5) => apiFetch(`/characters?q=${query}&limit=${limit}&order_by=favorites&sort=desc`),
-    searchPeople: (query, limit=5) => apiFetch(`/people?q=${query}&limit=${limit}&order_by=favorites&sort=desc`),
+    // Search (inputs sanitizados com encodeURIComponent)
+    searchAnime: (query, limit=5) => apiFetch(`/anime?q=${encodeURIComponent(query)}&limit=${limit}&order_by=members&sort=desc`),
+    searchCharacters: (query, limit=5) => apiFetch(`/characters?q=${encodeURIComponent(query)}&limit=${limit}&order_by=favorites&sort=desc`),
+    searchPeople: (query, limit=5) => apiFetch(`/people?q=${encodeURIComponent(query)}&limit=${limit}&order_by=favorites&sort=desc`),
 };

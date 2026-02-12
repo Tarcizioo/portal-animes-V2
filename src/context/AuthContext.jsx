@@ -4,7 +4,8 @@ import { auth, googleProvider, db } from '@/services/firebase';
 import {
     signInWithPopup,
     signOut as firebaseSignOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    reauthenticateWithPopup
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -67,9 +68,21 @@ export function AuthProvider({ children }) {
             await auth.currentUser.delete();
 
         } catch (error) {
+            // Se o login é antigo, Firebase exige re-autenticação
+            if (error.code === 'auth/requires-recent-login') {
+                try {
+                    toast.info("Por segurança, confirme sua identidade novamente.", "Re-autenticação");
+                    await reauthenticateWithPopup(auth.currentUser, googleProvider);
+                    // Tentar novamente após re-autenticação
+                    await auth.currentUser.delete();
+                    return;
+                } catch (reAuthError) {
+                    console.error("Erro na re-autenticação:", reAuthError);
+                    toast.error("Falha na re-autenticação. Tente fazer login novamente.", "Erro");
+                    throw reAuthError;
+                }
+            }
             console.error("Erro ao deletar conta:", error);
-            // Se falhar porque o login é antigo, o firebase pede re-autenticação
-            // error.code 'auth/requires-recent-login'
             throw error;
         }
     };

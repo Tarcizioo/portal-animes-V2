@@ -26,10 +26,11 @@ export function useComments(animeId) {
         }
 
         const commentsRef = collection(db, 'comments');
-        // Query: Filter by animeId only (Sorting client-side to avoid Index requirement)
+        // Query: Filter by animeId (sempre String para consistência com useParams)
+        const safeAnimeId = String(animeId);
         const q = query(
             commentsRef,
-            where("animeId", "==", animeId)
+            where("animeId", "==", safeAnimeId)
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -64,7 +65,7 @@ export function useComments(animeId) {
 
         try {
             await addDoc(collection(db, 'comments'), {
-                animeId: parseInt(animeId), // Ensure it's a number/consistent type if needed, or keep as is. Let's keep consistency.
+                animeId: String(animeId), // Sempre String para consistência com useParams
                 userId: user.uid,
                 userName: user.name || user.displayName || "Usuário",
                 userAvatar: user.photoURL,
@@ -78,9 +79,17 @@ export function useComments(animeId) {
         }
     };
 
-    // 3. Delete Comment
+    // 3. Delete Comment (com verificação de dono)
     const deleteComment = async (commentId) => {
         if (!user) return;
+
+        // Verificar se o comentário pertence ao usuário
+        const comment = comments.find(c => c.id === commentId);
+        if (!comment || comment.userId !== user.uid) {
+            console.warn("Tentativa de deletar comentário de outro usuário bloqueada.");
+            return;
+        }
+
         try {
             const commentRef = doc(db, 'comments', commentId);
             await deleteDoc(commentRef);
