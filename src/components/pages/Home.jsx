@@ -1,10 +1,13 @@
-import { BarChart2, Calendar, Zap, Heart, Theater, Skull, Smile, Wand2, Rocket, Trophy } from 'lucide-react';
+import { BarChart2, Calendar, Zap, Heart, Theater, Skull, Smile, Wand2, Rocket, Trophy, Sparkles } from 'lucide-react';
 
 import { Hero } from "@/components/home/Hero";
 import { AnimeCarousel } from '@/components/ui/AnimeCarousel';
 import { LazyAnimeCarousel } from '@/components/home/LazyAnimeCarousel';
 
 import { useHomeContent } from '@/hooks/useAnimeDiscovery';
+import { useRecommendations } from '@/hooks/useRecommendations';
+import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
+import { useAuth } from '@/context/AuthContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { SkeletonHero } from '@/components/ui/SkeletonHero';
 import { SkeletonCard } from '@/components/ui/SkeletonCard';
@@ -28,6 +31,10 @@ export function Home() {
     seasonalAnimes,
     loading
   } = useHomeContent();
+
+  const { user } = useAuth();
+  const { library } = useAnimeLibrary();
+  const { data: recommendations } = useRecommendations(library);
 
   usePageTitle('Início');
 
@@ -58,6 +65,16 @@ export function Home() {
       ) : (
         <>
           <Hero animes={featuredAnimes || []} />
+
+          {/* Recommendations - only for logged in users */}
+          {user && recommendations?.length > 0 && (
+            <AnimeCarousel
+              id="recommendations"
+              title="Recomendados Para Você"
+              icon={Sparkles}
+              animes={recommendations}
+            />
+          )}
 
           <AnimeCarousel
             id="popular"
