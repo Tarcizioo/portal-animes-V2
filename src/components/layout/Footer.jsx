@@ -23,20 +23,19 @@ export function Footer() {
                     </div>
 
                     {/* Navigation 1 */}
-                    <div>
+                    <div className="col-span-1 md:col-span-1">
                         <h4 className="font-bold text-text-primary mb-4">Explorar</h4>
-                        <ul className="space-y-2 text-sm text-text-secondary">
+                        <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-text-secondary">
                             <li><Link to="/" className="hover:text-primary transition-colors">Início</Link></li>
-                            <li><Link to="/catalog" className="hover:text-primary transition-colors">Catálogo Completo</Link></li>
-                            <li><Link to="/seasonal" className="hover:text-primary transition-colors">Temporada Atual</Link></li>
+                            <li><Link to="/catalog" className="hover:text-primary transition-colors">Catálogo</Link></li>
+                            <li><Link to="/seasonal" className="hover:text-primary transition-colors">Temporada</Link></li>
                             <li><Link to="/characters" className="hover:text-primary transition-colors">Personagens</Link></li>
+                            <li><Link to="/people" className="hover:text-primary transition-colors">Top Pessoas</Link></li>
                         </ul>
                     </div>
 
-
-
                     {/* Newsletter / Socials */}
-                    <div>
+                    <div className="col-span-1 md:col-span-1">
                         <h4 className="font-bold text-text-primary mb-4">Redes Sociais</h4>
                         <div className="flex gap-3">
                             <SocialButton icon={Github} href="https://github.com/Tarcizioo/portal-animes-V2" label="GitHub" />
@@ -49,11 +48,11 @@ export function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="border-t border-border-color pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-text-secondary">
-                    <p>&copy; {new Date().getFullYear()} Portal Animes. Todos os direitos reservados.</p>
-                    <div className="flex gap-6">
-                        <Link to="/privacy" className="hover:text-primary transition-colors">Privacidade</Link>
-                        <Link to="/terms" className="hover:text-primary transition-colors">Termos de Uso</Link>
+                <div className="border-t border-border-color pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-text-secondary text-center md:text-left">
+                    <p className="max-w-xs md:max-w-none mx-auto md:mx-0">&copy; {new Date().getFullYear()} Portal Animes. Todos os direitos reservados.</p>
+                    <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+                        <Link to="/privacy" className="hover:text-primary transition-colors whitespace-nowrap">Privacidade</Link>
+                        <Link to="/terms" className="hover:text-primary transition-colors whitespace-nowrap">Termos de Uso</Link>
                     </div>
                 </div>
             </div>
