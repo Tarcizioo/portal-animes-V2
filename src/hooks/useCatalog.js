@@ -64,6 +64,14 @@ export function useCatalog() {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
+  // Debounce para o campo de busca textual
+  const [debouncedQ, setDebouncedQ] = useState(filters.q);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQ(filters.q), 400);
+    return () => clearTimeout(timer);
+  }, [filters.q]);
+
   useEffect(() => {
     let isMounted = true;
     const controller = new AbortController();
@@ -72,16 +80,11 @@ export function useCatalog() {
       try {
         setLoading(true);
 
-        // Se mudou filtros e estamos na página 1, talvez queiramos limpar lista anterior 
-        // para dar feedback visual? Se não limpar, mantemos lista antiga até a nova chegar (melhor UX)
-        // Mas se a nova busca for muito diferente, pode confundir.
-        // Vamos manter a lista antiga enquanto carrega (Loading overlay deve cuidar da UX visual)
-
         const params = new URLSearchParams({ page: page, limit: 24, sfw: true });
         let endpoint = 'https://api.jikan.moe/v4/anime';
 
-        // Usamos filters diretamente aqui (sem debounce)
-        const currentFilters = filters;
+        // Usa debouncedQ para a busca textual
+        const currentFilters = { ...filters, q: debouncedQ };
 
         const hasTextOrGenre = currentFilters.q !== '' || currentFilters.genres.length > 0;
         const hasAdvancedFilters = currentFilters.year || currentFilters.season || currentFilters.type || currentFilters.producers;
@@ -94,7 +97,7 @@ export function useCatalog() {
           if (currentFilters.orderBy === 'favorites') params.append('filter', 'favorite');
         } else {
           endpoint = 'https://api.jikan.moe/v4/anime';
-          if (currentFilters.q) params.append('q', currentFilters.q);
+          if (currentFilters.q) params.append('q', encodeURIComponent(currentFilters.q));
           if (currentFilters.status) params.append('status', currentFilters.status);
           if (currentFilters.genres.length > 0) params.append('genres', currentFilters.genres.join(','));
           if (currentFilters.type) params.append('type', currentFilters.type);
@@ -209,7 +212,7 @@ export function useCatalog() {
     fetchCatalog();
 
     return () => { isMounted = false; controller.abort(); };
-  }, [page, filters]); // Agora depende diretamente de filters
+  }, [page, filters.genres, filters.orderBy, filters.status, filters.year, filters.season, filters.type, filters.producers, debouncedQ]); // Debounced 'q' ao invés do raw
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) setPage(prev => prev + 1);

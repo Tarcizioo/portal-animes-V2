@@ -68,7 +68,7 @@ export function AnimeSidebar({ anime, characters, staff }) {
                         >
                             <Link to={`/character/${char.character.mal_id}`} className="flex items-center gap-3 p-2 group">
                                 <div className="size-10 rounded-full overflow-hidden bg-bg-secondary shrink-0">
-                                    <img src={char.character.images?.jpg?.image_url} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
+                                    <img src={char.character.images?.jpg?.image_url} alt="" loading="lazy" className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                     <span className="text-sm font-bold group-hover:text-primary transition-colors line-clamp-1">{char.character.name}</span>
@@ -94,7 +94,7 @@ export function AnimeSidebar({ anime, characters, staff }) {
                             >
                                 <Link to={`/person/${person.person.mal_id}`} className="flex items-center gap-3 p-2 group">
                                     <div className="size-10 rounded-full overflow-hidden bg-bg-secondary shrink-0">
-                                        <img src={person.person.images?.jpg?.image_url} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
+                                        <img src={person.person.images?.jpg?.image_url} alt="" loading="lazy" className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
                                     </div>
                                     <div className="flex flex-col min-w-0">
                                         <span className="text-sm font-bold group-hover:text-primary transition-colors line-clamp-1">{person.person.name}</span>

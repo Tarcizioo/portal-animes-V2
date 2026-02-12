@@ -24,6 +24,7 @@ const PublicProfile = lazy(() => import('@/components/pages/PublicProfile').then
 // Loading Component
 import { Loader } from '@/components/ui/Loader';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { ProtectedRoute } from '@/components/ui/ProtectedRoute';
 
 const PageLoader = () => (
   <div className="flex items-center justify-center w-full h-full min-h-[60vh]">
@@ -50,8 +51,8 @@ const AnimatedRoutes = () => {
             <Route path="/studio/:id" element={<PageTransition><StudioDetails /></PageTransition>} />
             <Route path="/anime/:id" element={<PageTransition><AnimeDetails /></PageTransition>} />
             <Route path="/anime/:id/staff" element={<PageTransition><AnimeStaff /></PageTransition>} />
-            <Route path="/library" element={<PageTransition><Library /></PageTransition>} />
-            <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+            <Route path="/library" element={<PageTransition><ProtectedRoute><Library /></ProtectedRoute></PageTransition>} />
+            <Route path="/profile" element={<PageTransition><ProtectedRoute><Profile /></ProtectedRoute></PageTransition>} />
             <Route path="/u/:uid" element={<PageTransition><PublicProfile /></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
             <Route path="/terms" element={<PageTransition><TermsOfUse /></PageTransition>} />

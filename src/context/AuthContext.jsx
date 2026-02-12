@@ -7,7 +7,7 @@ import {
     onAuthStateChanged,
     reauthenticateWithPopup
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, getDoc, deleteDoc, serverTimestamp, collection, getDocs, query, where, writeBatch } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -54,17 +54,37 @@ export function AuthProvider({ children }) {
         return firebaseSignOut(auth);
     };
 
-    // Deletar Conta
+    // Deletar Conta (com limpeza de sub-coleções)
     const deleteAccount = async () => {
         if (!auth.currentUser) return;
 
         try {
             const uid = auth.currentUser.uid;
 
-            // 1. Deletar documento do Firestore
+            // 1. Limpar sub-coleções e dados órfãos
+            const subCollections = ['library', 'favorite_characters', 'followed_studios', 'notifications'];
+            
+            for (const subcol of subCollections) {
+                const snap = await getDocs(collection(db, 'users', uid, subcol));
+                if (!snap.empty) {
+                    const batch = writeBatch(db);
+                    snap.docs.forEach(d => batch.delete(d.ref));
+                    await batch.commit();
+                }
+            }
+
+            // 2. Limpar comentários do usuário na coleção raiz
+            const commentsSnap = await getDocs(query(collection(db, 'comments'), where('userId', '==', uid)));
+            if (!commentsSnap.empty) {
+                const batch = writeBatch(db);
+                commentsSnap.docs.forEach(d => batch.delete(d.ref));
+                await batch.commit();
+            }
+
+            // 3. Deletar documento principal do usuário
             await deleteDoc(doc(db, 'users', uid));
 
-            // 2. Deletar usuário da Autenticação
+            // 4. Deletar usuário da Autenticação
             await auth.currentUser.delete();
 
         } catch (error) {

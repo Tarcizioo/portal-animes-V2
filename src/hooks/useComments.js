@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { db } from '@/services/firebase';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -6,6 +6,7 @@ import {
     query,
     where,
     orderBy,
+    limit,
     onSnapshot,
     addDoc,
     deleteDoc,
@@ -13,12 +14,16 @@ import {
     serverTimestamp
 } from 'firebase/firestore';
 
+const COMMENTS_PER_PAGE = 20;
+
 export function useComments(animeId) {
     const { user } = useAuth();
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [commentsLimit, setCommentsLimit] = useState(COMMENTS_PER_PAGE);
+    const [hasMoreComments, setHasMoreComments] = useState(false);
 
-    // 1. Fetch Real-time Comments
+    // 1. Fetch Real-time Comments (com paginação)
     useEffect(() => {
         if (!animeId) {
             setLoading(false);
@@ -26,11 +31,13 @@ export function useComments(animeId) {
         }
 
         const commentsRef = collection(db, 'comments');
-        // Query: Filter by animeId (sempre String para consistência com useParams)
         const safeAnimeId = String(animeId);
+        // Busca limit+1 para saber se há mais comentários
         const q = query(
             commentsRef,
-            where("animeId", "==", safeAnimeId)
+            where("animeId", "==", safeAnimeId),
+            orderBy("createdAt", "desc"),
+            limit(commentsLimit + 1)
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -39,23 +46,22 @@ export function useComments(animeId) {
                 ...doc.data()
             }));
 
-            // Client-side sort (Newest first)
-            fetchedComments.sort((a, b) => {
-                const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
-                const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
-                return dateB - dateA;
-            });
-
-            setComments(fetchedComments);
+            // Se veio mais que o limit, há mais comentários
+            setHasMoreComments(fetchedComments.length > commentsLimit);
+            setComments(fetchedComments.slice(0, commentsLimit));
             setLoading(false);
         }, (error) => {
             console.error("Erro ao buscar comentários:", error);
-            // Se o erro for de índice, geralmente o Firebase avisa no console com um link para criar
             setLoading(false);
         });
 
         return () => unsubscribe();
-    }, [animeId]);
+    }, [animeId, commentsLimit]);
+
+    // Carregar mais comentários
+    const loadMoreComments = useCallback(() => {
+        setCommentsLimit(prev => prev + COMMENTS_PER_PAGE);
+    }, []);
 
     // 2. Add Comment
     const addComment = async (content) => {
@@ -65,7 +71,7 @@ export function useComments(animeId) {
 
         try {
             await addDoc(collection(db, 'comments'), {
-                animeId: String(animeId), // Sempre String para consistência com useParams
+                animeId: String(animeId),
                 userId: user.uid,
                 userName: user.name || user.displayName || "Usuário",
                 userAvatar: user.photoURL,
@@ -83,7 +89,6 @@ export function useComments(animeId) {
     const deleteComment = async (commentId) => {
         if (!user) return;
 
-        // Verificar se o comentário pertence ao usuário
         const comment = comments.find(c => c.id === commentId);
         if (!comment || comment.userId !== user.uid) {
             console.warn("Tentativa de deletar comentário de outro usuário bloqueada.");
@@ -103,6 +108,8 @@ export function useComments(animeId) {
         comments,
         loading,
         addComment,
-        deleteComment
+        deleteComment,
+        hasMoreComments,
+        loadMoreComments
     };
 }
