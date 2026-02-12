@@ -25,6 +25,7 @@ const PublicProfile = lazy(() => import('@/components/pages/PublicProfile').then
 import { Loader } from '@/components/ui/Loader';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { ProtectedRoute } from '@/components/ui/ProtectedRoute';
+import { RouteErrorBoundary } from '@/components/ui/RouteErrorBoundary';
 
 const PageLoader = () => (
   <div className="flex items-center justify-center w-full h-full min-h-[60vh]">
@@ -42,20 +43,20 @@ const AnimatedRoutes = () => {
       <Suspense fallback={<PageLoader />}>
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-            <Route path="/catalog" element={<PageTransition><Catalog /></PageTransition>} />
-            <Route path="/characters" element={<PageTransition><Characters /></PageTransition>} />
-            <Route path="/people" element={<PageTransition><VoiceActors /></PageTransition>} />
-            <Route path="/person/:id" element={<PageTransition><PersonDetails /></PageTransition>} />
-            <Route path="/character/:id" element={<PageTransition><CharacterDetails /></PageTransition>} />
-            <Route path="/studio/:id" element={<PageTransition><StudioDetails /></PageTransition>} />
-            <Route path="/anime/:id" element={<PageTransition><AnimeDetails /></PageTransition>} />
-            <Route path="/anime/:id/staff" element={<PageTransition><AnimeStaff /></PageTransition>} />
-            <Route path="/library" element={<PageTransition><ProtectedRoute><Library /></ProtectedRoute></PageTransition>} />
-            <Route path="/profile" element={<PageTransition><ProtectedRoute><Profile /></ProtectedRoute></PageTransition>} />
-            <Route path="/u/:uid" element={<PageTransition><PublicProfile /></PageTransition>} />
-            <Route path="/privacy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
-            <Route path="/terms" element={<PageTransition><TermsOfUse /></PageTransition>} />
+            <Route path="/" element={<PageTransition><RouteErrorBoundary><Home /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/catalog" element={<PageTransition><RouteErrorBoundary><Catalog /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/characters" element={<PageTransition><RouteErrorBoundary><Characters /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/people" element={<PageTransition><RouteErrorBoundary><VoiceActors /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/person/:id" element={<PageTransition><RouteErrorBoundary><PersonDetails /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/character/:id" element={<PageTransition><RouteErrorBoundary><CharacterDetails /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/studio/:id" element={<PageTransition><RouteErrorBoundary><StudioDetails /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/anime/:id" element={<PageTransition><RouteErrorBoundary><AnimeDetails /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/anime/:id/staff" element={<PageTransition><RouteErrorBoundary><AnimeStaff /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/library" element={<PageTransition><ProtectedRoute><RouteErrorBoundary><Library /></RouteErrorBoundary></ProtectedRoute></PageTransition>} />
+            <Route path="/profile" element={<PageTransition><ProtectedRoute><RouteErrorBoundary><Profile /></RouteErrorBoundary></ProtectedRoute></PageTransition>} />
+            <Route path="/u/:uid" element={<PageTransition><RouteErrorBoundary><PublicProfile /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/privacy" element={<PageTransition><RouteErrorBoundary><PrivacyPolicy /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/terms" element={<PageTransition><RouteErrorBoundary><TermsOfUse /></RouteErrorBoundary></PageTransition>} />
             <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
           </Routes>
         </AnimatePresence>
