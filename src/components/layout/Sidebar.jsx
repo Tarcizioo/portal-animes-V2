@@ -17,7 +17,7 @@ export function Sidebar() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isUserSearchOpen, setIsUserSearchOpen] = useState(false); // [NEW]
 
-  const { user, signOut } = useAuth();
+  const { user, signOut, signInGoogle } = useAuth();
   const { profile } = useUserProfile();
   const navigate = useNavigate();
 
@@ -134,49 +134,75 @@ export function Sidebar() {
 
         {/* 3. PERFIL DINÂMICO */}
         <div className="p-4 border-t border-border-color bg-bg-tertiary">
-          <Link
-            to="/profile"
-            className={`flex items-center gap-3 p-3 rounded-xl bg-bg-secondary border border-border-color shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden ${isCollapsed ? 'justify-center w-12 h-12 p-0' : ''}`}
-            title={!isCollapsed ? "Ver Perfil" : displayName}
-          >
-            {/* Efeito Hover suave no fundo */}
-            <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors" />
+          {user ? (
+            /* Logado: Link para o perfil */
+            <Link
+              to="/profile"
+              className={`flex items-center gap-3 p-3 rounded-xl bg-bg-secondary border border-border-color shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden ${isCollapsed ? 'justify-center w-12 h-12 p-0' : ''}`}
+              title={!isCollapsed ? "Ver Perfil" : displayName}
+            >
+              <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors" />
 
-            {/* Avatar */}
-            <div className="relative z-10 shrink-0">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-button-accent flex items-center justify-center text-white font-bold text-sm overflow-hidden ring-2 ring-transparent group-hover:ring-primary/20 transition-all">
-                {photoURL ? (
-                  <img src={photoURL} alt={displayName} className="w-full h-full object-cover" />
-                ) : (
-                  <span className="uppercase">{displayName.slice(0, 2)}</span>
-                )}
+              <div className="relative z-10 shrink-0">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-button-accent flex items-center justify-center text-white font-bold text-sm overflow-hidden ring-2 ring-transparent group-hover:ring-primary/20 transition-all">
+                  {photoURL ? (
+                    <img src={photoURL} alt={displayName} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="uppercase">{displayName.slice(0, 2)}</span>
+                  )}
+                </div>
+                <span className="absolute bottom-0 right-0 w-3 h-3 border-2 border-bg-secondary rounded-full bg-green-500"></span>
               </div>
-              <span className={`absolute bottom-0 right-0 w-3 h-3 border-2 border-bg-secondary rounded-full ${user ? 'bg-green-500' : 'bg-gray-500'}`}></span>
-            </div>
 
-            {/* Texto */}
-            {!isCollapsed && (
-              <div className="flex-1 min-w-0 z-10 ml-1">
-                <h4 className="text-sm font-bold text-text-primary truncate group-hover:text-primary transition-colors">
-                  {displayName}
-                </h4>
-                <p className="text-xs text-text-secondary truncate">
-                  {user ? 'Visualizar perfil' : 'Fazer Login'}
-                </p>
-              </div>
-            )}
+              {!isCollapsed && (
+                <div className="flex-1 min-w-0 z-10 ml-1">
+                  <h4 className="text-sm font-bold text-text-primary truncate group-hover:text-primary transition-colors">
+                    {displayName}
+                  </h4>
+                  <p className="text-xs text-text-secondary truncate">
+                    Visualizar perfil
+                  </p>
+                </div>
+              )}
 
-            {/* Ícone de Sair / Entrar */}
-            {!isCollapsed && (
-              <div
-                className="z-10 p-1.5 text-text-secondary group-hover:text-primary transition-colors"
-                onClick={user ? handleLogout : undefined}
-                title={user ? "Sair" : "Entrar"}
-              >
-                {user ? <LogOut className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
+              {!isCollapsed && (
+                <div
+                  className="z-10 p-1.5 text-text-secondary group-hover:text-red-400 transition-colors"
+                  onClick={handleLogout}
+                  title="Sair"
+                >
+                  <LogOut className="w-4 h-4" />
+                </div>
+              )}
+            </Link>
+          ) : (
+            /* Não logado: Botão de Login */
+            <button
+              onClick={signInGoogle}
+              className={`flex items-center gap-3 p-3 rounded-xl bg-bg-secondary border border-border-color shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden w-full ${isCollapsed ? 'justify-center w-12 h-12 p-0' : ''}`}
+              title={isCollapsed ? "Fazer Login" : ""}
+            >
+              <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors" />
+
+              <div className="relative z-10 shrink-0">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-button-accent flex items-center justify-center text-white font-bold text-sm overflow-hidden ring-2 ring-transparent group-hover:ring-primary/20 transition-all">
+                  <LogIn className="w-5 h-5" />
+                </div>
+                <span className="absolute bottom-0 right-0 w-3 h-3 border-2 border-bg-secondary rounded-full bg-gray-500"></span>
               </div>
-            )}
-          </Link>
+
+              {!isCollapsed && (
+                <div className="flex-1 min-w-0 z-10 ml-1 text-left">
+                  <h4 className="text-sm font-bold text-text-primary truncate group-hover:text-primary transition-colors">
+                    Visitante
+                  </h4>
+                  <p className="text-xs text-text-secondary truncate">
+                    Entrar com Google
+                  </p>
+                </div>
+              )}
+            </button>
+          )}
         </div>
 
       </aside>
