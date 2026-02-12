@@ -46,7 +46,7 @@ export function SettingsModal({ isOpen, onClose }) {
             <div className="space-y-8">
                 {/* Appearance Section */}
                 <section>
-                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
                         <Monitor className="w-4 h-4" /> Aparência
                     </h3>
 
@@ -63,14 +63,14 @@ export function SettingsModal({ isOpen, onClose }) {
                     flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-200
                     ${isActive
                                             ? 'border-primary bg-primary/10 text-primary'
-                                            : 'border-gray-200 dark:border-white/10 hover:border-primary/50 hover:bg-gray-50 dark:hover:bg-white/5'
+                                            : 'border-border-color hover:border-primary/50 hover:bg-bg-tertiary'
                                         }
 `}
                                 >
-                                    <div className={`w-8 h-8 rounded-full mb-2 flex items-center justify-center ${isActive ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400'}`}>
+                                    <div className={`w-8 h-8 rounded-full mb-2 flex items-center justify-center ${isActive ? 'bg-primary text-text-on-primary' : 'bg-bg-tertiary text-text-secondary'}`}>
                                         <Icon className="w-4 h-4" />
                                     </div>
-                                    <span className={`text-sm font-medium ${isActive ? 'text-primary' : 'text-gray-700 dark:text-gray-300'}`}>
+                                    <span className={`text-sm font-medium ${isActive ? 'text-primary' : 'text-text-secondary'}`}>
                                         {t.name}
                                     </span>
                                 </button>
@@ -81,7 +81,7 @@ export function SettingsModal({ isOpen, onClose }) {
 
                 {/* Other Features */}
                 <section>
-                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+                    <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-4">
                         Outros
                     </h3>
                     {/* Danger Zone (Only if logged in) */}
@@ -91,7 +91,7 @@ export function SettingsModal({ isOpen, onClose }) {
                                 <h4 className="flex items-center gap-2 text-red-500 font-bold mb-2">
                                     <AlertTriangle className="w-5 h-5" /> Zona de Perigo
                                 </h4>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                <p className="text-sm text-text-secondary mb-4">
                                     A exclusão da conta é permanente e não pode ser desfeita. Todos os seus dados serão apagados.
                                 </p>
 
@@ -103,15 +103,15 @@ export function SettingsModal({ isOpen, onClose }) {
                                         <Trash2 className="w-4 h-4" /> Excluir minha conta
                                     </button>
                                 ) : (
-                                    <div className="space-y-3 animate-fade-in bg-black/20 p-4 rounded-lg">
-                                        <label className="text-sm text-gray-300 block">
-                                            Digite <span className="font-bold text-white">DELETAR</span> para confirmar:
+                                    <div className="space-y-3 animate-fade-in bg-bg-tertiary p-4 rounded-lg">
+                                        <label className="text-sm text-text-secondary block">
+                                            Digite <span className="font-bold text-text-primary">DELETAR</span> para confirmar:
                                         </label>
                                         <input
                                             type="text"
                                             value={confirmText}
                                             onChange={(e) => setConfirmText(e.target.value)}
-                                            className="w-full bg-black/40 border border-red-500/30 rounded-lg px-3 py-2 text-white focus:border-red-500 focus:outline-none text-sm"
+                                            className="w-full bg-bg-primary border border-red-500/30 rounded-lg px-3 py-2 text-text-primary focus:border-red-500 focus:outline-none text-sm"
                                             placeholder="DELETAR"
                                         />
                                         <div className="flex gap-2">
@@ -127,7 +127,7 @@ export function SettingsModal({ isOpen, onClose }) {
                                                     setShowDeleteConfirm(false);
                                                     setConfirmText('');
                                                 }}
-                                                className="px-4 py-2 bg-transparent text-gray-400 hover:text-white text-sm font-medium"
+                                                className="px-4 py-2 bg-transparent text-text-secondary hover:text-text-primary text-sm font-medium"
                                             >
                                                 Cancelar
                                             </button>
@@ -137,8 +137,8 @@ export function SettingsModal({ isOpen, onClose }) {
                             </div>
                         </div>
                     ) : (
-                        <div className="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-center">
-                            <p className="text-gray-500 dark:text-gray-400 text-sm">Faça login para ver as opções da conta.</p>
+                        <div className="p-4 rounded-xl bg-bg-tertiary border border-border-color text-center">
+                            <p className="text-text-secondary text-sm">Faça login para ver as opções da conta.</p>
                         </div>
                     )}
                 </section>

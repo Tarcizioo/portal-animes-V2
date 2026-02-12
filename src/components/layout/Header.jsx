@@ -70,7 +70,7 @@ export function Header() {
     };
 
     return (
-        <header className="sticky top-0 z-40 bg-bg-primary/80 backdrop-blur-md px-4 md:px-8 py-4 flex items-center justify-between border-b border-border-color transition-colors duration-300">
+        <header className="sticky top-0 z-40 bg-bg-primary px-4 md:px-8 py-4 flex items-center justify-between border-b border-border-color transition-colors duration-300">
 
             <div className="flex items-center gap-4 pl-12 md:pl-0">
                 <div className="block">

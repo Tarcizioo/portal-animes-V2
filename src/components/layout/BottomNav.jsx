@@ -10,7 +10,7 @@ import { UserSearchModal } from '@/components/profile/UserSearchModal';
 export function BottomNav() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { signOut } = useAuth();
+    const { user, signOut, signInGoogle } = useAuth();
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -20,7 +20,7 @@ export function BottomNav() {
         { icon: Home, label: 'Início', path: '/' },
         { icon: Compass, label: 'Catálogo', path: '/catalog' },
         { icon: Library, label: 'Biblioteca', path: '/library' },
-        { icon: User, label: 'Perfil', path: '/profile' },
+        { icon: User, label: 'Perfil', path: '/profile', authRequired: true },
         { icon: Menu, label: 'Menu', action: () => setIsMenuOpen(true) },
     ];
 
@@ -100,12 +100,14 @@ export function BottomNav() {
                                 ))}
                             </div>
 
+                            {user && (
                             <button
                                 onClick={handleLogout}
                                 className="w-full py-4 flex items-center justify-center gap-2 text-red-400 font-bold bg-bg-secondary/30 hover:bg-red-500/10 rounded-2xl transition-colors border border-transparent active:scale-98"
                             >
                                 <LogOut className="w-5 h-5" /> Sair da Conta
                             </button>
+                            )}
                         </motion.div>
                     </motion.div>
                 )}
@@ -116,7 +118,7 @@ export function BottomNav() {
                 {/* Gradient Line Top */}
                 <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-border-color to-transparent opacity-50" />
                 
-                <div className="bg-bg-primary/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl px-2">
+                <div className="bg-bg-primary px-2 border-t border-border-color">
                     <nav className="flex justify-around items-center h-[72px]">
                         {navItems.map((item) => {
                             const isActive = item.path ? location.pathname === item.path : isMenuOpen;
@@ -124,7 +126,15 @@ export function BottomNav() {
                             return (
                                 <button
                                     key={item.label}
-                                    onClick={() => item.action ? item.action() : navigate(item.path)}
+                                    onClick={() => {
+                                        if (item.action) {
+                                            item.action();
+                                        } else if (item.authRequired && !user) {
+                                            signInGoogle();
+                                        } else {
+                                            navigate(item.path);
+                                        }
+                                    }}
                                     style={{ WebkitTapHighlightColor: 'transparent' }}
                                     className="relative flex flex-col items-center justify-center w-full h-full gap-1 group outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none bg-transparent border-none p-0"
                                 >

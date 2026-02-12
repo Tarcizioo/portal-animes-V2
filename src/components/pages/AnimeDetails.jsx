@@ -150,32 +150,32 @@ export function AnimeDetails() {
                         >
                             {/* Badges */}
                             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
-                                <span className="px-3 py-1 rounded-lg bg-primary text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary/20">
+                                <span className="px-3 py-1 rounded-lg bg-primary text-text-on-primary text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary/20">
                                     {anime.type || 'TV'}
                                 </span>
-                                <span className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-xs font-bold uppercase tracking-wider">
+                                <span className="px-3 py-1 rounded-lg bg-bg-tertiary border border-border-color text-xs font-bold uppercase tracking-wider">
                                     {anime.year || 'Unknown'}
                                 </span>
                                 {anime.status && (
                                     <span className={clsx(
                                         "px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border backdrop-blur-md",
                                         anime.status === 'Finished Airing'
-                                            ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
-                                            : "bg-blue-500/10 text-blue-300 border-blue-500/20"
+                                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                            : "bg-blue-500/10 text-blue-600 border-blue-500/20"
                                     )}>
                                         {anime.status === 'Finished Airing' ? 'Completo' : 'Em Lançamento'}
                                     </span>
                                 )}
                             </div>
 
-                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-white drop-shadow-2xl">
+                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-text-primary drop-shadow-2xl">
                                 {anime.title}
                             </h1>
                             {anime.title_english && (
-                                <h2 className="text-lg md:text-xl text-gray-300 font-medium">{anime.title_english}</h2>
+                                <h2 className="text-lg md:text-xl text-text-secondary font-medium">{anime.title_english}</h2>
                             )}
 
-                            <p className="text-gray-300 text-sm md:text-base leading-relaxed max-w-3xl line-clamp-3 md:line-clamp-4">
+                            <p className="text-text-secondary text-sm md:text-base leading-relaxed max-w-3xl line-clamp-3 md:line-clamp-4">
                                 {anime.synopsis}
                             </p>
                         </motion.div>

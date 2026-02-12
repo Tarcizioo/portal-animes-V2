@@ -55,7 +55,7 @@ export function LazyAnimeCarousel({ id, title, icon: Icon, genreId }) {
                 <div className="mb-12">
                     <div className="flex items-center gap-2 mb-6 px-1">
                         {Icon && <Icon className="w-6 h-6 text-primary/40 animate-pulse" />}
-                        <div className="h-8 w-48 bg-white/5 rounded-lg animate-pulse" />
+                        <div className="h-8 w-48 bg-bg-tertiary rounded-lg animate-pulse" />
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-y-8 gap-x-6">
                         {Array.from({ length: 5 }).map((_, i) => (
