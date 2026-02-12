@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Compass, Library, User, Menu, Settings, Globe, Users, LogOut, X } from 'lucide-react';
+import { Home, Compass, Library, User, Menu, Settings, Globe, Users, LogOut, X, BarChart3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { useAuth } from '@/context/AuthContext';
@@ -40,6 +40,12 @@ export function BottomNav() {
             label: 'Personagens',
             onClick: () => { navigate('/characters'); setIsMenuOpen(false); },
             color: 'text-purple-400', bg: 'bg-purple-500/10'
+        },
+        {
+            icon: BarChart3,
+            label: 'Estatísticas',
+            onClick: () => { navigate('/stats'); setIsMenuOpen(false); },
+            color: 'text-green-400', bg: 'bg-green-500/10'
         },
         {
             icon: Globe,

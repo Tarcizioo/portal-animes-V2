@@ -19,6 +19,7 @@ const PrivacyPolicy = lazy(() => import('@/components/pages/PrivacyPolicy').then
 const TermsOfUse = lazy(() => import('@/components/pages/TermsOfUse').then(module => ({ default: module.TermsOfUse })));
 const NotFound = lazy(() => import('@/components/pages/NotFound').then(module => ({ default: module.NotFound })));
 const Library = lazy(() => import('@/components/pages/Library').then(module => ({ default: module.Library })));
+const Stats = lazy(() => import('@/components/pages/Stats').then(module => ({ default: module.Stats }))); // [NEW]
 const PublicProfile = lazy(() => import('@/components/pages/PublicProfile').then(module => ({ default: module.PublicProfile })));
 
 // Loading Component
@@ -53,6 +54,7 @@ const AnimatedRoutes = () => {
             <Route path="/anime/:id" element={<PageTransition><RouteErrorBoundary><AnimeDetails /></RouteErrorBoundary></PageTransition>} />
             <Route path="/anime/:id/staff" element={<PageTransition><RouteErrorBoundary><AnimeStaff /></RouteErrorBoundary></PageTransition>} />
             <Route path="/library" element={<PageTransition><ProtectedRoute><RouteErrorBoundary><Library /></RouteErrorBoundary></ProtectedRoute></PageTransition>} />
+            <Route path="/stats" element={<PageTransition><ProtectedRoute><RouteErrorBoundary><Stats /></RouteErrorBoundary></ProtectedRoute></PageTransition>} />
             <Route path="/profile" element={<PageTransition><ProtectedRoute><RouteErrorBoundary><Profile /></RouteErrorBoundary></ProtectedRoute></PageTransition>} />
             <Route path="/u/:uid" element={<PageTransition><RouteErrorBoundary><PublicProfile /></RouteErrorBoundary></PageTransition>} />
             <Route path="/privacy" element={<PageTransition><RouteErrorBoundary><PrivacyPolicy /></RouteErrorBoundary></PageTransition>} />
