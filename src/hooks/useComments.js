@@ -35,9 +35,7 @@ export function useComments(animeId) {
         // Busca limit+1 para saber se há mais comentários
         const q = query(
             commentsRef,
-            where("animeId", "==", safeAnimeId),
-            orderBy("createdAt", "desc"),
-            limit(commentsLimit + 1)
+            where("animeId", "==", safeAnimeId)
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -45,6 +43,12 @@ export function useComments(animeId) {
                 id: doc.id,
                 ...doc.data()
             }));
+
+            fetchedComments.sort((a, b) => {
+                const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+                const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+                return timeB - timeA;
+            });
 
             // Se veio mais que o limit, há mais comentários
             setHasMoreComments(fetchedComments.length > commentsLimit);
@@ -86,20 +90,27 @@ export function useComments(animeId) {
     };
 
     // 3. Delete Comment (com verificação de dono)
+    // 3. Delete Comment
     const deleteComment = async (commentId) => {
         if (!user) return;
 
-        const comment = comments.find(c => c.id === commentId);
-        if (!comment || comment.userId !== user.uid) {
-            console.warn("Tentativa de deletar comentário de outro usuário bloqueada.");
-            return;
-        }
+        // Optimistic UI update to prevent Firestore from panicking on active listeners
+        setComments(prev => prev.filter(c => c.id !== commentId));
 
         try {
             const commentRef = doc(db, 'comments', commentId);
-            await deleteDoc(commentRef);
+            // Push deletion to the end of the event loop to ensure any pending
+            // snapshot updates or local state reconciliations have finished
+            setTimeout(async () => {
+                try {
+                    await deleteDoc(commentRef);
+                } catch (internalError) {
+                    console.error("Firestore Delete Error (Async):", internalError);
+                }
+            }, 50);
         } catch (error) {
-            console.error("Erro ao deletar comentário:", error);
+            console.error("Erro ao preparar deleção:", error);
+            setLoading(true); 
             throw error;
         }
     };

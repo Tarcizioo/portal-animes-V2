@@ -265,9 +265,7 @@ export function AnimeDetails() {
                                     <iframe
                                         src={anime.trailer.replace("autoplay=1", "autoplay=0")}
                                         title="Trailer"
-                                        className="w-full h-full pointer-events-none" // pointer-events-none to allow hover on parent, IF we want the card to scale. 
-                                        // Actually, pointer-events-none breaks controls. Let's just animate the container and keep controls working.
-                                        // Removing pointer-events-none to keep controls usable.
+                                        className="w-full h-full"
                                         allowFullScreen
                                     />
                                 </motion.div>
