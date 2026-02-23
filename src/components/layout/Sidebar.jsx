@@ -41,8 +41,9 @@ export function Sidebar() {
   const navItems = [
     { icon: Home, label: 'Início', path: '/' },
     { icon: Compass, label: 'Catálogo', path: '/catalog' },
+    { icon: Tv, label: 'Calendário', path: '/calendar' },
     { icon: Library, label: 'Minha Biblioteca', path: '/library' },
-    { icon: BarChart3, label: 'Estatísticas', path: '/stats' },
+    { icon: BarChart3, label: 'Estat. Pessoais', path: '/stats' },
     { icon: Users, label: 'Personagens', path: '/characters' },
   ];
 

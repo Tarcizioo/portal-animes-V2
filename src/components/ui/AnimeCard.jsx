@@ -46,8 +46,8 @@ export function AnimeCard({ id, title, genre, image, score, onRemove }) {
 
         {/* Nota (Badge) com Glassmorphism Visual */}
         <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md border border-white/10 px-2 py-1 rounded-md flex items-center gap-1 shadow-sm">
-          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-          <span className="text-white text-xs font-bold">{score}</span>
+          <Star className={`w-3 h-3 ${score ? 'text-yellow-400 fill-yellow-400' : 'text-text-secondary fill-transparent'}`} />
+          <span className="text-white text-xs font-bold">{score != null ? score : 'N/A'}</span>
         </div>
       </div>
 

@@ -9,6 +9,7 @@ const Home = lazy(() => import('@/components/pages/Home').then(module => ({ defa
 const AnimeDetails = lazy(() => import('@/components/pages/AnimeDetails').then(module => ({ default: module.AnimeDetails })));
 const AnimeStaff = lazy(() => import('@/components/pages/AnimeStaff').then(module => ({ default: module.AnimeStaff })));
 const Catalog = lazy(() => import('@/components/pages/Catalog').then(module => ({ default: module.Catalog })));
+const Calendar = lazy(() => import('@/components/pages/Calendar').then(module => ({ default: module.Calendar })));
 const Profile = lazy(() => import('@/components/pages/Profile').then(module => ({ default: module.Profile })));
 const Characters = lazy(() => import('@/components/pages/Characters').then(module => ({ default: module.Characters })));
 const CharacterDetails = lazy(() => import('@/components/pages/CharacterDetails').then(module => ({ default: module.CharacterDetails })));
@@ -46,6 +47,7 @@ const AnimatedRoutes = () => {
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<PageTransition><RouteErrorBoundary><Home /></RouteErrorBoundary></PageTransition>} />
             <Route path="/catalog" element={<PageTransition><RouteErrorBoundary><Catalog /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/calendar" element={<PageTransition><RouteErrorBoundary><Calendar /></RouteErrorBoundary></PageTransition>} />
             <Route path="/characters" element={<PageTransition><RouteErrorBoundary><Characters /></RouteErrorBoundary></PageTransition>} />
             <Route path="/people" element={<PageTransition><RouteErrorBoundary><VoiceActors /></RouteErrorBoundary></PageTransition>} />
             <Route path="/person/:id" element={<PageTransition><RouteErrorBoundary><PersonDetails /></RouteErrorBoundary></PageTransition>} />

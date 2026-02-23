@@ -44,6 +44,7 @@ export async function apiFetch(endpoint, options = {}, retries = 3, backoff = 10
 export const jikanApi = {
     getTopAnime: (params = '') => apiFetch(`/top/anime${params}`),
     getSeasonNow: (params = '') => apiFetch(`/seasons/now${params}`),
+    getSchedules: (params = '') => apiFetch(`/schedules${params}`),
     getAnimeById: (id) => apiFetch(`/anime/${id}`),
     getAnimeFullById: (id) => apiFetch(`/anime/${id}/full`),
     getAnimeCharacters: (id) => apiFetch(`/anime/${id}/characters`),

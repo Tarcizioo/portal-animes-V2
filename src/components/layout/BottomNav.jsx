@@ -43,7 +43,7 @@ export function BottomNav() {
         },
         {
             icon: BarChart3,
-            label: 'Estatísticas',
+            label: 'Est. Pessoais',
             onClick: () => { navigate('/stats'); setIsMenuOpen(false); },
             color: 'text-green-400', bg: 'bg-green-500/10'
         },
