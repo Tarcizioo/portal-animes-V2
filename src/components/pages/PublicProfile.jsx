@@ -102,8 +102,11 @@ export function PublicProfile() {
                             characterFavorites={characterFavorites}
                             readOnly={true}
                         />
-
-                        <AchievementBadges readOnly={true} />
+                        <AchievementBadges 
+                            readOnly={true} 
+                            publicLibrary={library} 
+                            publicProfile={profile} 
+                        />
                     </div>
 
                     {/* Coluna Lateral */}

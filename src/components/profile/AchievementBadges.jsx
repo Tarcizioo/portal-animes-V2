@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Lock, Edit2, PlusCircle } from 'lucide-react';
@@ -6,10 +6,25 @@ import { BadgesModal } from './BadgesModal';
 import clsx from 'clsx';
 import { BADGES } from '@/constants/badges';
 
-export function AchievementBadges({ readOnly = false }) {
-  const { unlockedBadges, lockedBadges } = useAchievements();
-  const { profile } = useUserProfile();
+export function AchievementBadges({ readOnly = false, publicLibrary = null, publicProfile = null }) {
+  const { unlockedBadges: localUnlocked } = useAchievements();
+  const { profile: localProfile } = useUserProfile();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const profile = readOnly ? publicProfile : localProfile;
+
+  const unlockedBadges = useMemo(() => {
+    if (!readOnly) return localUnlocked || [];
+    if (!publicLibrary) return [];
+
+    const stats = {
+      totalAnimes: publicLibrary.length,
+      completedAnimes: publicLibrary.filter(a => a.status === 'completed').length,
+      episodesWatched: publicLibrary.reduce((acc, curr) => acc + (curr.currentEp || 0), 0)
+    };
+
+    return BADGES.filter(badge => badge.requirement(stats, publicLibrary));
+  }, [readOnly, localUnlocked, publicLibrary]);
 
   // Calcular progresso total
   const totalUnlocked = unlockedBadges.length;
