@@ -49,7 +49,7 @@ export function Sidebar() {
 
   // Link Base Styles
   const linkBase = `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ease-in-out font-medium w-full whitespace-nowrap overflow-hidden ${isCollapsed ? 'justify-center px-2' : 'text-left'}`;
-  const linkActive = "bg-button-accent text-text-on-primary shadow-lg shadow-button-accent/25";
+  const linkActive = "bg-button-accent text-text-on-primary hover:text-text-on-primary shadow-lg shadow-button-accent/25";
   const linkInactive = "text-text-secondary hover:bg-bg-tertiary hover:text-primary transition-colors";
 
   // Determinar Nome e Foto

@@ -155,10 +155,10 @@ export function CharacterDetails() {
                                         disabled={favLoading}
                                         className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-all duration-300 shadow-xl active:scale-95 group border ${isFavorite
                                             ? "bg-red-500 text-white border-red-400"
-                                            : "bg-white/10 text-white hover:bg-white/20 border-white/10"
+                                            : "bg-bg-secondary text-text-primary hover:bg-bg-tertiary border-border-color"
                                             }`}
                                     >
-                                        <Heart className={`w-5 h-5 transition-transform duration-300 ${isFavorite ? "fill-white" : ""} ${isAnimating ? "scale-150" : "group-hover:scale-110"}`} />
+                                        <Heart className={`w-5 h-5 transition-transform duration-300 ${isFavorite ? "fill-white text-white" : "text-text-secondary"} ${isAnimating ? "scale-150" : "group-hover:scale-110"}`} />
                                         <span>{isFavorite ? "Favoritado" : "Favoritar"}</span>
                                     </button>
                                 </div>

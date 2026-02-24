@@ -78,7 +78,9 @@ export function AnimeSidebar({ anime, characters, staff }) {
                         </motion.div>
                     ))}
                 </div>
-                <Link to="/characters" className="block text-center text-sm font-bold text-primary hover:underline">Ver todo o elenco</Link>
+                <Link to={`/anime/${anime.id}/characters`} className="block text-center text-sm font-bold text-primary hover:underline mt-4">
+                    Ver todo o elenco
+                </Link>
             </div>
 
             {/* Production Staff Section - New Feature */}

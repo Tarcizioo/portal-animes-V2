@@ -8,6 +8,7 @@ import { PageTransition } from '@/components/layout/PageTransition';
 const Home = lazy(() => import('@/components/pages/Home').then(module => ({ default: module.Home })));
 const AnimeDetails = lazy(() => import('@/components/pages/AnimeDetails').then(module => ({ default: module.AnimeDetails })));
 const AnimeStaff = lazy(() => import('@/components/pages/AnimeStaff').then(module => ({ default: module.AnimeStaff })));
+const AnimeCharacters = lazy(() => import('@/components/pages/AnimeCharacters').then(module => ({ default: module.AnimeCharacters })));
 const Catalog = lazy(() => import('@/components/pages/Catalog').then(module => ({ default: module.Catalog })));
 const Calendar = lazy(() => import('@/components/pages/Calendar').then(module => ({ default: module.Calendar })));
 const Profile = lazy(() => import('@/components/pages/Profile').then(module => ({ default: module.Profile })));
@@ -55,6 +56,7 @@ const AnimatedRoutes = () => {
             <Route path="/studio/:id" element={<PageTransition><RouteErrorBoundary><StudioDetails /></RouteErrorBoundary></PageTransition>} />
             <Route path="/anime/:id" element={<PageTransition><RouteErrorBoundary><AnimeDetails /></RouteErrorBoundary></PageTransition>} />
             <Route path="/anime/:id/staff" element={<PageTransition><RouteErrorBoundary><AnimeStaff /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/anime/:id/characters" element={<PageTransition><RouteErrorBoundary><AnimeCharacters /></RouteErrorBoundary></PageTransition>} />
             <Route path="/library" element={<PageTransition><ProtectedRoute><RouteErrorBoundary><Library /></RouteErrorBoundary></ProtectedRoute></PageTransition>} />
             <Route path="/stats" element={<PageTransition><ProtectedRoute><RouteErrorBoundary><Stats /></RouteErrorBoundary></ProtectedRoute></PageTransition>} />
             <Route path="/profile" element={<PageTransition><ProtectedRoute><RouteErrorBoundary><Profile /></RouteErrorBoundary></ProtectedRoute></PageTransition>} />
