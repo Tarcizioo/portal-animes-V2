@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Compass, Library, User, Menu, Settings, Globe, Users, LogOut, X, BarChart3 } from 'lucide-react';
+import { Home, Compass, Library, User, Menu, Settings, Globe, Users, LogOut, X, BarChart3, Tv } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { useAuth } from '@/context/AuthContext';
@@ -52,6 +52,12 @@ export function BottomNav() {
             label: 'Explorar Usuários',
             onClick: () => { setIsUserSearchOpen(true); setIsMenuOpen(false); },
             color: 'text-blue-400', bg: 'bg-blue-500/10'
+        },
+        {
+            icon: Tv,
+            label: 'Calendário',
+            onClick: () => { navigate('/calendar'); setIsMenuOpen(false); },
+            color: 'text-orange-400', bg: 'bg-orange-500/10'
         },
         {
             icon: Settings,
