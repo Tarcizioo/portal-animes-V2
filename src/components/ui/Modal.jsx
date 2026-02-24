@@ -2,8 +2,11 @@
 import { X } from 'lucide-react';
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useModalClose } from '@/hooks/useModalClose';
 
 export function Modal({ isOpen, onClose, title, children }) {
+    useModalClose(isOpen, onClose);
+
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useModalClose } from '@/hooks/useModalClose';
 import { X, Save, Upload, Link as LinkIcon, Hash, Camera, Lock, Globe } from 'lucide-react'; // [Modified]
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useAuth } from '@/context/AuthContext';
@@ -15,7 +16,7 @@ const ANIME_GENRES = [
 ];
 
 export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
-    if (!isOpen) return null;
+    useModalClose(isOpen, onClose);
 
     const { user } = useAuth();
     const { toast } = useToast();
@@ -194,9 +195,17 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
         }
     };
 
+    if (!isOpen) return null;
+
     return (
-        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-            <div className="bg-[var(--bg-secondary)] w-full max-w-2xl rounded-t-2xl md:rounded-2xl border border-[var(--border-color)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] md:max-h-[90vh] mb-16 md:mb-0">
+        <div 
+            className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+            onClick={onClose}
+        >
+            <div 
+                className="bg-[var(--bg-secondary)] w-full max-w-2xl rounded-t-2xl md:rounded-2xl border border-[var(--border-color)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] md:max-h-[90vh] mb-16 md:mb-0"
+                onClick={(e) => e.stopPropagation()}
+            >
 
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 md:p-6 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">

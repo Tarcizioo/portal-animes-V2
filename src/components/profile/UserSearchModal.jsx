@@ -19,14 +19,7 @@ export function UserSearchModal({ isOpen, onClose }) {
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
-    // Keyboard events (ESC) - Modal doesn't handle this natively
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.key === 'Escape') onClose();
-        };
-        if (isOpen) window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, onClose]);
+
 
     // Search logic
     useEffect(() => {

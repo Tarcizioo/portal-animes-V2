@@ -1,13 +1,13 @@
 import { useState, useRef } from 'react';
+import { useModalClose } from '@/hooks/useModalClose';
 import { X, Copy, Download, Share2, Check } from 'lucide-react';
 import html2canvas from 'html2canvas';
 
 export function ShareProfileModal({ isOpen, onClose, user, profile, favorites, library = [] }) {
+    useModalClose(isOpen, onClose);
     const [isGenerating, setIsGenerating] = useState(false);
     const [copied, setCopied] = useState(false);
     const cardRef = useRef(null);
-
-    if (!isOpen) return null;
 
     const publicUrl = `${window.location.origin}/u/${user?.uid}`;
     const banner = profile?.bannerURL || user?.bannerURL || "https://placehold.co/1200x400/1a1a1a/FFF?text=Banner";
@@ -52,9 +52,17 @@ export function ShareProfileModal({ isOpen, onClose, user, profile, favorites, l
         }
     };
 
+    if (!isOpen) return null;
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-bg-secondary w-full max-w-2xl rounded-3xl border border-border-color shadow-2xl relative flex flex-col max-h-[90vh]">
+        <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={onClose}
+        >
+            <div 
+                className="bg-bg-secondary w-full max-w-2xl rounded-3xl border border-border-color shadow-2xl relative flex flex-col max-h-[90vh]"
+                onClick={(e) => e.stopPropagation()}
+            >
 
                 {/* Header Modal */}
                 <div className="flex items-center justify-between p-6 border-b border-border-color">

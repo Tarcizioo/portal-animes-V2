@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useModalClose } from '@/hooks/useModalClose';
 import { X, Save, Lock, Trophy } from 'lucide-react';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -6,7 +7,7 @@ import { useToast } from '@/context/ToastContext';
 import clsx from 'clsx';
 
 export function BadgesModal({ isOpen, onClose }) {
-    if (!isOpen) return null;
+    useModalClose(isOpen, onClose);
 
     const { unlockedBadges, lockedBadges } = useAchievements();
     const { profile, updateProfileData } = useUserProfile();
@@ -60,9 +61,17 @@ export function BadgesModal({ isOpen, onClose }) {
         }
     };
 
+    if (!isOpen) return null;
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-            <div className="bg-[var(--bg-secondary)] w-full max-w-2xl rounded-2xl border border-[var(--border-color)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+        <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+            onClick={onClose}
+        >
+            <div 
+                className="bg-[var(--bg-secondary)] w-full max-w-2xl rounded-2xl border border-[var(--border-color)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+                onClick={(e) => e.stopPropagation()}
+            >
 
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">

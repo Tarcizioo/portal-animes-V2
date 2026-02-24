@@ -1,15 +1,10 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useModalClose } from '@/hooks/useModalClose';
 
 export function ImageModal({ isOpen, onClose, imageUrl, altText }) {
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [isOpen, onClose]);
+  useModalClose(isOpen, onClose);
 
   if (!isOpen) return null;
 
