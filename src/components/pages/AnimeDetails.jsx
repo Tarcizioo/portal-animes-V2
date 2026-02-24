@@ -243,7 +243,7 @@ export function AnimeDetails() {
                 <div className="lg:hidden mb-8">
                      <div className="grid grid-cols-2 gap-3">
                         <StatsCard value={`#${anime.rank || '-'}`} label="Ranking" icon={Trophy} />
-                        <StatsCard value={anime.score || '-'} label="Score" icon={Star} color="text-yellow-500" />
+                        <StatsCard value={anime.score || '-'} label="Score Médio" icon={Star} color="text-yellow-500" />
                         <StatsCard value={anime.popularity || '-'} label="Popularidade" icon={Heart} color="text-red-500" />
                         <StatsCard value={anime.members?.toLocaleString() || '-'} label="Membros" icon={Users} color="text-blue-500" />
                     </div>
@@ -264,7 +264,7 @@ export function AnimeDetails() {
                             className="hidden lg:grid grid-cols-2 md:grid-cols-4 gap-4"
                         >
                             <StatsCard value={`#${anime.rank || '-'}`} label="Ranking" icon={Trophy} />
-                            <StatsCard value={anime.score || '-'} label="Score" icon={Star} color="text-yellow-500" />
+                            <StatsCard value={anime.score || '-'} label="Score Médio" icon={Star} color="text-yellow-500" />
                             <StatsCard value={anime.popularity || '-'} label="Popularidade" icon={Heart} color="text-red-500" />
                             <StatsCard value={anime.members?.toLocaleString() || '-'} label="Membros" icon={Users} color="text-blue-500" />
                         </motion.div>

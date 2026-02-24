@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, X, Bell, ArrowLeft, ChevronDown } from 'lucide-react';
+import { Search, X, Bell, ArrowLeft, ChevronDown, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSearch } from '@/hooks/useSearch';
 import { useAuth } from '@/context/AuthContext';
@@ -11,7 +11,7 @@ import { NotificationDropdown } from '@/components/notifications/NotificationDro
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function Header() {
-    const { query, setQuery, type, setType, results, setResults } = useSearch();
+    const { query, setQuery, type, setType, results, isSearching, setResults } = useSearch();
     const navigate = useNavigate();
     const [showMobileSearch, setShowMobileSearch] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -145,6 +145,11 @@ export function Header() {
                             placeholder="Pesquisar..."
                             className="block w-full pl-10 pr-10 py-2.5 border-2 border-transparent rounded-2xl bg-bg-tertiary text-text-primary focus:outline-none focus:border-primary focus:bg-bg-secondary focus:shadow-[0_0_20px_var(--shadow-color)] transition-all duration-300 shadow-sm hover:shadow-md placeholder-text-secondary/50"
                         />
+                        {isSearching && (
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                            </div>
+                        )}
                         {/* Results Dropdown (Desktop) */}
                         {results.length > 0 && (
                             <div className="absolute top-full mt-3 left-0 w-full bg-bg-secondary rounded-2xl shadow-xl z-50 max-h-[60vh] overflow-y-auto border border-border-color overflow-hidden animate-in fade-in zoom-in-95 duration-200 custom-scrollbar">
@@ -211,7 +216,11 @@ export function Header() {
                                         autoFocus
                                         className="w-full bg-bg-tertiary border-2 border-transparent focus:border-primary/20 rounded-xl py-3 pl-10 pr-10 text-lg text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:bg-bg-secondary transition-all"
                                     />
-                                    {query && (
+                                    {isSearching ? (
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none">
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                        </div>
+                                    ) : query ? (
                                         <button 
                                             onClick={() => setQuery('')}
                                             className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-primary p-1 bg-bg-tertiary rounded-full"
@@ -219,7 +228,7 @@ export function Header() {
                                         >
                                             <X className="w-4 h-4" />
                                         </button>
-                                    )}
+                                    ) : null}
                                 </div>
                             </div>
 
