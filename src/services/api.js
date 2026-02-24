@@ -29,6 +29,15 @@ export async function apiFetch(endpoint, options = {}, retries = 3, backoff = 10
             }
 
             if (!response.ok) {
+                // If the error is a client error (e.g. 404 Not Found, 400 Bad Request) 
+                // and NOT a 429 Rate Limit, we should fail fast because retrying won't fix it.
+                if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+                    const error = new Error(`API Client Error: ${response.status} ${response.statusText}`);
+                    error.status = response.status;
+                    error.isClientError = true;
+                    throw error;
+                }
+                
                 throw new Error(`API Error: ${response.status} ${response.statusText}`);
             }
 
@@ -36,7 +45,7 @@ export async function apiFetch(endpoint, options = {}, retries = 3, backoff = 10
         } catch (error) {
             // AbortError denotes the request was intentionally cancelled (e.g., component unmounted or new search typed).
             // Do NOT retry AbortErrors, let them fail fast to prevent rate limit saturation.
-            if (error.name === 'AbortError') {
+            if (error.name === 'AbortError' || error.isClientError) {
                 throw error;
             }
 
