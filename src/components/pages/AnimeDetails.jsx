@@ -20,11 +20,16 @@ import { InfoRow } from '@/components/anime/InfoRow';
 import { StatsCard } from '@/components/anime/StatsCard';
 import { EpisodesList } from '@/components/anime/EpisodesList';
 import { AnimeSidebar } from '@/components/anime/AnimeSidebar';
+import { AnimeRelations } from '@/components/anime/AnimeRelations';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 
 export function AnimeDetails() {
     const { id } = useParams();
-    const { anime, characters, recommendations, staff, loading } = useAnimeInfo(id);
+    console.log(`[AnimeDetails] Component rendering for ID: ${id}`);
+
+    const { anime, characters, recommendations, staff, loading, error } = useAnimeInfo(id);
+    console.log(`[AnimeDetails] useAnimeInfo result -> loading: ${loading}, animeExists: ${!!anime}, errorExists: ${!!error}`);
+    
     const { user } = useAuth();
     const { toast } = useToast();
     const { library, addToLibrary, incrementProgress, updateProgress, updateRating, toggleFavorite, removeFromLibrary } = useAnimeLibrary();
@@ -43,6 +48,11 @@ export function AnimeDetails() {
     const [isVisible, setIsVisible] = useState(false);
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
     const [isZoomOpen, setIsZoomOpen] = useState(false);
+
+    // Scroll to top whenever the ID changes (e.g. clicking a Relation or Recommendation)
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [id]);
 
     useEffect(() => {
         const timer = setTimeout(() => setIsVisible(true), 100);
@@ -78,6 +88,7 @@ export function AnimeDetails() {
     const totalEp = anime?.episodes || 0;
 
     if (loading) {
+        console.log(`[AnimeDetails] Rendering loading state for ID: ${id}`);
         return (
 
             <div className="flex h-[80vh] items-center justify-center">
@@ -87,8 +98,17 @@ export function AnimeDetails() {
         );
     }
 
+    if (error) {
+        console.error(`[AnimeDetails] Rendering error state for ID: ${id}`, error);
+        return (
+            <div className="flex bg-bg-primary text-text-primary items-center justify-center h-screen">
+                <p>Erro ao carregar anime: {error?.message || "Erro desconhecido"}</p>
+            </div>
+        );
+    }
 
     if (!anime) {
+        console.warn(`[AnimeDetails] Rendering Not Found state for ID: ${id}`);
         return (
             <div className="flex bg-bg-primary text-text-primary items-center justify-center h-screen">
                 <p>Anime não encontrado.</p>
@@ -96,6 +116,7 @@ export function AnimeDetails() {
         );
     }
 
+    console.log(`[AnimeDetails] Rendering full page for ID: ${id}, Title: ${anime.title}`);
     const bannerImage = anime.banner || anime.image;
 
     return (
@@ -308,6 +329,9 @@ export function AnimeDetails() {
                                 </div>
                             )}
                         </motion.section>
+
+                        {/* Relações (Temporadas / Franquia) */}
+                        <AnimeRelations relations={anime.relations} />
 
                         {/* Recomendações */}
                         <motion.section

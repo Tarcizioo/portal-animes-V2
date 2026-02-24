@@ -1,49 +1,58 @@
 import { useQuery } from '@tanstack/react-query';
+import { jikanApi } from '@/services/api';
 
 async function fetchAnimeDetails(id) {
-  // Helper de delay
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-  // Helper para não quebrar tudo se uma request falhar
-  const safeFetch = async (url) => {
+  // Use the built-in jikanApi wrapper which inherently handles backoffs and 429s
+  const safeCall = async (apiFunc, ...args) => {
     try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        if (res.status === 429) console.warn(`Rate limit hit for ${url}`);
-        return { data: [] };
-      }
-      return await res.json();
+      const res = await apiFunc(...args);
+      return { data: res?.data || [] };
     } catch (e) {
-      console.warn(`Error fetching ${url}:`, e);
+      console.warn(`Error in API call:`, e);
       return { data: [] };
     }
   };
 
   // 1. Core Details (Critical)
-  const animeRes = await fetch(`https://api.jikan.moe/v4/anime/${id}/full`);
-  if (!animeRes.ok) {
-    if (animeRes.status === 429) {
-      throw new Error("Muitas requisições. Tente novamente em instantes.");
-    }
-    throw new Error(`Falha ao carregar anime: ${animeRes.status}`);
+  let animeData;
+  try {
+      console.log(`[useAnimeInfo] Fetching core details for ID: ${id}...`);
+      const response = await jikanApi.getAnimeFullById(id);
+      animeData = response?.data;
+      console.log(`[useAnimeInfo] Core details fetched successfully for ID: ${id}`);
+  } catch (error) {
+      console.error(`[useAnimeInfo] Error fetching core details for ID ${id}:`, error);
+      throw new Error(`Falha ao carregar anime: ${error.message}`);
   }
-  const animeJson = await animeRes.json();
 
-  // 2. Batch paralelo: Characters + Recommendations
-  await delay(600);
-  const [charJson, recJson] = await Promise.all([
-    safeFetch(`https://api.jikan.moe/v4/anime/${id}/characters`),
-    safeFetch(`https://api.jikan.moe/v4/anime/${id}/recommendations`)
-  ]);
+  if (!animeData) {
+      console.error(`[useAnimeInfo] animeData is null for ID: ${id}`);
+      throw new Error("Anime não pôde ser resgatado da API.");
+  }
 
-  // 3. Batch paralelo: Episodes + Staff
-  await delay(600);
-  const [epJson, staffJson] = await Promise.all([
-    safeFetch(`https://api.jikan.moe/v4/anime/${id}/episodes`),
-    safeFetch(`https://api.jikan.moe/v4/anime/${id}/staff`)
-  ]);
+  // 2. Sequentially fetch to avoid overwhelming Jikan (3 requests per sec limit)
+  console.log(`[useAnimeInfo] Fetching characters for ID: ${id}...`);
+  // Even though api.js has a retry, pacing it out improves UX and prevents long queue blocks
+  await new Promise(r => setTimeout(r, 340));
+  const charJson = await safeCall(jikanApi.getAnimeCharacters, id);
+  console.log(`[useAnimeInfo] Characters fetched for ID: ${id}`);
+  
+  await new Promise(r => setTimeout(r, 340));
+  console.log(`[useAnimeInfo] Fetching recommendations for ID: ${id}...`);
+  const recJson = await safeCall(jikanApi.getAnimeRecommendations, id);
+  console.log(`[useAnimeInfo] Recommendations fetched for ID: ${id}`);
 
-  const data = animeJson.data;
+  await new Promise(r => setTimeout(r, 340));
+  console.log(`[useAnimeInfo] Fetching episodes for ID: ${id}...`);
+  const epJson = await safeCall(jikanApi.getAnimeEpisodes, id);
+  console.log(`[useAnimeInfo] Episodes fetched for ID: ${id}`);
+
+  await new Promise(r => setTimeout(r, 340));
+  console.log(`[useAnimeInfo] Fetching staff for ID: ${id}...`);
+  const staffJson = await safeCall(jikanApi.getAnimeStaff, id);
+  console.log(`[useAnimeInfo] Staff fetched for ID: ${id}`);
+
+  const data = animeData;
 
   const formattedAnime = {
     id: data.mal_id,
@@ -69,6 +78,7 @@ async function fetchAnimeDetails(id) {
     type: data.type,
     members: data.members,
     aired: data.aired,
+    relations: data.relations || [],
     episodesList: epJson.data || []
   };
 
@@ -81,6 +91,7 @@ async function fetchAnimeDetails(id) {
 }
 
 export function useAnimeInfo(id) {
+  console.log(`[useAnimeInfo] Hook called with ID: ${id}`);
   const { data, isLoading, error } = useQuery({
     queryKey: ['anime', id],
     queryFn: () => fetchAnimeDetails(id),
@@ -88,6 +99,10 @@ export function useAnimeInfo(id) {
     enabled: !!id && id !== 'undefined',             // Só busca se tiver ID válido
     retry: 1,                  // Tenta apenas mais 1 vez se falhar
   });
+
+  if (error) {
+    console.error(`[useAnimeInfo] React Query Error for ID ${id}:`, error);
+  }
 
   return {
     anime: data?.anime || null,

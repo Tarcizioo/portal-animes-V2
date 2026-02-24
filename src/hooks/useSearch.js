@@ -25,7 +25,7 @@ export function useSearch() {
         let results = [];
 
         if (type === 'anime') {
-          const data = await jikanApi.searchAnime(query, 6);
+          const data = await jikanApi.searchAnime(query, 6, { signal });
           results = (data.data || []).map(anime => ({
             id: anime.mal_id,
             title: anime.title_english || anime.title,
@@ -37,7 +37,7 @@ export function useSearch() {
             kind: 'anime'
           }));
         } else if (type === 'character') {
-          const data = await jikanApi.searchCharacters(query, 6);
+          const data = await jikanApi.searchCharacters(query, 6, { signal });
           results = (data.data || []).map(char => ({
             id: char.mal_id,
             title: char.name,
@@ -45,7 +45,7 @@ export function useSearch() {
             kind: 'character'
           }));
         } else if (type === 'person') {
-          const data = await jikanApi.searchPeople(query, 6);
+          const data = await jikanApi.searchPeople(query, 6, { signal });
           results = (data.data || []).map(person => ({
             id: person.mal_id,
             title: person.name,
@@ -53,18 +53,20 @@ export function useSearch() {
             kind: 'person' // Novo tipo
           }));
         } else {
-            // Default: Anime + Character mix (previous behavior)
-            // But maybe we should include People too?
-            // User asked for "searching: animes, characters and people".
-            // Let's do a balanced mix: 3 Anime, 2 
-            // Characters, 2 People.
-            const [animeRes, charRes, peopleRes] = await Promise.all([
-               jikanApi.searchAnime(query, 3),
-               jikanApi.searchCharacters(query, 2),
-               jikanApi.searchPeople(query, 2)
-            ]);
+            // Default: Anime + Character + People mix
+            // Sequentially await with delays to prevent Jikan 429 Rate Limit
+            const animeRes = await jikanApi.searchAnime(query, 3, { signal });
+            if (signal.aborted) return;
+            await new Promise(r => setTimeout(r, 400));
+            
+            const charRes = await jikanApi.searchCharacters(query, 2, { signal });
+            if (signal.aborted) return;
+            await new Promise(r => setTimeout(r, 400));
+            
+            const peopleRes = await jikanApi.searchPeople(query, 2, { signal });
+            if (signal.aborted) return;
 
-            const animes = (animeRes.data || []).map(anime => ({
+            const animes = (animeRes?.data || []).map(anime => ({
                 id: anime.mal_id,
                 title: anime.title_english || anime.title,
                 image: anime.images?.jpg?.image_url,
@@ -74,14 +76,14 @@ export function useSearch() {
                 kind: 'anime'
             }));
 
-            const chars = (charRes.data || []).map(char => ({
+            const chars = (charRes?.data || []).map(char => ({
                 id: char.mal_id,
                 title: char.name,
                 image: char.images?.jpg?.image_url,
                 kind: 'character'
             }));
 
-            const people = (peopleRes.data || []).map(p => ({
+            const people = (peopleRes?.data || []).map(p => ({
                 id: p.mal_id,
                 title: p.name,
                 image: p.images?.jpg?.image_url,

@@ -34,6 +34,12 @@ export async function apiFetch(endpoint, options = {}, retries = 3, backoff = 10
 
             return await response.json();
         } catch (error) {
+            // AbortError denotes the request was intentionally cancelled (e.g., component unmounted or new search typed).
+            // Do NOT retry AbortErrors, let them fail fast to prevent rate limit saturation.
+            if (error.name === 'AbortError') {
+                throw error;
+            }
+
             if (i === retries - 1) throw error;
             // If it's a network error (not a 4xx/5xx response), we also retry
             await delay(backoff * (i + 1));
@@ -70,7 +76,7 @@ export const jikanApi = {
     getGenreAnime: (genreId) => apiFetch(`/anime?genres=${genreId}&order_by=score&sort=desc`),
 
     // Search (inputs sanitizados com encodeURIComponent)
-    searchAnime: (query, limit=5) => apiFetch(`/anime?q=${encodeURIComponent(query)}&limit=${limit}&order_by=members&sort=desc`),
-    searchCharacters: (query, limit=5) => apiFetch(`/characters?q=${encodeURIComponent(query)}&limit=${limit}&order_by=favorites&sort=desc`),
-    searchPeople: (query, limit=5) => apiFetch(`/people?q=${encodeURIComponent(query)}&limit=${limit}&order_by=favorites&sort=desc`),
+    searchAnime: (query, limit=5, options={}) => apiFetch(`/anime?q=${encodeURIComponent(query)}&limit=${limit}&order_by=members&sort=desc`, options),
+    searchCharacters: (query, limit=5, options={}) => apiFetch(`/characters?q=${encodeURIComponent(query)}&limit=${limit}&order_by=favorites&sort=desc`, options),
+    searchPeople: (query, limit=5, options={}) => apiFetch(`/people?q=${encodeURIComponent(query)}&limit=${limit}&order_by=favorites&sort=desc`, options),
 };
