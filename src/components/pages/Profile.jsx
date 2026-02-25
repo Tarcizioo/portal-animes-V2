@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileStats } from '@/components/profile/ProfileStats';
@@ -15,7 +16,82 @@ import { useCharacterLibrary } from '@/hooks/useCharacterLibrary';
 import { useFavoriteStudios } from '@/hooks/useFavoriteStudios';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { LogIn, Hash, Link as LinkIcon, Monitor, X } from 'lucide-react';
+import { LogIn, Hash, Link as LinkIcon, Monitor, X, Clock, ArrowRight, PlayCircle, CheckCircle, BookMarked, PauseCircle, XCircle } from 'lucide-react';
+
+// ─── Status config ────────────────────────────────────────────────────────────
+const STATUS_CONFIG = {
+    watching:      { label: 'Assistindo', color: 'bg-green-500/90' },
+    completed:     { label: 'Completo',   color: 'bg-blue-500/90' },
+    plan_to_watch: { label: 'Planejado',  color: 'bg-gray-500/90' },
+    paused:        { label: 'Pausado',    color: 'bg-yellow-500/90' },
+    dropped:       { label: 'Dropado',    color: 'bg-red-500/90' },
+};
+
+// ─── Recent Activity (private) ────────────────────────────────────────────────
+function RecentActivity({ library }) {
+    const recentAnimes = useMemo(() => {
+        if (!library || library.length === 0) return [];
+        return [...library]
+            .sort((a, b) => (b.lastUpdated?.seconds || 0) - (a.lastUpdated?.seconds || 0))
+            .slice(0, 6);
+    }, [library]);
+
+    return (
+        <div className="bg-bg-secondary border border-border-color rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-5">
+                <h3 className="font-bold text-text-primary flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-button-accent" />
+                    Atividade Recente
+                </h3>
+                <Link
+                    to="/library"
+                    className="flex items-center gap-1.5 text-xs font-bold text-button-accent hover:text-text-primary transition-colors group"
+                >
+                    Ver minha biblioteca
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+            </div>
+
+            {recentAnimes.length === 0 ? (
+                <p className="text-text-secondary text-sm text-center py-6 opacity-60">
+                    Nenhum anime na biblioteca ainda.
+                </p>
+            ) : (
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                    {recentAnimes.map((anime, index) => {
+                        const statusCfg = STATUS_CONFIG[anime.status] || STATUS_CONFIG.plan_to_watch;
+                        return (
+                            <motion.div
+                                key={anime.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                            >
+                                <Link to={`/anime/${anime.id}`} className="block group relative" title={anime.title}>
+                                    <div className="relative aspect-[2/3] rounded-xl overflow-hidden mb-2 shadow-md group-hover:shadow-lg group-hover:shadow-primary/20 transition-all duration-300">
+                                        <img
+                                            src={anime.image || anime.smallImage}
+                                            alt={anime.title}
+                                            loading="lazy"
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                                        <div className={`absolute bottom-1.5 left-1.5 right-1.5 px-1.5 py-0.5 rounded-md text-[8px] font-bold text-white text-center ${statusCfg.color} backdrop-blur-sm`}>
+                                            {statusCfg.label}
+                                        </div>
+                                    </div>
+                                    <p className="text-[11px] font-semibold text-text-secondary group-hover:text-primary line-clamp-2 leading-tight transition-colors">
+                                        {anime.title}
+                                    </p>
+                                </Link>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+}
 
 export function Profile() {
   const { user, signInGoogle, loading: authLoading } = useAuth();
@@ -170,6 +246,8 @@ export function Profile() {
               preferredView={profile?.preferredFavoritesView}
               onSetPreferredView={handleSetPreferredView}
             />
+            {/* ── Atividade Recente ─────────────────────────────────────── */}
+            <RecentActivity library={library} />
             <AchievementBadges />
           </div>
 
