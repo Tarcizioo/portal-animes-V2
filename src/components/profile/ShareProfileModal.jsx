@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useModalClose } from '@/hooks/useModalClose';
-import { X, Copy, Download, Share2, Check } from 'lucide-react';
+import { X, Copy, Download, Share2, Check, Star, Tv, Clock } from 'lucide-react';
 import html2canvas from 'html2canvas';
 
 export function ShareProfileModal({ isOpen, onClose, user, profile, favorites, library = [] }) {
@@ -11,18 +12,15 @@ export function ShareProfileModal({ isOpen, onClose, user, profile, favorites, l
 
     const publicUrl = `${window.location.origin}/u/${user?.uid}`;
     const banner = profile?.bannerURL || user?.bannerURL || "https://placehold.co/1200x400/1a1a1a/FFF?text=Banner";
-    const photo = profile?.photoURL || user?.photoURL || "https://placehold.co/200x200/6366f1/FFF?text=User";
-    const name = profile?.displayName || user?.displayName || "Usuário";
+    const photo  = profile?.photoURL  || user?.photoURL  || "https://placehold.co/200x200/6366f1/FFF?text=User";
+    const name   = profile?.displayName || user?.displayName || "Usuário";
+    const about  = profile?.about || '';
 
-    // CALCULAR ESTATÍSTICAS REAIS
-    const totalAnimes = library.length;
-
-    // Dias Assistidos: (TotalEpisodios * 24min) / 60min / 24h
-    const totalEpisodes = library.reduce((acc, curr) => acc + (curr.currentEp || 0), 0);
-    const daysWatched = ((totalEpisodes * 24) / 1440).toFixed(1);
-
-    // Top 3 Favoritos para o Card
-    const topFavorites = favorites.slice(0, 3);
+    const totalAnimes    = library.length;
+    const totalEpisodes  = library.reduce((acc, a) => acc + (a.currentEp || 0), 0);
+    const daysWatched    = ((totalEpisodes * 24) / 1440).toFixed(1);
+    const topFavorites   = favorites.slice(0, 3);
+    const shortUrl       = publicUrl.replace(/^https?:\/\//, '');
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(publicUrl);
@@ -35,18 +33,18 @@ export function ShareProfileModal({ isOpen, onClose, user, profile, favorites, l
         setIsGenerating(true);
         try {
             const canvas = await html2canvas(cardRef.current, {
-                useCORS: true, // Importante para imagens externas
-                backgroundColor: '#0f0f12', // Cor de fundo do card
-                scale: 2, // Retina quality
+                useCORS: true,
+                backgroundColor: null,
+                scale: 2,
+                logging: false,
             });
-
-            const image = canvas.toDataURL("image/png");
-            const link = document.createElement('a');
-            link.href = image;
+            const image = canvas.toDataURL('image/png');
+            const link  = document.createElement('a');
+            link.href     = image;
             link.download = `profile-${name}.png`;
             link.click();
         } catch (err) {
-            console.error("Erro ao gerar card:", err);
+            console.error('Erro ao gerar card:', err);
         } finally {
             setIsGenerating(false);
         }
@@ -54,40 +52,38 @@ export function ShareProfileModal({ isOpen, onClose, user, profile, favorites, l
 
     if (!isOpen) return null;
 
-    return (
-        <div 
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+    const modal = (
+        <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
             onClick={onClose}
         >
-            <div 
-                className="bg-bg-secondary w-full max-w-2xl rounded-3xl border border-border-color shadow-2xl relative flex flex-col max-h-[90vh]"
+            <div
+                className="bg-bg-secondary w-full max-w-2xl rounded-3xl border border-border-color shadow-2xl relative flex flex-col max-h-[92vh]"
                 onClick={(e) => e.stopPropagation()}
             >
-
-                {/* Header Modal */}
-                <div className="flex items-center justify-between p-6 border-b border-border-color">
-                    <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
-                        <Share2 className="w-5 h-5 text-primary" /> Compartilhar Perfil
+                {/* Header */}
+                <div className="flex items-center justify-between p-5 border-b border-border-color">
+                    <h2 className="text-lg font-bold text-text-primary flex items-center gap-2">
+                        <Share2 className="w-5 h-5 text-button-accent" /> Compartilhar Perfil
                     </h2>
                     <button onClick={onClose} className="p-2 hover:bg-bg-tertiary rounded-full text-text-secondary hover:text-text-primary transition-colors">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
-                <div className="p-6 overflow-y-auto space-y-8">
+                <div className="p-5 overflow-y-auto space-y-6 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
 
-                    {/* Link Section */}
-                    <div className="space-y-3">
-                        <label className="text-sm font-medium text-text-secondary uppercase tracking-wider">Link Público</label>
+                    {/* Link */}
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">Link Público</label>
                         <div className="flex gap-2">
                             <input
-                                readOnly
-                                value={publicUrl}
-                                className="flex-1 bg-bg-tertiary border border-border-color rounded-xl px-4 py-3 text-text-primary focus:outline-none focus:border-primary/50 text-sm font-mono"
+                                readOnly value={publicUrl}
+                                className="flex-1 bg-bg-tertiary border border-border-color rounded-xl px-4 py-2.5 text-text-primary focus:outline-none text-sm font-mono"
                             />
                             <button
                                 onClick={handleCopyLink}
-                                className="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold transition-all shadow-lg flex items-center gap-2 min-w-[100px] justify-center"
+                                className="px-4 py-2 bg-button-accent hover:opacity-90 text-text-on-primary rounded-xl font-bold transition-all flex items-center gap-2 min-w-[100px] justify-center text-sm"
                             >
                                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                                 {copied ? 'Copiado!' : 'Copiar'}
@@ -95,103 +91,173 @@ export function ShareProfileModal({ isOpen, onClose, user, profile, favorites, l
                         </div>
                     </div>
 
-                    <div className="border-t border-border-color"></div>
+                    <div className="border-t border-border-color" />
 
-                    {/* Card Preview Section */}
-                    <div className="space-y-4">
+                    {/* Card Preview */}
+                    <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium text-text-secondary uppercase tracking-wider">Preview do Card</label>
+                            <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">Card de Perfil</label>
                             <button
                                 onClick={handleDownloadCard}
                                 disabled={isGenerating}
-                                className="text-sm font-bold text-primary hover:underline flex items-center gap-1 disabled:opacity-50"
+                                className="flex items-center gap-1.5 text-sm font-bold text-button-accent hover:opacity-80 disabled:opacity-40 transition-all"
                             >
                                 <Download className="w-4 h-4" />
-                                {isGenerating ? 'Gerando...' : 'Baixar Imagem'}
+                                {isGenerating ? 'Gerando...' : 'Baixar PNG'}
                             </button>
                         </div>
 
-                        {/* O ELEMENTO QUE SERÁ TRANSFORMADO EM IMAGEM */}
-                        <div className="flex justify-center bg-black/20 p-4 rounded-xl overflow-hidden">
+                        {/* ── THE CARD ── (captured by html2canvas) */}
+                        <div className="flex justify-center bg-black/30 p-4 rounded-2xl overflow-hidden">
                             <div
                                 ref={cardRef}
-                                className="w-[600px] bg-bg-primary text-text-primary rounded-2xl overflow-hidden border border-white/10 relative shadow-2xl"
-                                style={{ backgroundImage: `url('/bg-pattern.svg')` }} // Opcional texture
+                                style={{
+                                    width: 560,
+                                    background: 'linear-gradient(145deg, #0f0f14 0%, #13131a 60%, #18181f 100%)',
+                                    borderRadius: 20,
+                                    overflow: 'hidden',
+                                    position: 'relative',
+                                    fontFamily: '"Inter", "Segoe UI", sans-serif',
+                                }}
                             >
-                                {/* Banner Card */}
-                                <div className="h-32 relative">
-                                    <img src={banner} className="w-full h-full object-cover" crossOrigin="anonymous" alt="Banner" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-bg-primary to-transparent"></div>
+                                {/* Banner with gradient overlay */}
+                                <div style={{ position: 'relative', height: 130 }}>
+                                    <img
+                                        src={banner} alt=""
+                                        crossOrigin="anonymous"
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                    />
+                                    {/* Gradient bottom fade */}
+                                    <div style={{
+                                        position: 'absolute', inset: 0,
+                                        background: 'linear-gradient(to bottom, rgba(15,15,20,0.1) 0%, rgba(15,15,20,0.7) 70%, rgba(15,15,20,1) 100%)',
+                                    }} />
+                                    {/* Top right branding */}
+                                    <div style={{
+                                        position: 'absolute', top: 12, right: 14,
+                                        background: 'rgba(255,255,255,0.08)',
+                                        backdropFilter: 'blur(8px)',
+                                        border: '1px solid rgba(255,255,255,0.12)',
+                                        borderRadius: 8, padding: '3px 10px',
+                                        fontSize: 10, fontWeight: 800,
+                                        color: '#a78bfa', letterSpacing: '0.12em',
+                                    }}>
+                                        PORTAL ANIMES
+                                    </div>
                                 </div>
 
-                                {/* Content */}
-                                <div className="px-8 pb-8 relative -top-10 flex gap-6 items-end">
-                                    <div className="w-24 h-24 rounded-full p-1 bg-bg-primary relative z-10 shrink-0">
-                                        <img src={photo} className="w-full h-full rounded-full object-cover" crossOrigin="anonymous" alt="Avatar" />
+                                {/* Avatar + Name row */}
+                                <div style={{ display: 'flex', alignItems: 'flex-end', padding: '0 24px', marginTop: -44, gap: 16, position: 'relative', zIndex: 2 }}>
+                                    <div style={{
+                                        width: 80, height: 80, borderRadius: '50%',
+                                        border: '3px solid #a78bfa',
+                                        overflow: 'hidden', flexShrink: 0,
+                                        boxShadow: '0 0 0 3px #13131a, 0 8px 28px rgba(167,139,250,0.35)',
+                                    }}>
+                                        <img src={photo} alt="" crossOrigin="anonymous"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                                     </div>
-                                    <div className="pb-2 flex-1 relative top-10">
-                                        <h3 className="text-2xl font-black text-white">{name}</h3>
-                                        <p className="text-gray-400 text-sm">Biblioteca do Portal Animes</p>
-                                    </div>
-                                    <div className="pb-3 relative top-10">
-                                        <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
-                                            <span className="text-xs font-bold text-primary">PORTAL ANIMES</span>
+                                    <div style={{ paddingBottom: 6, flex: 1, minWidth: 0 }}>
+                                        <div style={{ fontSize: 22, fontWeight: 900, color: '#ffffff', lineHeight: 1.1, letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {name}
+                                        </div>
+                                        <div style={{ fontSize: 12, color: '#7c7c9a', marginTop: 3 }}>
+                                            {shortUrl}
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Stats Grid Minimal */}
-                                <div className="px-8 mt-2 grid grid-cols-3 gap-4 mb-6">
-                                    <div className="bg-bg-secondary p-3 rounded-lg border border-border-color text-center">
-                                        <span className="block text-xl font-bold text-white">{favorites.length}</span>
-                                        <span className="text-xs text-text-secondary uppercase">Favoritos</span>
+                                {/* About / tagline */}
+                                {about && (
+                                    <div style={{ padding: '10px 24px 0', fontSize: 12, color: '#9ca3b0', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                        {about}
                                     </div>
-                                    <div className="bg-bg-secondary p-3 rounded-lg border border-border-color text-center">
-                                        <span className="block text-xl font-bold text-white max-w-full truncate px-1">{totalAnimes}</span>
-                                        <span className="text-xs text-text-secondary uppercase">Animes</span>
-                                    </div>
-                                    <div className="bg-bg-secondary p-3 rounded-lg border border-border-color text-center">
-                                        <span className="block text-xl font-bold text-white max-w-full truncate px-1">{daysWatched}</span>
-                                        <span className="text-xs text-text-secondary uppercase">Dias</span>
-                                    </div>
+                                )}
+
+                                {/* Divider */}
+                                <div style={{ margin: '16px 24px', height: 1, background: 'linear-gradient(90deg, rgba(167,139,250,0.3) 0%, rgba(255,255,255,0.04) 100%)' }} />
+
+                                {/* Stats */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, padding: '0 24px' }}>
+                                    {[
+                                        { icon: '▶️', label: 'Eps Vistos', value: totalEpisodes },
+                                        { icon: '📺', label: 'Animes',    value: totalAnimes },
+                                        { icon: '🕐', label: 'Dias',      value: daysWatched },
+                                    ].map(s => (
+                                        <div key={s.label} style={{
+                                            background: 'rgba(255,255,255,0.04)',
+                                            border: '1px solid rgba(255,255,255,0.07)',
+                                            borderRadius: 12, padding: '10px 8px', textAlign: 'center',
+                                        }}>
+                                            <div style={{ fontSize: 18, marginBottom: 2 }}>{s.icon}</div>
+                                            <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', lineHeight: 1 }}>{s.value}</div>
+                                            <div style={{ fontSize: 10, color: '#6b6b85', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{s.label}</div>
+                                        </div>
+                                    ))}
                                 </div>
 
                                 {/* Top 3 Favorites */}
-                                <div className="px-8 pb-8">
-                                    <h4 className="text-sm font-bold text-text-secondary mb-3 uppercase tracking-wider">Top 3 Favoritos</h4>
-                                    <div className="grid grid-cols-3 gap-3">
-                                        {topFavorites.length > 0 ? topFavorites.map(fav => (
-                                            <div key={fav.id} className="aspect-[3/4] rounded-lg overflow-hidden relative bg-bg-secondary">
-                                                <img src={fav.image} className="w-full h-full object-cover" crossOrigin="anonymous" alt={fav.title} />
-                                                <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/90 to-transparent">
-                                                    <p className="text-[10px] text-white font-bold line-clamp-1">{fav.title}</p>
+                                {topFavorites.length > 0 && (
+                                    <div style={{ padding: '16px 24px 0' }}>
+                                        <div style={{ fontSize: 10, fontWeight: 700, color: '#6b6b85', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
+                                            Top Favoritos
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                                            {topFavorites.map((fav, i) => (
+                                                <div key={fav.id} style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', aspectRatio: '3/4' }}>
+                                                    <img src={fav.image} alt={fav.title} crossOrigin="anonymous"
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                                                    {/* Rank badge */}
+                                                    <div style={{
+                                                        position: 'absolute', top: 6, left: 6,
+                                                        width: 20, height: 20, borderRadius: '50%',
+                                                        background: i === 0 ? '#f59e0b' : i === 1 ? '#94a3b8' : '#b45309',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        fontSize: 10, fontWeight: 900, color: '#fff',
+                                                    }}>
+                                                        {i + 1}
+                                                    </div>
+                                                    <div style={{
+                                                        position: 'absolute', inset: '0 0 0 0',
+                                                        background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 55%)',
+                                                    }} />
+                                                    <div style={{
+                                                        position: 'absolute', bottom: 0, left: 0, right: 0, padding: '6px 7px',
+                                                        fontSize: 10, fontWeight: 700, color: '#fff',
+                                                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                                    }}>
+                                                        {fav.title}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )) : (
-                                            <div className="col-span-3 text-center py-4 text-xs text-text-secondary italic bg-bg-secondary rounded-lg">
-                                                Sem favoritos definidos
-                                            </div>
-                                        )}
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Footer */}
+                                <div style={{
+                                    margin: '16px 24px 20px',
+                                    padding: '10px 14px',
+                                    background: 'rgba(167,139,250,0.06)',
+                                    border: '1px solid rgba(167,139,250,0.15)',
+                                    borderRadius: 10,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                }}>
+                                    <div style={{ fontSize: 10, color: '#7c6fad', fontWeight: 600 }}>
+                                        🔗 {shortUrl}
+                                    </div>
+                                    <div style={{ fontSize: 10, color: '#4a4a62' }}>
+                                        {new Date().toLocaleDateString('pt-BR')}
                                     </div>
                                 </div>
-
-                                {/* Footer do Card - Link visível */}
-                                <div className="px-8 pb-4 flex justify-between items-center opacity-50">
-                                    <div className="text-[10px] text-text-secondary font-mono tracking-wider">
-                                        {publicUrl.replace(/^https?:\/\//, '')}
-                                    </div>
-                                    <div className="text-[10px] text-text-secondary">
-                                        Gerado em {new Date().toLocaleDateString()}
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
-                        <p className="text-xs text-text-secondary text-center">Este card é gerado automaticamente com base no seu perfil.</p>
+                        <p className="text-xs text-text-secondary text-center">Gerado automaticamente com base no seu perfil.</p>
                     </div>
-
                 </div>
             </div>
         </div>
     );
+
+    return createPortal(modal, document.body);
 }

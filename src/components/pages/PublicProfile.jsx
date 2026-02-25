@@ -8,6 +8,7 @@ import { useToast } from '@/context/ToastContext';
 import {
     Hash, Link as LinkIcon, AlertCircle, Lock,
     Clock, ArrowRight, Copy, ExternalLink,
+    PlayCircle, CheckCircle, BookMarked, PauseCircle, XCircle,
 } from 'lucide-react';
 import { useMemo } from 'react';
 import { usePageTitle } from '@/hooks/usePageTitle';
