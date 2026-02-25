@@ -13,6 +13,8 @@ import { useMemo } from 'react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { motion } from 'framer-motion';
 
+const DEFAULT_SECTION_ORDER = ['favorites', 'recent', 'achievements'];
+
 // ─── Status config for the recent-activity badges ─────────────────────────────
 const STATUS_CONFIG = {
     watching:      { label: 'Assistindo', color: 'bg-green-500/90',  icon: PlayCircle },
@@ -116,6 +118,27 @@ export function PublicProfile() {
         });
     }, [library, profile?.favoritesOrder]);
 
+    // Section order saved by the profile owner
+    const sectionOrder = useMemo(
+        () => profile?.profileSectionOrder?.length
+            ? profile.profileSectionOrder
+            : DEFAULT_SECTION_ORDER,
+        [profile?.profileSectionOrder]
+    );
+
+    const renderSection = (id) => {
+        if (id === 'favorites') return (
+            <FavoritesWidget
+                animeFavorites={sortedFavorites}
+                characterFavorites={characterFavorites}
+                readOnly={true}
+            />
+        );
+        if (id === 'recent')       return <RecentActivity library={library} uid={uid} />;
+        if (id === 'achievements') return <AchievementBadges readOnly={true} publicLibrary={library} publicProfile={profile} />;
+        return null;
+    };
+
     if (loading) {
         return (
             <div className="flex-1 flex flex-col min-w-0">
@@ -166,20 +189,9 @@ export function PublicProfile() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
 
-                        <FavoritesWidget
-                            animeFavorites={sortedFavorites}
-                            characterFavorites={characterFavorites}
-                            readOnly={true}
-                        />
-
-                        {/* ── Atividade Recente ─────────────────────────── */}
-                        <RecentActivity library={library} uid={uid} />
-
-                        <AchievementBadges
-                            readOnly={true}
-                            publicLibrary={library}
-                            publicProfile={profile}
-                        />
+                        {sectionOrder.map(id => (
+                            <div key={id}>{renderSection(id)}</div>
+                        ))}
                     </div>
 
                     {/* Coluna Lateral */}
