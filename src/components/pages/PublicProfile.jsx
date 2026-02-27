@@ -11,8 +11,11 @@ import {
     Clock, ArrowRight, Copy, ExternalLink,
     PlayCircle, CheckCircle, BookMarked, PauseCircle, XCircle,
 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { useAuth } from '@/context/AuthContext';
+import { useCompatibility } from '@/hooks/useCompatibility';
+import { CompatibilityModal } from '@/components/profile/CompatibilityModal';
 import { motion } from 'framer-motion';
 
 const DEFAULT_SECTION_ORDER = ['favorites', 'recent', 'achievements', 'heatmap'];
@@ -107,6 +110,15 @@ export function PublicProfile() {
     const { profile, library, characterFavorites, loading, error } = usePublicProfile(uid);
     const { toast } = useToast();
 
+    const { user: currentUser } = useAuth();
+    const isOwnProfile = currentUser?.uid === uid;
+
+    // Compatibility (only when viewing someone else's profile)
+    const { score: compatScore, sharedAnimes, sharedCount, genreOverlap, scoreAffinity,
+            commonGenres, myAvgScore, pubAvgScore } =
+        useCompatibility(!isOwnProfile ? library : []);
+    const [isCompatModalOpen, setCompatModalOpen] = useState(false);
+
     usePageTitle(profile ? `Perfil de ${profile.displayName}` : 'Perfil Público');
 
     const sortedFavorites = useMemo(() => {
@@ -187,10 +199,17 @@ export function PublicProfile() {
     }
 
     return (
+        <>
         <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-surface-dark scrollbar-track-bg-primary">
             <div className="max-w-7xl mx-auto space-y-8 pb-10">
 
-                <ProfileHeader user={null} profile={profile} readOnly={true} />
+                <ProfileHeader
+                    user={null}
+                    profile={profile}
+                    readOnly={true}
+                    onCompatibility={!isOwnProfile && currentUser ? () => setCompatModalOpen(true) : undefined}
+                    compatibilityScore={!isOwnProfile && currentUser ? compatScore : null}
+                />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
@@ -266,5 +285,20 @@ export function PublicProfile() {
 
             </div>
         </div>
+
+        <CompatibilityModal
+            isOpen={isCompatModalOpen}
+            onClose={() => setCompatModalOpen(false)}
+            score={compatScore ?? 0}
+            sharedAnimes={sharedAnimes ?? []}
+            sharedCount={sharedCount ?? 0}
+            genreOverlap={genreOverlap ?? 0}
+            scoreAffinity={scoreAffinity ?? 0}
+            commonGenres={commonGenres ?? []}
+            myAvgScore={myAvgScore ?? 0}
+            pubAvgScore={pubAvgScore ?? 0}
+            otherName={profile?.displayName ?? 'este usuário'}
+        />
+        </>
     );
 }

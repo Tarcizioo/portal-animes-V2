@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Edit2, Share2, Maximize2 } from 'lucide-react';
+import { Edit2, Share2, Maximize2, Heart } from 'lucide-react';
 import { ImageModal } from '@/components/ui/ImageModal';
 import { motion } from 'framer-motion';
 
-export function ProfileHeader({ user, profile, onEdit, onShare, readOnly = false }) {
+export function ProfileHeader({ user, profile, onEdit, onShare, readOnly = false, onCompatibility, compatibilityScore }) {
     const banner = profile?.bannerURL || user?.bannerURL || "https://placehold.co/1200x400/1a1a1a/FFF?text=Banner+Anime";
     const photo  = profile?.photoURL  || user?.photoURL  || "https://placehold.co/200x200/6366f1/FFF?text=User";
     const name   = profile?.displayName || user?.displayName || "Usuário";
@@ -94,6 +94,21 @@ export function ProfileHeader({ user, profile, onEdit, onShare, readOnly = false
                         >
                             <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                             <span className="hidden sm:inline">Editar Perfil</span>
+                        </motion.button>
+                    </div>
+                )}
+
+                {/* ── Compatibility button — shown on other users' public profiles ── */}
+                {readOnly && onCompatibility && compatibilityScore !== null && (
+                    <div className="absolute -bottom-12 right-0 md:-bottom-14 md:right-0 flex items-center gap-2 px-4 md:px-0">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                            onClick={onCompatibility}
+                            className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 hover:border-pink-500/60 text-pink-400 hover:text-pink-300 rounded-xl shadow-md transition-all text-xs md:text-sm font-bold"
+                            title="Ver compatibilidade"
+                        >
+                            <Heart className="w-3.5 h-3.5 fill-pink-500" />
+                            {compatibilityScore}% Compatível
                         </motion.button>
                     </div>
                 )}
