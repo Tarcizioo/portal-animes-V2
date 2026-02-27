@@ -12,8 +12,15 @@ import {
     updateDoc,
     deleteDoc,
     serverTimestamp,
-    getDoc
+    getDoc,
+    increment,
 } from 'firebase/firestore';
+
+// Returns today as "YYYY-MM-DD" in local time
+const toDateKey = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 export function useAnimeLibrary() {
     const { user } = useAuth();
@@ -157,6 +164,12 @@ export function useAnimeLibrary() {
 
         try {
             const animeRef = doc(db, 'users', user.uid, APP_CONFIG.LIBRARY.COLLECTION_NAME, String(animeId));
+
+            // Calcular quantos eps foram assistidos agora
+            const snap = await getDoc(animeRef);
+            const oldEp = snap.exists() ? (snap.data().currentEp || 0) : 0;
+            const epsWatched = newEp - oldEp;
+
             const updates = {
                 currentEp: newEp,
                 lastUpdated: serverTimestamp()
@@ -167,10 +180,20 @@ export function useAnimeLibrary() {
                 toast.success("Anime concluído! 🎉", "Parabéns");
             }
 
+            // Atualizar progresso do anime
             await updateDoc(animeRef, updates);
+
+            // Registrar atividade no heatmap (apenas se assistiu eps novos)
+            if (epsWatched > 0) {
+                const dateKey = toDateKey();
+                const userRef = doc(db, 'users', user.uid);
+                await updateDoc(userRef, {
+                    [`activityLog.${dateKey}`]: increment(epsWatched)
+                });
+            }
         } catch (error) {
             console.error("Erro ao atualizar progresso:", error);
-             toast.error("Falha ao salvar progresso.", "Erro");
+            toast.error("Falha ao salvar progresso.", "Erro");
         }
     };
 

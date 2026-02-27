@@ -26,6 +26,7 @@ import { AnimeTrackerList } from '@/components/profile/AnimeTrackerList';
 import { EditProfileModal } from '@/components/profile/EditProfileModal';
 import { FavoritesWidget } from '@/components/profile/FavoritesWidget';
 import { ShareProfileModal } from '@/components/profile/ShareProfileModal';
+import { ActivityHeatmap } from '@/components/profile/ActivityHeatmap';
 import { useAuth } from '@/context/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
@@ -41,7 +42,7 @@ import {
 import { useToast } from '@/context/ToastContext';
 
 // ─── Defaults ─────────────────────────────────────────────────────────────────
-const DEFAULT_SECTION_ORDER = ['favorites', 'recent', 'achievements'];
+const DEFAULT_SECTION_ORDER = ['favorites', 'recent', 'achievements', 'heatmap'];
 
 const STATUS_CONFIG = {
     watching:      { label: 'Assistindo', color: 'bg-green-500/90' },
@@ -170,6 +171,7 @@ const SECTION_LABELS = {
     favorites:    '⭐ Favoritos',
     recent:       '🕒 Atividade Recente',
     achievements: '🏆 Conquistas',
+    heatmap:      '🗓️ Heatmap de Atividade',
 };
 
 // ─── Main Profile Page ────────────────────────────────────────────────────────
@@ -193,8 +195,11 @@ export function Profile() {
     // Sync order from Firestore when profile loads
     useEffect(() => {
         if (profile?.profileSectionOrder?.length) {
-            setSectionOrder(profile.profileSectionOrder);
-            setSavedOrder(profile.profileSectionOrder);
+            const saved = profile.profileSectionOrder;
+            // Append any new sections not yet in the saved order
+            const merged = [...saved, ...DEFAULT_SECTION_ORDER.filter(id => !saved.includes(id))];
+            setSectionOrder(merged);
+            setSavedOrder(merged);
         }
     }, [profile?.profileSectionOrder]);
 
@@ -289,6 +294,7 @@ export function Profile() {
         );
         if (id === 'recent') return <RecentActivity library={library} />;
         if (id === 'achievements') return <AchievementBadges />;
+        if (id === 'heatmap') return <ActivityHeatmap activityLog={profile?.activityLog} />;
         return null;
     };
 

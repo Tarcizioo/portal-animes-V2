@@ -4,6 +4,7 @@ import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { AchievementBadges } from '@/components/profile/AchievementBadges';
 import { FavoritesWidget } from '@/components/profile/FavoritesWidget';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { ActivityHeatmap } from '@/components/profile/ActivityHeatmap';
 import { useToast } from '@/context/ToastContext';
 import {
     Hash, Link as LinkIcon, AlertCircle, Lock,
@@ -14,7 +15,7 @@ import { useMemo } from 'react';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { motion } from 'framer-motion';
 
-const DEFAULT_SECTION_ORDER = ['favorites', 'recent', 'achievements'];
+const DEFAULT_SECTION_ORDER = ['favorites', 'recent', 'achievements', 'heatmap'];
 
 // ─── Status config for the recent-activity badges ─────────────────────────────
 const STATUS_CONFIG = {
@@ -121,12 +122,14 @@ export function PublicProfile() {
     }, [library, profile?.favoritesOrder]);
 
     // Section order saved by the profile owner
-    const sectionOrder = useMemo(
-        () => profile?.profileSectionOrder?.length
-            ? profile.profileSectionOrder
-            : DEFAULT_SECTION_ORDER,
-        [profile?.profileSectionOrder]
-    );
+    const sectionOrder = useMemo(() => {
+        const saved = profile?.profileSectionOrder;
+        if (saved?.length) {
+            // Append any new sections not in the saved order
+            return [...saved, ...DEFAULT_SECTION_ORDER.filter(id => !saved.includes(id))];
+        }
+        return DEFAULT_SECTION_ORDER;
+    }, [profile?.profileSectionOrder]);
 
     const renderSection = (id) => {
         if (id === 'favorites') return (
@@ -138,6 +141,7 @@ export function PublicProfile() {
         );
         if (id === 'recent')       return <RecentActivity library={library} uid={uid} />;
         if (id === 'achievements') return <AchievementBadges readOnly={true} publicLibrary={library} publicProfile={profile} />;
+        if (id === 'heatmap')      return <ActivityHeatmap activityLog={profile?.activityLog} />;
         return null;
     };
 

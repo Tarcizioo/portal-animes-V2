@@ -30,6 +30,12 @@
   --shadow-color: rgba(0, 0, 0, 0.8);
   --primary: #6366f1;
   --primary-hover: #4f46e5;
+  /* Heatmap intensity levels (auto-follows button-accent) */
+  --heatmap-0: rgba(255, 255, 255, 0.06);
+  --heatmap-1: color-mix(in srgb, var(--button-accent) 25%, transparent);
+  --heatmap-2: color-mix(in srgb, var(--button-accent) 50%, transparent);
+  --heatmap-3: color-mix(in srgb, var(--button-accent) 75%, transparent);
+  --heatmap-4: var(--button-accent);
 }
 
 [data-theme="dark"] {
