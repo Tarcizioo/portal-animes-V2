@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { Lock, Edit2, PlusCircle } from 'lucide-react';
+import { Lock, Edit2, PlusCircle, Trophy } from 'lucide-react';
 import { BadgesModal } from './BadgesModal';
 import clsx from 'clsx';
 import { BADGES } from '@/constants/badges';
@@ -48,7 +48,7 @@ export function AchievementBadges({ readOnly = false, publicLibrary = null, publ
     <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl md:rounded-2xl p-4 md:p-6 space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xl md:text-2xl">🏆</span>
+          <Trophy className="w-4 h-4 text-button-accent" />
           <div>
             <h3 className="font-bold text-[var(--text-primary)] text-sm md:text-lg leading-none">Conquistas</h3>
             <span className="text-[10px] md:text-xs text-[var(--text-secondary)] font-medium">{totalUnlocked} de {totalBadges} desbloqueadas</span>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, Plus, GripVertical, User, Pin, Pencil, Check, X } from 'lucide-react';
+import { Heart, Plus, GripVertical, User, Pin, Pencil, Check, X, Star } from 'lucide-react';
 import { ViewToggle } from '@/components/ui/ViewToggle';
 import {
     DndContext,
@@ -29,38 +29,50 @@ function FavoriteCard({ item, type, isOverlay = false, isEditing = false, dragLi
 
     return (
         <div className={clsx(
-            "relative aspect-[2/3] rounded-xl overflow-hidden bg-bg-tertiary border border-border-color shadow-sm group transition-all",
-            isOverlay && "cursor-grabbing scale-105 shadow-2xl ring-2 ring-primary z-50",
-            isEditing && "hover:border-primary/50"
+            "group",
+            isOverlay && "cursor-grabbing scale-105"
         )}>
-            {/* Drag Handle (Only in Edit Mode) */}
-            {isEditing && (
-                <div
-                    {...dragListeners}
-                    {...dragAttributes}
-                    className="absolute top-2 right-2 z-20 p-2 bg-black/60 backdrop-blur-md rounded-lg cursor-grab active:cursor-grabbing hover:bg-primary transition-colors touch-none shadow-lg"
-                >
-                    <GripVertical className="w-4 h-4 text-white" />
-                </div>
-            )}
+            {/* Card image */}
+            <div className={clsx(
+                "relative aspect-[2/3] rounded-xl overflow-hidden bg-bg-tertiary border border-border-color shadow-md mb-2",
+                "group-hover:shadow-lg group-hover:shadow-primary/20 transition-all duration-300",
+                isEditing && "hover:border-primary/50"
+            )}>
+                {/* Drag Handle (Only in Edit Mode) */}
+                {isEditing && (
+                    <div
+                        {...dragListeners}
+                        {...dragAttributes}
+                        className="absolute top-2 right-2 z-20 p-2 bg-black/60 backdrop-blur-md rounded-lg cursor-grab active:cursor-grabbing hover:bg-primary transition-colors touch-none shadow-lg"
+                    >
+                        <GripVertical className="w-4 h-4 text-white" />
+                    </div>
+                )}
 
+                <Link
+                    to={isEditing ? "#" : linkPath}
+                    className={clsx("block w-full h-full", isEditing && "pointer-events-none")}
+                    draggable={false}
+                >
+                    <img
+                        src={item.image}
+                        alt={item.title || item.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        draggable={false}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
+                </Link>
+            </div>
+
+            {/* Title below card — matches RecentActivity style */}
             <Link
-                to={isEditing ? "#" : linkPath} // Disable link in edit mode prevent accidental clicks
-                className={clsx("block w-full h-full", isEditing && "pointer-events-none")}
+                to={isEditing ? "#" : linkPath}
+                className={clsx(isEditing && "pointer-events-none")}
                 draggable={false}
             >
-                <img
-                    src={item.image}
-                    alt={item.title || item.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    draggable={false}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
-                <div className="absolute bottom-0 left-0 p-3 w-full">
-                    <h4 className="text-white text-xs md:text-sm font-bold line-clamp-2 leading-tight drop-shadow-md">
-                        {item.title || item.name}
-                    </h4>
-                </div>
+                <p className="text-[11px] font-semibold text-text-secondary group-hover:text-primary line-clamp-2 leading-tight transition-colors">
+                    {item.title || item.name}
+                </p>
             </Link>
         </div>
     );
@@ -178,7 +190,15 @@ export function FavoritesWidget({
             {/* Decorative Background */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-            {/* Header */}
+            {/* Section title — matches RecentActivity / AchievementBadges pattern */}
+            <div className="flex items-center justify-between mb-4 md:mb-6 relative z-10">
+                <h3 className="font-bold text-text-primary flex items-center gap-2">
+                    <Star className="w-4 h-4 text-button-accent" />
+                    Favoritos
+                </h3>
+            </div>
+
+            {/* Controls row */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-6 mb-4 md:mb-8 relative z-10">
 
                 <div className="flex items-center gap-2 md:gap-4">
@@ -235,7 +255,7 @@ export function FavoritesWidget({
             {/* Grid Area */}
             {readOnly ? (
                 // Static View
-                <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4 relative z-10">
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 relative z-10">
                     {localItems.map((item) => (
                         <FavoriteCard key={item.id} item={item} type={type} />
                     ))}
@@ -254,7 +274,7 @@ export function FavoritesWidget({
                     onDragStart={(e) => setActiveId(e.active.id)}
                     onDragEnd={handleDragEnd}
                 >
-                    <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4 relative z-10">
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 relative z-10">
                         <SortableContext items={localItems.map(i => i.id)} strategy={rectSortingStrategy}>
                             {localItems.map((item) => (
                                 <SortableFavoriteItem key={item.id} item={item} type={type} isEditing={isEditing} />

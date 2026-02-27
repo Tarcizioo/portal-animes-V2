@@ -1,4 +1,5 @@
 import { useMemo, useRef, useEffect, useState } from 'react';
+import { CalendarDays } from 'lucide-react';
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
 
@@ -98,7 +99,7 @@ export function ActivityHeatmap({ activityLog = {} }) {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-text-primary text-sm md:text-base flex items-center gap-2">
-                    <span>🗓️</span> Atividade de Episódios
+                    <CalendarDays className="w-4 h-4 text-button-accent" /> Atividade de Episódios
                 </h3>
                 <span className="text-xs text-text-secondary font-medium">
                     {totalEps} eps nos últimos 12 meses
@@ -170,7 +171,7 @@ export function ActivityHeatmap({ activityLog = {} }) {
                                                     backgroundColor: `var(--heatmap-${lv})`,
                                                     border: lv > 0
                                                         ? '1px solid color-mix(in srgb, var(--button-accent) 40%, transparent)'
-                                                        : '1px solid rgba(255,255,255,0.05)',
+                                                        : '1px solid var(--border-color)',
                                                     transition: 'opacity 0.15s',
                                                     cursor: 'default',
                                                 }}
