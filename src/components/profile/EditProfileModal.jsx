@@ -338,6 +338,7 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }) {
                         </section>
                     </div>
 
+
                     {/* Footer */}
                     <div className="p-4 md:p-6 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)] flex justify-end gap-2 md:gap-3">
                         <button onClick={onClose} className="px-4 md:px-6 py-2 md:py-2.5 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-primary)]/10 hover:text-[var(--text-primary)] transition-all font-medium text-sm md:text-base">

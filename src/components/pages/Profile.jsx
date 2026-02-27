@@ -570,6 +570,7 @@ export function Profile() {
                 onClose={() => setIsModalOpen(false)}
                 profile={profile}
                 onSave={updateProfileData}
+                library={library}
             />
 
             <ShareProfileModal
@@ -580,6 +581,7 @@ export function Profile() {
                 favorites={sortedFavorites}
                 library={library}
             />
+
         </>
     );
 }
