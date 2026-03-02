@@ -18,7 +18,7 @@ export function Sidebar() {
   const [isUserSearchOpen, setIsUserSearchOpen] = useState(false); // [NEW]
 
   const { user, signOut, signInGoogle } = useAuth();
-  const { profile } = useUserProfile();
+  const { profile, loading: profileLoading } = useUserProfile();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,9 +52,11 @@ export function Sidebar() {
   const linkActive = "bg-button-accent text-text-on-primary hover:text-text-on-primary shadow-lg shadow-button-accent/25";
   const linkInactive = "text-text-secondary hover:bg-bg-tertiary hover:text-primary transition-colors";
 
-  // Determinar Nome e Foto
-  const displayName = profile?.displayName || user?.displayName || 'Visitante';
-  const photoURL = profile?.photoURL || user?.photoURL;
+  // Usar APENAS dados do perfil customizado (nunca do Google Auth)
+  // Enquanto o profile carrega, mostramos skeleton em vez de dados do Google
+  const profileReady = !profileLoading && profile !== null;
+  const displayName = profile?.displayName || user?.displayName || 'Usuário';
+  const photoURL = profile?.photoURL || null;
 
   return (
     <>
@@ -141,29 +143,49 @@ export function Sidebar() {
             <Link
               to="/profile"
               className={`flex items-center gap-3 p-3 rounded-xl bg-bg-secondary border border-border-color shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden ${isCollapsed ? 'justify-center w-12 h-12 p-0' : ''}`}
-              title={!isCollapsed ? "Ver Perfil" : displayName}
+              title={!isCollapsed ? 'Ver Perfil' : displayName}
             >
               <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors" />
 
+              {/* Avatar / Skeleton */}
               <div className="relative z-10 shrink-0">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-button-accent flex items-center justify-center text-white font-bold text-sm overflow-hidden ring-2 ring-transparent group-hover:ring-primary/20 transition-all">
-                  {photoURL ? (
+                  {profileLoading ? (
+                    // Skeleton shimmer enquanto o perfil carrega
+                    <div className="w-full h-full bg-bg-tertiary relative overflow-hidden">
+                      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                    </div>
+                  ) : photoURL ? (
                     <img src={photoURL} alt={displayName} className="w-full h-full object-cover" />
                   ) : (
                     <span className="uppercase">{displayName.slice(0, 2)}</span>
                   )}
                 </div>
-                <span className="absolute bottom-0 right-0 w-3 h-3 border-2 border-bg-secondary rounded-full bg-green-500"></span>
+                <span className="absolute bottom-0 right-0 w-3 h-3 border-2 border-bg-secondary rounded-full bg-green-500" />
               </div>
 
               {!isCollapsed && (
                 <div className="flex-1 min-w-0 z-10 ml-1">
-                  <h4 className="text-sm font-bold text-text-primary truncate group-hover:text-primary transition-colors">
-                    {displayName}
-                  </h4>
-                  <p className="text-xs text-text-secondary truncate">
-                    Visualizar perfil
-                  </p>
+                  {profileLoading ? (
+                    // Skeleton de nome
+                    <div className="space-y-1.5">
+                      <div className="h-3 w-24 bg-bg-tertiary rounded relative overflow-hidden">
+                        <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                      </div>
+                      <div className="h-2.5 w-16 bg-bg-tertiary rounded relative overflow-hidden">
+                        <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <h4 className="text-sm font-bold text-text-primary truncate group-hover:text-primary transition-colors">
+                        {displayName}
+                      </h4>
+                      <p className="text-xs text-text-secondary truncate">
+                        Visualizar perfil
+                      </p>
+                    </>
+                  )}
                 </div>
               )}
 

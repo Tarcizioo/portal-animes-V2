@@ -16,7 +16,7 @@ import {
 
 const COMMENTS_PER_PAGE = 20;
 
-export function useComments(animeId) {
+export function useComments(animeId, profile = null) {
     const { user } = useAuth();
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -73,12 +73,16 @@ export function useComments(animeId) {
         if (!content.trim()) throw new Error("O comentário não pode estar vazio.");
         if (!animeId) throw new Error("ID do anime inválido.");
 
+        // Prioriza dados do perfil customizado do site, não os dados brutos do Google Auth
+        const authorName = profile?.displayName || user.displayName || "Usuário";
+        const authorAvatar = profile?.photoURL || null;
+
         try {
             await addDoc(collection(db, 'comments'), {
                 animeId: String(animeId),
                 userId: user.uid,
-                userName: user.name || user.displayName || "Usuário",
-                userAvatar: user.photoURL,
+                userName: authorName,
+                userAvatar: authorAvatar,
                 content: content.trim(),
                 createdAt: serverTimestamp(),
                 likes: 0
@@ -110,7 +114,7 @@ export function useComments(animeId) {
             }, 50);
         } catch (error) {
             console.error("Erro ao preparar deleção:", error);
-            setLoading(true); 
+            setLoading(true);
             throw error;
         }
     };

@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { Send, MessageSquare } from 'lucide-react';
 import { useComments } from '@/hooks/useComments';
 import { useAuth } from '@/context/AuthContext';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { CommentItem } from './CommentItem';
 import { useToast } from '@/context/ToastContext';
 
 export function CommentsSection({ animeId }) {
     const { user } = useAuth();
+    const { profile } = useUserProfile();
     const { toast } = useToast();
-    const { comments, loading, addComment, deleteComment } = useComments(animeId);
+    const { comments, loading, addComment, deleteComment } = useComments(animeId, profile);
     const [newComment, setNewComment] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
