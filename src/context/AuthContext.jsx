@@ -54,37 +54,42 @@ export function AuthProvider({ children }) {
         return firebaseSignOut(auth);
     };
 
+    // ── Helper: limpa todos os dados do usuário no Firestore ──────────────────
+    const cleanupUserData = async (uid) => {
+        // 1. Limpar sub-coleções e dados órfãos
+        const subCollections = ['library', 'favorite_characters', 'followed_studios', 'notifications'];
+        for (const subcol of subCollections) {
+            const snap = await getDocs(collection(db, 'users', uid, subcol));
+            if (!snap.empty) {
+                const batch = writeBatch(db);
+                snap.docs.forEach(d => batch.delete(d.ref));
+                await batch.commit();
+            }
+        }
+
+        // 2. Limpar comentários do usuário na coleção raiz
+        const commentsSnap = await getDocs(query(collection(db, 'comments'), where('userId', '==', uid)));
+        if (!commentsSnap.empty) {
+            const batch = writeBatch(db);
+            commentsSnap.docs.forEach(d => batch.delete(d.ref));
+            await batch.commit();
+        }
+
+        // 3. Deletar documento principal do usuário
+        await deleteDoc(doc(db, 'users', uid));
+    };
+
     // Deletar Conta (com limpeza de sub-coleções)
     const deleteAccount = async () => {
         if (!auth.currentUser) return;
 
+        const uid = auth.currentUser.uid;
+
         try {
-            const uid = auth.currentUser.uid;
+            // Limpar dados no Firestore antes de deletar o Auth account
+            await cleanupUserData(uid);
 
-            // 1. Limpar sub-coleções e dados órfãos
-            const subCollections = ['library', 'favorite_characters', 'followed_studios', 'notifications'];
-            
-            for (const subcol of subCollections) {
-                const snap = await getDocs(collection(db, 'users', uid, subcol));
-                if (!snap.empty) {
-                    const batch = writeBatch(db);
-                    snap.docs.forEach(d => batch.delete(d.ref));
-                    await batch.commit();
-                }
-            }
-
-            // 2. Limpar comentários do usuário na coleção raiz
-            const commentsSnap = await getDocs(query(collection(db, 'comments'), where('userId', '==', uid)));
-            if (!commentsSnap.empty) {
-                const batch = writeBatch(db);
-                commentsSnap.docs.forEach(d => batch.delete(d.ref));
-                await batch.commit();
-            }
-
-            // 3. Deletar documento principal do usuário
-            await deleteDoc(doc(db, 'users', uid));
-
-            // 4. Deletar usuário da Autenticação
+            // Deletar usuário da Autenticação
             await auth.currentUser.delete();
 
         } catch (error) {
@@ -93,7 +98,9 @@ export function AuthProvider({ children }) {
                 try {
                     toast.info("Por segurança, confirme sua identidade novamente.", "Re-autenticação");
                     await reauthenticateWithPopup(auth.currentUser, googleProvider);
-                    // Tentar novamente após re-autenticação
+
+                    // ✅ Limpar Firestore ANTES de deletar — sem dados órfãos
+                    await cleanupUserData(uid);
                     await auth.currentUser.delete();
                     return;
                 } catch (reAuthError) {

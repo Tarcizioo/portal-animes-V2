@@ -45,9 +45,9 @@ function buildWeeks() {
 /** Heatmap level (0‒4) */
 function level(count) {
     if (!count || count === 0) return 0;
-    if (count <= 2)  return 1;
-    if (count <= 5)  return 2;
-    if (count <= 9)  return 3;
+    if (count <= 2) return 1;
+    if (count <= 5) return 2;
+    if (count <= 9) return 3;
     return 4;
 }
 
@@ -95,18 +95,19 @@ export function ActivityHeatmap({ activityLog = {} }) {
     const STEP = cellSize + GAP;
 
     return (
-        <div className="bg-bg-secondary border border-border-color rounded-2xl p-5 md:p-6 select-none">
+        <div className="bg-bg-secondary border border-border-color rounded-2xl p-5 md:p-6 select-none overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-text-primary text-sm md:text-base flex items-center gap-2">
+            <div className="flex items-center justify-between mb-4 gap-2">
+                <h3 className="font-bold text-text-primary text-sm md:text-base flex items-center gap-2 shrink-0">
                     <CalendarDays className="w-4 h-4 text-button-accent" /> Atividade de Episódios
                 </h3>
-                <span className="text-xs text-text-secondary font-medium">
+                <span className="text-xs text-text-secondary font-medium text-right">
                     {totalEps} eps nos últimos 12 meses
                 </span>
             </div>
 
-            <div ref={wrapRef} className="w-full">
+            {/* Outer wrapper: overflow-hidden prevents pixel-based labels from blowing out viewport */}
+            <div ref={wrapRef} className="w-full overflow-hidden">
                 <div style={{ display: 'flex', gap: 0, width: '100%', alignItems: 'flex-start' }}>
 
                     {/* Weekday labels (left) */}
@@ -127,17 +128,18 @@ export function ActivityHeatmap({ activityLog = {} }) {
                     </div>
 
                     {/* Grid area */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                        {/* Month labels */}
-                        <div style={{ position: 'relative', height: 20, marginBottom: 2 }}>
+                    <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                        {/* Month labels — percentage-based so they never overflow on mobile */}
+                        <div style={{ position: 'relative', height: 20, marginBottom: 2, overflow: 'hidden' }}>
                             {monthLabels.map((m, i) => (
                                 <span key={i} style={{
                                     position: 'absolute',
-                                    left: m.wi * STEP,
+                                    left: `${(m.wi / weeks.length) * 100}%`,
                                     fontSize: 10,
                                     color: 'var(--text-secondary)',
                                     lineHeight: '20px',
                                     whiteSpace: 'nowrap',
+                                    transform: 'translateX(-2px)', // tiny nudge to align with column start
                                 }}>
                                     {m.name}
                                 </span>
@@ -147,7 +149,7 @@ export function ActivityHeatmap({ activityLog = {} }) {
                         {/* Week columns — flex row, each col = flex column of 7 cells */}
                         <div style={{ display: 'flex', gap: GAP }}>
                             {weeks.map((week, wi) => (
-                                <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: GAP, flex: '1 1 0' }}>
+                                <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: GAP, flex: '1 1 0', minWidth: 0 }}>
                                     {week.map((day, di) => {
                                         if (day === null) {
                                             // future padding — transparent placeholder
@@ -155,9 +157,9 @@ export function ActivityHeatmap({ activityLog = {} }) {
                                                 <div key={di} style={{ height: cellSize, borderRadius: 3 }} />
                                             );
                                         }
-                                        const key   = toKey(day);
+                                        const key = toKey(day);
                                         const count = activityLog[key] || 0;
-                                        const lv    = level(count);
+                                        const lv = level(count);
                                         const label = count
                                             ? `${count} ep${count > 1 ? 's' : ''} assistido${count > 1 ? 's' : ''} em ${day.toLocaleDateString('pt-BR')}`
                                             : `Nenhuma atividade em ${day.toLocaleDateString('pt-BR')}`;
@@ -165,6 +167,7 @@ export function ActivityHeatmap({ activityLog = {} }) {
                                             <div
                                                 key={di}
                                                 title={label}
+                                                aria-label={label}
                                                 style={{
                                                     height: cellSize,
                                                     borderRadius: 3,
@@ -174,6 +177,7 @@ export function ActivityHeatmap({ activityLog = {} }) {
                                                         : '1px solid var(--border-color)',
                                                     transition: 'opacity 0.15s',
                                                     cursor: 'default',
+                                                    flexShrink: 0,
                                                 }}
                                                 onMouseEnter={e => e.currentTarget.style.opacity = '0.75'}
                                                 onMouseLeave={e => e.currentTarget.style.opacity = '1'}
@@ -193,6 +197,7 @@ export function ActivityHeatmap({ activityLog = {} }) {
                 {[0, 1, 2, 3, 4].map(l => (
                     <div key={l} style={{
                         width: 12, height: 12, borderRadius: 3,
+                        flexShrink: 0,
                         backgroundColor: `var(--heatmap-${l})`,
                         border: l > 0
                             ? '1px solid color-mix(in srgb, var(--button-accent) 40%, transparent)'
