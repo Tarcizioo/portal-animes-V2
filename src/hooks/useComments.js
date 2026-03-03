@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '@/services/firebase';
 import { useAuth } from '@/context/AuthContext';
+import { notifyCommentLike } from '@/services/notificationService';
 import {
     collection,
     query,
@@ -10,13 +11,17 @@ import {
     onSnapshot,
     addDoc,
     deleteDoc,
+    updateDoc,
     doc,
-    serverTimestamp
+    serverTimestamp,
+    arrayUnion,
+    arrayRemove,
+    increment
 } from 'firebase/firestore';
 
 const COMMENTS_PER_PAGE = 20;
 
-export function useComments(animeId, profile = null) {
+export function useComments(animeId, profile = null, animeTitle = '') {
     const { user } = useAuth();
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -119,11 +124,48 @@ export function useComments(animeId, profile = null) {
         }
     };
 
+    // 4. Toggle Like (curte / descurte)
+    const toggleLike = async (comment) => {
+        if (!user) return;
+
+        const commentRef = doc(db, 'comments', comment.id);
+        const likedBy = comment.likedBy || [];
+        const alreadyLiked = likedBy.includes(user.uid);
+
+        try {
+            if (alreadyLiked) {
+                // Descurtir
+                await updateDoc(commentRef, {
+                    likedBy: arrayRemove(user.uid),
+                    likes: increment(-1),
+                });
+            } else {
+                // Curtir
+                await updateDoc(commentRef, {
+                    likedBy: arrayUnion(user.uid),
+                    likes: increment(1),
+                });
+                // Notificar o dono do comentario (anti-spam embutido no service)
+                await notifyCommentLike(
+                    comment.userId,
+                    profile,
+                    user.uid,
+                    comment.content,
+                    animeId,
+                    animeTitle
+                );
+            }
+        } catch (err) {
+            console.error('Erro ao curtir comentario:', err);
+        }
+    };
+
     return {
         comments,
         loading,
         addComment,
         deleteComment,
+        toggleLike,
         hasMoreComments,
         loadMoreComments
     };

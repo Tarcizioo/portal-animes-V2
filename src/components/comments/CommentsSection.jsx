@@ -6,11 +6,11 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { CommentItem } from './CommentItem';
 import { useToast } from '@/context/ToastContext';
 
-export function CommentsSection({ animeId }) {
+export function CommentsSection({ animeId, animeTitle = '' }) {
     const { user } = useAuth();
     const { profile } = useUserProfile();
     const { toast } = useToast();
-    const { comments, loading, addComment, deleteComment } = useComments(animeId, profile);
+    const { comments, loading, addComment, deleteComment, toggleLike } = useComments(animeId, profile, animeTitle);
     const [newComment, setNewComment] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -89,6 +89,7 @@ export function CommentsSection({ animeId }) {
                                 key={comment.id}
                                 comment={comment}
                                 onDelete={handleDelete}
+                                onLike={toggleLike}
                             />
                         ))
                     ) : (

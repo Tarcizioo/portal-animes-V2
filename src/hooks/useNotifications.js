@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
-import { collection, query, orderBy, limit, onSnapshot, doc, updateDoc, writeBatch, where } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, doc, updateDoc, writeBatch, where, deleteDoc } from 'firebase/firestore';
 
 export function useNotifications() {
     const { user } = useAuth();
@@ -68,11 +68,39 @@ export function useNotifications() {
         }
     };
 
+    const deleteNotification = async (notificationId) => {
+        if (!user) return;
+        try {
+            const notifRef = doc(db, 'users', user.uid, 'notifications', notificationId);
+            await deleteDoc(notifRef);
+        } catch (error) {
+            console.error('Error deleting notification:', error);
+        }
+    };
+
+    const deleteAllRead = async () => {
+        if (!user || notifications.length === 0) return;
+        try {
+            const batch = writeBatch(db);
+            const read = notifications.filter(n => n.read);
+            if (read.length === 0) return;
+            read.forEach(n => {
+                const ref = doc(db, 'users', user.uid, 'notifications', n.id);
+                batch.delete(ref);
+            });
+            await batch.commit();
+        } catch (error) {
+            console.error('Error deleting read notifications:', error);
+        }
+    };
+
     return {
         notifications,
         unreadCount,
         loading,
         markAsRead,
-        markAllAsRead
+        markAllAsRead,
+        deleteNotification,
+        deleteAllRead,
     };
 }

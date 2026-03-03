@@ -91,9 +91,13 @@ service cloud.firestore {
                      && isValidString(request.resource.data.name, 1, 100);
       }
 
-      // 3. Notifications (PRIVATE)
+      // 3. Notifications
+      // CREATE: Any authenticated user can create a notification for any user
+      //         (ex: visitor sends a profile_view notif to the profile owner)
+      // READ/UPDATE/DELETE: Only the owner can manage their own notifications
       match /notifications/{notifId} {
-        allow read, write: if isOwner(userId);
+        allow create: if isAuthenticated();
+        allow read, update, delete: if isOwner(userId);
       }
       
       // Default: Private
@@ -113,12 +117,22 @@ service cloud.firestore {
                     && isValidString(request.resource.data.content, 1, 500)
                     && request.resource.data.createdAt == request.time;
                     
-      // UPDATE/DELETE: Only the author can modify/delete
-      // Note: We don't typically allow updating comment CONTENT in this app, but if we did/do:
-      allow update: if isAuthenticated() 
-                    && resource.data.userId == request.auth.uid
-                    && request.resource.data.userId == request.auth.uid // Cannot change ownership
-                    && isValidString(request.resource.data.content, 1, 500);
+      // UPDATE:
+      // a) Qualquer usuário logado pode curtir/descurtir (atualiza likedBy + likes)
+      // b) Só o autor pode editar o conteúdo do comentário
+      allow update: if isAuthenticated() && (
+        // Like toggle: só modifica likedBy e likes, não muda userId nem content
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likedBy', 'likes'])
+        )
+        ||
+        // Edição de conteúdo: apenas o autor
+        (
+          resource.data.userId == request.auth.uid
+          && request.resource.data.userId == request.auth.uid
+          && isValidString(request.resource.data.content, 1, 500)
+        )
+      );
 
       allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }

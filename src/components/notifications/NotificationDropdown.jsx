@@ -1,65 +1,162 @@
 import { useRef, useEffect } from 'react';
-import { Bell, Check, Trash2, MessageSquare, Heart, Info, X } from 'lucide-react';
+import { Bell, Check, Heart, Eye, X, Trash2 } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { Link } from 'react-router-dom';
 
+// ─── Timestamp relativo ──────────────────────────────────────────────────────
+function relativeTime(date) {
+    if (!date) return '';
+    const now = Date.now();
+    const diff = now - (date instanceof Date ? date.getTime() : new Date(date).getTime());
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (mins < 1) return 'agora mesmo';
+    if (mins < 60) return `há ${mins} min`;
+    if (hours < 24) return `há ${hours}h`;
+    if (days < 7) return `há ${days}d`;
+    return new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+}
+
+// ─── Ícone por tipo ───────────────────────────────────────────────────────────
+function NotifIcon({ type }) {
+    if (type === 'profile_view') return <Eye className="w-4 h-4 text-blue-400" />;
+    if (type === 'comment_like') return <Heart className="w-4 h-4 text-pink-500 fill-pink-500" />;
+    return <Bell className="w-4 h-4 text-primary" />;
+}
+
+// ─── Item de notificação ──────────────────────────────────────────────────────
+function NotifItem({ notif, onRead, onDelete, onClose, showBorder }) {
+    return (
+        <div className={[
+            'relative group flex gap-3 p-4 hover:bg-bg-tertiary/60 transition-colors',
+            !notif.read ? 'bg-primary/5' : '',
+            showBorder ? 'border-t border-border-color/15' : '',
+        ].join(' ')}>
+
+            {/* Avatar do ator */}
+            <div className="shrink-0 relative">
+                {notif.actorAvatar ? (
+                    <img
+                        src={notif.actorAvatar}
+                        alt={notif.actorName}
+                        className="w-9 h-9 rounded-full object-cover border border-border-color"
+                    />
+                ) : (
+                    <div className="w-9 h-9 rounded-full bg-bg-tertiary border border-border-color flex items-center justify-center">
+                        <NotifIcon type={notif.type} />
+                    </div>
+                )}
+                {/* Badge do tipo sobre o avatar */}
+                {notif.actorAvatar && (
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-bg-secondary border border-border-color flex items-center justify-center">
+                        <NotifIcon type={notif.type} />
+                    </div>
+                )}
+            </div>
+
+            {/* Conteúdo */}
+            <Link
+                to={notif.link || '#'}
+                className="flex-1 min-w-0"
+                onClick={() => { onRead(notif.id); onClose(); }}
+            >
+                <p className="text-sm text-text-primary leading-snug">
+                    {notif.content}
+                </p>
+                <p className="text-xs text-text-secondary mt-0.5">
+                    {relativeTime(notif.createdAt)}
+                </p>
+            </Link>
+
+            {/* Ações: marcar lida + deletar */}
+            <div className="flex flex-col gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                {!notif.read && (
+                    <button
+                        onClick={() => onRead(notif.id)}
+                        className="p-1 rounded text-primary hover:bg-primary/10 transition-colors"
+                        title="Marcar como lida"
+                    >
+                        <Check className="w-3.5 h-3.5" />
+                    </button>
+                )}
+                <button
+                    onClick={() => onDelete(notif.id)}
+                    className="p-1 rounded text-text-secondary hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                    title="Deletar"
+                >
+                    <Trash2 className="w-3.5 h-3.5" />
+                </button>
+            </div>
+        </div>
+    );
+}
+
+// ─── Dropdown principal ───────────────────────────────────────────────────────
 export function NotificationDropdown({ isOpen, onClose }) {
-    const { notifications, unreadCount, markAsRead, markAllAsRead, loading } = useNotifications();
+    const {
+        notifications, unreadCount, loading,
+        markAsRead, markAllAsRead,
+        deleteNotification, deleteAllRead,
+    } = useNotifications();
     const dropdownRef = useRef(null);
 
-    // Close on click outside
     useEffect(() => {
-        function handleClickOutside(event) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                onClose();
-            }
+        function handleClickOutside(e) {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) onClose();
         }
-        if (isOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
+        if (isOpen) document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isOpen, onClose]);
 
     if (!isOpen) return null;
 
-    const getIcon = (type) => {
-        switch (type) {
-            case 'like': return <Heart className="w-4 h-4 text-pink-500" />;
-            case 'comment': return <MessageSquare className="w-4 h-4 text-blue-500" />;
-            case 'system': return <Info className="w-4 h-4 text-yellow-500" />;
-            default: return <Bell className="w-4 h-4 text-primary" />;
-        }
-    };
+    const hasRead = notifications.some(n => n.read);
 
     return (
-        <div ref={dropdownRef} className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-bg-secondary border border-border-color rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div
+            ref={dropdownRef}
+            className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-bg-secondary border border-border-color rounded-xl shadow-2xl z-50 overflow-hidden"
+        >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border-color bg-bg-tertiary/50">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border-color bg-bg-tertiary/50">
                 <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-text-primary">Notificações</h3>
+                    <h3 className="font-bold text-text-primary text-sm">Notificações</h3>
                     {unreadCount > 0 && (
                         <span className="bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                             {unreadCount}
                         </span>
                     )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                     {unreadCount > 0 && (
                         <button
                             onClick={markAllAsRead}
-                            className="text-xs text-primary hover:text-primary-hover font-medium flex items-center gap-1 transition-colors"
-                            title="Marcar todas como lidas"
+                            className="text-xs text-primary hover:text-primary-hover font-medium flex items-center gap-1 px-2 py-1 rounded hover:bg-primary/10 transition-colors"
                         >
-                            <Check className="w-3 h-3" /> Limpar
+                            <Check className="w-3 h-3" /> Lidas
                         </button>
                     )}
+                    {hasRead && (
+                        <button
+                            onClick={deleteAllRead}
+                            className="text-xs text-text-secondary hover:text-red-400 font-medium flex items-center gap-1 px-2 py-1 rounded hover:bg-red-500/10 transition-colors"
+                            title="Deletar todas as lidas"
+                        >
+                            <Trash2 className="w-3 h-3" />
+                        </button>
+                    )}
+                    <button
+                        onClick={onClose}
+                        className="p-1 rounded text-text-secondary hover:text-text-primary transition-colors ml-1"
+                    >
+                        <X className="w-4 h-4" />
+                    </button>
                 </div>
             </div>
 
-            {/* List */}
-            <div className="max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-surface-dark/20 hover:scrollbar-thumb-surface-dark/40">
+            <div className="max-h-[60vh] overflow-y-auto">
                 {loading ? (
                     <div className="p-8 text-center text-text-secondary text-sm">Carregando...</div>
                 ) : notifications.length === 0 ? (
@@ -68,48 +165,16 @@ export function NotificationDropdown({ isOpen, onClose }) {
                         <p className="text-sm">Nenhuma notificação por enquanto.</p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-border-color/50">
-                        {notifications.map(notif => (
-                            <div
-                                key={notif.id}
-                                className={`p-4 hover:bg-bg-tertiary transition-colors relative group ${!notif.read ? 'bg-primary/5' : ''}`}
-                            >
-                                <Link
-                                    to={notif.link || '#'}
-                                    onClick={() => {
-                                        markAsRead(notif.id);
-                                        onClose();
-                                    }}
-                                    className="flex gap-3"
-                                >
-                                    <div className={`mt-1 w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-border-color bg-bg-primary`}>
-                                        {getIcon(notif.type)}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm text-text-primary leading-snug">
-                                            {notif.content}
-                                        </p>
-                                        <p className="text-xs text-text-secondary mt-1">
-                                            {notif.createdAt.toLocaleDateString()}
-                                        </p>
-                                    </div>
-                                </Link>
-
-                                {!notif.read && (
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            markAsRead(notif.id);
-                                        }}
-                                        className="absolute right-2 top-2 p-1 text-primary opacity-0 group-hover:opacity-100 transition-opacity"
-                                        title="Marcar como lida"
-                                    >
-                                        <div className="w-2 h-2 rounded-full bg-primary"></div>
-                                    </button>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                    notifications.map((notif, index) => (
+                        <NotifItem
+                            key={notif.id}
+                            notif={notif}
+                            onRead={markAsRead}
+                            onDelete={deleteNotification}
+                            onClose={onClose}
+                            showBorder={index > 0}
+                        />
+                    ))
                 )}
             </div>
         </div>
