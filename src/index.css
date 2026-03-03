@@ -227,3 +227,28 @@ body,
   margin: 0;
   padding: 0;
 }
+
+/* ── Mobile UX: elimina bounce scroll e delay de toque ──────────────────────── */
+html {
+  /* Evita o "rubber-band" scroll que revela bg atrás do BottomNav no iOS/Android */
+  overscroll-behavior: none;
+}
+
+button,
+a,
+[role="button"] {
+  /* Remove o delay de 300ms em taps no mobile */
+  touch-action: manipulation;
+}
+
+/* Scrollbar fina — usada via className="custom-scrollbar" */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 4px;
+}

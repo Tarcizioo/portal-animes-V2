@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { db } from '@/services/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { APP_CONFIG } from '@/constants/app';
-import { useToast } from '@/context/ToastContext'; // Import Toast
+import { useToast } from '@/context/ToastContext';
+import { apiFetch } from '@/services/api';
 import {
     collection,
     query,
@@ -69,12 +70,12 @@ export function useAnimeLibrary() {
         }
 
         // Lógica de Imagem: Prioiriza Full HD (Large) -> Standard -> Fallback
-        const imageUrl = anime.images?.webp?.large_image_url || 
-                         anime.images?.jpg?.large_image_url || 
-                         anime.images?.webp?.image_url || 
-                         anime.images?.jpg?.image_url || 
-                         anime.image || 
-                         null;
+        const imageUrl = anime.images?.webp?.large_image_url ||
+            anime.images?.jpg?.large_image_url ||
+            anime.images?.webp?.image_url ||
+            anime.images?.jpg?.image_url ||
+            anime.image ||
+            null;
 
         // Lógica de Gêneros: Pode vir como strings (View Model) ou objetos (Jikan Raw)
         let genres = [];
@@ -140,11 +141,11 @@ export function useAnimeLibrary() {
             const animeData = mapAnimeData(anime, existingData, status);
 
             await setDoc(animeRef, animeData, { merge: true });
-            
+
             if (!exists) {
                 toast.success("Anime adicionado à biblioteca!", "Sucesso");
             } else {
-               // toast.info("Informações do anime atualizadas.", "Atualizado"); // Maybe too frequent
+                // toast.info("Informações do anime atualizadas.", "Atualizado"); // Maybe too frequent
             }
 
         } catch (error) {
@@ -278,8 +279,8 @@ export function useAnimeLibrary() {
                 toast.success("Adicionado aos Favoritos!", "Favoritou");
             } else {
                 await updateDoc(animeRef, { isFavorite: !isCurrentlyFavorite });
-                 if (!isCurrentlyFavorite) toast.success("Adicionado aos Favoritos!", "Favoritou");
-                 else toast.info("Removido dos Favoritos.", "Desfavoritou");
+                if (!isCurrentlyFavorite) toast.success("Adicionado aos Favoritos!", "Favoritou");
+                else toast.info("Removido dos Favoritos.", "Desfavoritou");
             }
         } catch (error) {
             console.error("Erro ao alterar favorito:", error);
@@ -300,7 +301,7 @@ export function useAnimeLibrary() {
         });
 
         if (animesToUpdate.length === 0) return 0;
-        
+
         toast.info(`Sincronizando ${animesToUpdate.length} animes...`, "Manutenção");
 
         let processed = 0;
@@ -314,14 +315,8 @@ export function useAnimeLibrary() {
         const processBatch = async (batch) => {
             const promises = batch.map(async (anime) => {
                 try {
-                    // Se o ID for inválido ou numérico legado, precisamos garantir que funciona
-                    const response = await fetch(`https://api.jikan.moe/v4/anime/${anime.id}/full`);
-                    if (!response.ok) {
-                        // Se der 429, apenas ignoramos esse item por hora para não travar tudo
-                        if (response.status === 429) console.warn(`Rate limit hit for ${anime.id}`);
-                        return;
-                    }
-                    const json = await response.json();
+                    // Usa apiFetch (com retry automático em 429 + backoff)
+                    const json = await apiFetch(`/anime/${anime.id}/full`);
                     const freshData = json.data;
 
                     // Reutiliza addToLibrary que agora é robusto
@@ -346,7 +341,7 @@ export function useAnimeLibrary() {
                 await new Promise(r => setTimeout(r, delayBetweenRequests));
             }
         }
-        
+
         toast.success("Sincronização concluída!", "Sucesso");
     };
 

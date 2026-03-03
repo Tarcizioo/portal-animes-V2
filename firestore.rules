@@ -46,17 +46,29 @@ service cloud.firestore {
        return userDoc.data.isPublic != false;
     }
 
+    // Validate date key format YYYY-MM-DD (for activityLog)
+    function isValidDateKey(key) {
+      return key is string && key.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+    }
+
     // --- USERS COLLECTION ---
     match /users/{userId} {
       // GET (single doc): Owner can read everything. Others can read if profile is public.
       allow get: if isOwner(userId) || isResourcePublic();
       
       // LIST (queries/search): Authenticated users can query the users collection.
-      // Client-side filters out private profiles (isPublic !== false).
       allow list: if isAuthenticated();
       
-      // WRITE: Only Owner can update their profile.
-      allow write: if isOwner(userId);
+      // CREATE: Only the owner can create their profile document.
+      allow create: if isOwner(userId);
+
+      // UPDATE: Only owner. If activityLog is present, validate each entry.
+      allow update: if isOwner(userId)
+                    && (!request.resource.data.keys().hasAny(['activityLog'])
+                        || request.resource.data.activityLog is map);
+
+      // DELETE: Only owner.
+      allow delete: if isOwner(userId);
 
       // --- SUBCOLLECTIONS ---
 
