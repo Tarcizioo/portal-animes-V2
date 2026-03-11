@@ -1,9 +1,26 @@
 import {
     collection, addDoc, query, where,
-    getDocs, serverTimestamp, orderBy, limit,
-    Timestamp
+    getDocs, getDoc, serverTimestamp, orderBy, limit,
+    Timestamp, doc
 } from 'firebase/firestore';
 import { db } from '@/services/firebase';
+
+// ─── Preference gate ─────────────────────────────────────────────────────────
+/**
+ * Returns whether `targetUid` has a given notification type enabled.
+ * Defaults to true if the field is missing (opt-out model).
+ */
+async function isNotifEnabled(targetUid, type) {
+    try {
+        const snap = await getDoc(doc(db, 'users', targetUid));
+        if (!snap.exists()) return true;
+        const prefs = snap.data()?.notificationPrefs;
+        if (!prefs || prefs[type] === undefined) return true;
+        return prefs[type] === true;
+    } catch {
+        return true; // fail open: don't block notifications on read errors
+    }
+}
 
 /**
  * Escreve uma notificação na subcoleção do usuário-alvo.
@@ -57,6 +74,10 @@ export async function notifyProfileView(targetUid, visitorProfile, visitorUid) {
     if (!targetUid || !visitorUid || targetUid === visitorUid) return;
     if (!visitorProfile) return;
 
+    // Check user preference before writing
+    const enabled = await isNotifEnabled(targetUid, 'profile_view');
+    if (!enabled) return;
+
     const dup = await isDuplicate(targetUid, 'profile_view', visitorUid, 24);
     if (dup) return;
 
@@ -78,6 +99,10 @@ export async function notifyProfileView(targetUid, visitorProfile, visitorUid) {
 export async function notifyCommentLike(commentOwnerUid, likerProfile, likerUid, commentContent, animeId, animeTitle) {
     if (!commentOwnerUid || !likerUid || commentOwnerUid === likerUid) return;
     if (!likerProfile) return;
+
+    // Check user preference before writing
+    const enabled = await isNotifEnabled(commentOwnerUid, 'comment_like');
+    if (!enabled) return;
 
     // Anti-spam: 1 like notification por liker por comentário a cada 12h
     const dup = await isDuplicate(commentOwnerUid, 'comment_like', likerUid, 12);

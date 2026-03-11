@@ -6,10 +6,11 @@ import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/context/AuthContext';
 import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 import { useLibraryBackup } from '@/hooks/useLibraryBackup';
+import { useNotificationPrefs } from '@/hooks/useNotificationPrefs';
 import {
     Moon, Sun, Palette, Monitor, Trash2, AlertTriangle, X,
     Download, FileJson, FileSpreadsheet, FileUp,
-    Loader2, CheckCircle2, AlertCircle, Settings,
+    Loader2, CheckCircle2, AlertCircle, Settings, Bell, Eye, Heart,
 } from 'lucide-react';
 
 // ── Theme data ────────────────────────────────────────────────────────────────
@@ -25,9 +26,10 @@ const themes = [
 ];
 
 const TABS = [
-    { id: 'appearance', label: 'Aparência' },
-    { id: 'library',    label: 'Biblioteca' },
-    { id: 'account',    label: 'Conta'      },
+    { id: 'appearance',    label: 'Aparência'     },
+    { id: 'library',       label: 'Biblioteca'    },
+    { id: 'notifications', label: 'Notificações'  },
+    { id: 'account',       label: 'Conta'         },
 ];
 
 // ── Tab button ────────────────────────────────────────────────────────────────
@@ -240,6 +242,79 @@ function LibraryTab({ library }) {
     );
 }
 
+// ── Notifications tab ────────────────────────────────────────────────────────
+function PrefToggle({ icon: Icon, label, description, checked, onChange, disabled }) {
+    return (
+        <div className="flex items-start justify-between gap-4 p-4 rounded-xl border border-border-color bg-bg-primary/40 hover:bg-bg-tertiary/40 transition-colors">
+            <div className="flex items-start gap-3">
+                <div className="mt-0.5 p-2 rounded-lg bg-bg-tertiary text-text-secondary flex-shrink-0">
+                    <Icon className="w-4 h-4" />
+                </div>
+                <div>
+                    <p className="text-sm font-semibold text-text-primary">{label}</p>
+                    <p className="text-xs text-text-secondary mt-0.5">{description}</p>
+                </div>
+            </div>
+            <button
+                onClick={() => !disabled && onChange(!checked)}
+                disabled={disabled}
+                aria-checked={checked}
+                role="switch"
+                className={`relative flex-shrink-0 w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${
+                    disabled ? 'opacity-40 cursor-not-allowed' :
+                    checked  ? 'bg-button-accent cursor-pointer' :
+                               'bg-bg-tertiary border border-border-color cursor-pointer'
+                }`}
+            >
+                <span
+                    className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                        checked ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                />
+            </button>
+        </div>
+    );
+}
+
+function NotificationsTab({ user }) {
+    const { prefs, loading, updatePref } = useNotificationPrefs();
+
+    if (!user) {
+        return (
+            <div className="p-4 rounded-xl bg-bg-tertiary border border-border-color text-center">
+                <Bell className="w-8 h-8 text-text-secondary mx-auto mb-2 opacity-50" />
+                <p className="text-text-secondary text-sm">Faça login para configurar suas notificações.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-4">
+            <p className="text-xs text-text-secondary">
+                Escolha quais notificações você deseja receber. As alterações são salvas automaticamente.
+            </p>
+
+            <PrefToggle
+                icon={Eye}
+                label="Visitas ao perfil"
+                description="Receba uma notificação quando alguém visitar o seu perfil público."
+                checked={prefs.profile_view}
+                onChange={(val) => updatePref('profile_view', val)}
+                disabled={loading}
+            />
+
+            <PrefToggle
+                icon={Heart}
+                label="Likes em comentários"
+                description="Receba uma notificação quando alguém curtir um dos seus comentários."
+                checked={prefs.comment_like}
+                onChange={(val) => updatePref('comment_like', val)}
+                disabled={loading}
+            />
+        </div>
+    );
+}
+
 // ── Account tab ───────────────────────────────────────────────────────────────
 function AccountTab({ user, deleteAccount, onClose }) {
     const [isDeleting, setIsDeleting]           = useState(false);
@@ -371,9 +446,10 @@ export function SettingsModal({ isOpen, onClose }) {
                                     exit={{ opacity: 0, y: -8 }}
                                     transition={{ duration: 0.15 }}
                                 >
-                                    {activeTab === 'appearance' && <AppearanceTab theme={theme} setTheme={setTheme} />}
-                                    {activeTab === 'library'    && <LibraryTab library={library} />}
-                                    {activeTab === 'account'   && <AccountTab user={user} deleteAccount={deleteAccount} onClose={onClose} />}
+                                    {activeTab === 'appearance'    && <AppearanceTab theme={theme} setTheme={setTheme} />}
+                                    {activeTab === 'library'       && <LibraryTab library={library} />}
+                                    {activeTab === 'notifications' && <NotificationsTab user={user} />}
+                                    {activeTab === 'account'      && <AccountTab user={user} deleteAccount={deleteAccount} onClose={onClose} />}
                                 </motion.div>
                             </AnimatePresence>
                         </div>
