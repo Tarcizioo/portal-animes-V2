@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { usePublicProfile } from '@/hooks/usePublicProfile';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
+import { ProfileStats } from '@/components/profile/ProfileStats';
 import { AchievementBadges } from '@/components/profile/AchievementBadges';
 import { FavoritesWidget } from '@/components/profile/FavoritesWidget';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -220,6 +221,8 @@ export function PublicProfile() {
                         onCompatibility={!isOwnProfile && currentUser ? () => setCompatModalOpen(true) : undefined}
                         compatibilityScore={!isOwnProfile && currentUser ? compatScore : null}
                     />
+
+                    <ProfileStats library={library} isLoading={loading} />
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 space-y-8">

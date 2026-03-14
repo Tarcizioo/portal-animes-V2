@@ -1,9 +1,10 @@
-// In production (Vercel) → requests go through our caching proxy (/api/jikan/...)
-// In development (localhost) → hit Jikan directly (proxy not running locally)
-const IS_PROD = import.meta.env.PROD;
-const BASE_URL = IS_PROD
-    ? `${window.location.origin}/api/jikan`
-    : 'https://api.jikan.moe/v4';
+// Use the Vercel caching proxy for every non-localhost origin.
+// - localhost (dev or preview) → hits Jikan directly (no serverless fn running)
+// - Vercel / custom domain     → routes through /api/jikan for CDN caching
+const IS_LOCAL = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+const BASE_URL = IS_LOCAL
+    ? 'https://api.jikan.moe/v4'
+    : `${window.location.origin}/api/jikan`;
 
 
 /**
@@ -45,6 +46,12 @@ export async function apiFetch(endpoint, options = {}, retries = 3, backoff = 10
                 }
                 
                 throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            }
+
+            // Guard against HTML responses (e.g. proxy route returning index.html)
+            const contentType = response.headers.get('Content-Type') || '';
+            if (!contentType.includes('application/json')) {
+                throw new Error(`Expected JSON but got ${contentType}. Check if the proxy route is deployed.`);
             }
 
             return await response.json();
