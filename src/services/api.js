@@ -1,4 +1,10 @@
-const BASE_URL = "https://api.jikan.moe/v4";
+// In production (Vercel) → requests go through our caching proxy (/api/jikan/...)
+// In development (localhost) → hit Jikan directly (proxy not running locally)
+const IS_PROD = import.meta.env.PROD;
+const BASE_URL = IS_PROD
+    ? `${window.location.origin}/api/jikan`
+    : 'https://api.jikan.moe/v4';
+
 
 /**
  * Helper delay function to pause execution
