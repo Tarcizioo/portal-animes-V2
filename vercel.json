@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/jikan/:path*",
-      "destination": "/api/jikan/:path*"
+      "destination": "https://api.jikan.moe/v4/:path*"
     },
     {
       "source": "/(.*)",
@@ -10,6 +10,15 @@
     }
   ],
   "headers": [
+    {
+      "source": "/api/jikan/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=1800, stale-while-revalidate=3600"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
