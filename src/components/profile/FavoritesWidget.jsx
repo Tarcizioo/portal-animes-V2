@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, Plus, GripVertical, User, Pin, Pencil, Check, X, Star } from 'lucide-react';
+import { Heart, Plus, GripVertical, User, Pin, Pencil, Check, X, Star, Image as ImageIcon } from 'lucide-react';
 import { ViewToggle } from '@/components/ui/ViewToggle';
+import { ImageSelectModal } from '@/components/profile/ImageSelectModal';
 import {
     DndContext,
     closestCenter,
@@ -24,7 +25,7 @@ import { clsx } from 'clsx';
 
 // --- Components Helpers ---
 
-function FavoriteCard({ item, type, isOverlay = false, isEditing = false, dragListeners = {}, dragAttributes = {} }) {
+function FavoriteCard({ item, type, isOverlay = false, isEditing = false, dragListeners = {}, dragAttributes = {}, onOpenImageModal }) {
     const linkPath = type === 'anime' ? `/anime/${item.id}` : `/character/${item.id}`;
 
     return (
@@ -44,9 +45,21 @@ function FavoriteCard({ item, type, isOverlay = false, isEditing = false, dragLi
                         {...dragListeners}
                         {...dragAttributes}
                         className="absolute top-2 right-2 z-20 p-2 bg-black/60 backdrop-blur-md rounded-lg cursor-grab active:cursor-grabbing hover:bg-primary transition-colors touch-none shadow-lg"
+                        title="Segure para reordenar"
                     >
                         <GripVertical className="w-4 h-4 text-white" />
                     </div>
+                )}
+
+                {/* Edit Image Button (Only in Edit Mode) */}
+                {isEditing && onOpenImageModal && (
+                    <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onOpenImageModal(item.id); }}
+                        className="absolute bottom-2 right-2 z-20 p-2 bg-black/60 backdrop-blur-md rounded-lg hover:bg-button-accent transition-colors shadow-lg group-hover:scale-105"
+                        title="Mudar Foto do Card"
+                    >
+                        <ImageIcon className="w-4 h-4 text-white" />
+                    </button>
                 )}
 
                 <Link
@@ -78,7 +91,7 @@ function FavoriteCard({ item, type, isOverlay = false, isEditing = false, dragLi
     );
 }
 
-function SortableFavoriteItem({ item, type, isEditing }) {
+function SortableFavoriteItem({ item, type, isEditing, onOpenImageModal }) {
     const {
         attributes,
         listeners,
@@ -103,6 +116,7 @@ function SortableFavoriteItem({ item, type, isEditing }) {
                 isEditing={isEditing}
                 dragListeners={listeners}
                 dragAttributes={attributes}
+                onOpenImageModal={onOpenImageModal}
             />
         </div>
     );
@@ -115,12 +129,16 @@ export function FavoritesWidget({
     characterFavorites,
     onReorderAnimes,
     onReorderCharacters,
+    onUpdateImage,
     preferredView,
     onSetPreferredView,
     readOnly = false
 }) {
     const [activeTab, setActiveTab] = useState(preferredView || 'anime');
     const [isEditing, setIsEditing] = useState(false);
+    
+    // State para o Modal de Trocar Imagem do Card
+    const [imageModalState, setImageModalState] = useState({ open: false, itemId: null });
 
     // Sync preference
     useEffect(() => {
@@ -277,7 +295,13 @@ export function FavoritesWidget({
                     <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 relative z-10">
                         <SortableContext items={localItems.map(i => i.id)} strategy={rectSortingStrategy}>
                             {localItems.map((item) => (
-                                <SortableFavoriteItem key={item.id} item={item} type={type} isEditing={isEditing} />
+                                <SortableFavoriteItem 
+                                    key={item.id} 
+                                    item={item} 
+                                    type={type} 
+                                    isEditing={isEditing} 
+                                    onOpenImageModal={(id) => setImageModalState({ open: true, itemId: id })}
+                                />
                             ))}
                         </SortableContext>
 
@@ -307,6 +331,20 @@ export function FavoritesWidget({
                     </DragOverlay>
                 </DndContext>
             )}
+
+            {/* Modal para Trocar Imagem do Post/Card */}
+            <ImageSelectModal
+                isOpen={imageModalState.open}
+                onClose={() => setImageModalState({ open: false, itemId: null })}
+                itemId={imageModalState.itemId}
+                type={type}
+                onSelect={async (newUrl) => {
+                    if (onUpdateImage) {
+                        await onUpdateImage(type, imageModalState.itemId, newUrl);
+                    }
+                    setImageModalState({ open: false, itemId: null });
+                }}
+            />
         </div>
     );
 }

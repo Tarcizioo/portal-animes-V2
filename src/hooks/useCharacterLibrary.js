@@ -90,10 +90,23 @@ export function useCharacterLibrary() {
         return characterLibrary.some(c => String(c.id) === String(charId));
     };
 
+    // 3. Atualizar Imagem
+    const updateCharacterImage = async (charId, newImageUrl) => {
+        if (!user || !charId || !newImageUrl) return;
+        try {
+            const charRef = doc(db, 'users', user.uid, 'favorite_characters', String(charId));
+            await setDoc(charRef, { image: newImageUrl }, { merge: true });
+        } catch (error) {
+            console.error("Erro ao atualizar imagem do personagem:", error);
+            throw error;
+        }
+    };
+
     return {
         characterLibrary,
         loading,
         toggleCharacterFavorite,
-        isCharacterFavorite
+        isCharacterFavorite,
+        updateCharacterImage
     };
 }

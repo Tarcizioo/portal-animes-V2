@@ -178,8 +178,8 @@ const SECTION_LABELS = {
 export function Profile() {
     const { user, signInGoogle, loading: authLoading } = useAuth();
     const { profile, loading: profileLoading, updateProfileData } = useUserProfile();
-    const { library, loading: libraryLoading } = useAnimeLibrary();
-    const { characterLibrary } = useCharacterLibrary();
+    const { library, loading: libraryLoading, updateAnimeImage } = useAnimeLibrary();
+    const { characterLibrary, updateCharacterImage } = useCharacterLibrary();
     const { favoriteStudios, toggleFavorite } = useFavoriteStudios();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -281,6 +281,22 @@ export function Profile() {
         catch (err) { console.error('Failed to set preferred view:', err); }
     }, [updateProfileData]);
 
+    // ── Update Images ─────────────────────────────────────────────────────────
+    const handleUpdateImage = useCallback(async (type, id, url) => {
+        try {
+            if (type === 'anime') {
+                await updateAnimeImage(id, url);
+                toast.success('Imagem do anime atualizada!', 'Favoritos');
+            } else if (type === 'character') {
+                await updateCharacterImage(id, url);
+                toast.success('Imagem do personagem atualizada!', 'Favoritos');
+            }
+        } catch (err) {
+            console.error('Erro ao atualizar imagem:', err);
+            toast.error('Erro ao atualizar imagem.', 'Erro');
+        }
+    }, [updateAnimeImage, updateCharacterImage, toast]);
+
     // ── Render helpers ────────────────────────────────────────────────────────
     const renderSection = (id) => {
         if (id === 'favorites') return (
@@ -289,6 +305,7 @@ export function Profile() {
                 characterFavorites={sortedCharFavorites}
                 onReorderAnimes={handleFavoritesReorder}
                 onReorderCharacters={handleCharFavoritesReorder}
+                onUpdateImage={handleUpdateImage}
                 preferredView={profile?.preferredFavoritesView}
                 onSetPreferredView={handleSetPreferredView}
             />

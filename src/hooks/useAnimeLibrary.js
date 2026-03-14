@@ -345,6 +345,18 @@ export function useAnimeLibrary() {
         toast.success("Sincronização concluída!", "Sucesso");
     };
 
+    // 9. Atualizar Imagem
+    const updateAnimeImage = async (animeId, newImageUrl) => {
+        if (!user || !animeId || !newImageUrl) return;
+        try {
+            const animeRef = doc(db, 'users', user.uid, APP_CONFIG.LIBRARY.COLLECTION_NAME, String(animeId));
+            await updateDoc(animeRef, { image: newImageUrl, lastUpdated: serverTimestamp() });
+        } catch (error) {
+            console.error("Erro ao atualizar a imagem do anime:", error);
+            throw error;
+        }
+    };
+
     return {
         library,
         loading,
@@ -355,6 +367,7 @@ export function useAnimeLibrary() {
         updateRating,
         removeFromLibrary,
         toggleFavorite,
-        syncLibraryData
+        syncLibraryData,
+        updateAnimeImage
     };
 }
