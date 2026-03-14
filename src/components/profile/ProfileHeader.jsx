@@ -100,20 +100,46 @@ export function ProfileHeader({ user, profile, onEdit, onShare, readOnly = false
 
                 {/* ── Compatibility + Follow buttons ─ shown on other users' public profiles ── */}
                 {readOnly && (onCompatibility || followButton) && (
-                    <div className="absolute -bottom-12 right-0 md:-bottom-14 md:right-0 flex items-center gap-2 px-4 md:px-0">
+                    <>
+                        {/* Mobile: compat LEFT, follow RIGHT — avoids overlapping the name */}
                         {onCompatibility && compatibilityScore !== null && (
-                            <motion.button
-                                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                                onClick={onCompatibility}
-                                className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 hover:border-pink-500/60 text-pink-400 hover:text-pink-300 rounded-xl shadow-md transition-all text-xs md:text-sm font-bold"
-                                title="Ver compatibilidade"
-                            >
-                                <Heart className="w-3.5 h-3.5 fill-pink-500" />
-                                {compatibilityScore}% Compatível
-                            </motion.button>
+                            <div className="md:hidden absolute -bottom-12 left-0 px-4">
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                                    onClick={onCompatibility}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 hover:border-pink-500/60 text-pink-400 hover:text-pink-300 rounded-xl shadow-md transition-all text-xs font-bold"
+                                    title="Ver compatibilidade"
+                                >
+                                    <Heart className="w-3.5 h-3.5 fill-pink-500 flex-shrink-0" />
+                                    <span>{compatibilityScore}%</span>
+                                </motion.button>
+                            </div>
                         )}
-                        {followButton}
-                    </div>
+
+                        {/* Mobile: follow RIGHT */}
+                        {followButton && (
+                            <div className="md:hidden absolute -bottom-12 right-0 px-4">
+                                {followButton}
+                            </div>
+                        )}
+
+                        {/* Desktop: both on the right together */}
+                        <div className="hidden md:flex absolute -bottom-14 right-0 items-center gap-2">
+                            {onCompatibility && compatibilityScore !== null && (
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                                    onClick={onCompatibility}
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 hover:border-pink-500/60 text-pink-400 hover:text-pink-300 rounded-xl shadow-md transition-all text-sm font-bold"
+                                    title="Ver compatibilidade"
+                                >
+                                    <Heart className="w-4 h-4 fill-pink-500 flex-shrink-0" />
+                                    <span>{compatibilityScore}%</span>
+                                    <span>Compatível</span>
+                                </motion.button>
+                            )}
+                            {followButton}
+                        </div>
+                    </>
                 )}
             </div>
 

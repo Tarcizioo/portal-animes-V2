@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, UserCheck, Loader2 } from 'lucide-react';
@@ -56,6 +56,12 @@ function FollowRow({ uid, displayName, photoURL }) {
 // ── Modal ──────────────────────────────────────────────────────────────────────
 export function FollowersModal({ isOpen, onClose, uid, initialTab = 'followers' }) {
     const [activeTab, setActiveTab] = useState(initialTab);
+
+    // Sync tab whenever the modal opens or initialTab changes
+    useEffect(() => {
+        if (isOpen) setActiveTab(initialTab);
+    }, [isOpen, initialTab]);
+
     const { list: followers, loading: loadingFollowers } = useFollowList(uid, 'followers');
     const { list: following, loading: loadingFollowing } = useFollowList(uid, 'following');
 
@@ -81,7 +87,7 @@ export function FollowersModal({ isOpen, onClose, uid, initialTab = 'followers' 
                         animate={{ opacity: 1, scale: 1,    y: 0  }}
                         exit={{   opacity: 0, scale: 0.95, y: 10 }}
                         transition={{ duration: 0.2 }}
-                        className="relative z-10 bg-bg-secondary border border-border-color rounded-2xl shadow-2xl w-full max-w-sm max-h-[80vh] flex flex-col"
+                        className="relative z-10 bg-bg-secondary border border-border-color rounded-2xl shadow-2xl w-full max-w-md h-[560px] flex flex-col"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between p-4 border-b border-border-color flex-shrink-0">

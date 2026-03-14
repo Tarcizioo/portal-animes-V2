@@ -62,10 +62,16 @@ service cloud.firestore {
       // CREATE: Only the owner can create their profile document.
       allow create: if isOwner(userId);
 
-      // UPDATE: Only owner. If activityLog is present, validate each entry.
-      allow update: if isOwner(userId)
-                    && (!request.resource.data.keys().hasAny(['activityLog'])
-                        || request.resource.data.activityLog is map);
+      // UPDATE:
+      // a) Owner can update any field (with activityLog validation).
+      // b) Any authenticated user can increment/decrement the follow counters
+      //    (followersCount, followingCount) — but ONLY those two fields.
+      allow update: if (isOwner(userId)
+                        && (!request.resource.data.keys().hasAny(['activityLog'])
+                            || request.resource.data.activityLog is map))
+                    || (isAuthenticated()
+                        && request.resource.data.diff(resource.data).affectedKeys()
+                             .hasOnly(['followersCount', 'followingCount']));
 
       // DELETE: Only owner.
       allow delete: if isOwner(userId);

@@ -33,6 +33,7 @@ import { useAnimeLibrary } from '@/hooks/useAnimeLibrary';
 import { useCharacterLibrary } from '@/hooks/useCharacterLibrary';
 import { useFavoriteStudios } from '@/hooks/useFavoriteStudios';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { FollowersModal } from '@/components/profile/FollowersModal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import {
     LogIn, Hash, Link as LinkIcon, Monitor, X,
@@ -182,6 +183,7 @@ export function Profile() {
     const { favoriteStudios, toggleFavorite } = useFavoriteStudios();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+    const [followModal, setFollowModal] = useState({ open: false, tab: 'followers' });
 
     // ── Layout drag state ─────────────────────────────────────────────────────
     const { toast } = useToast();
@@ -360,6 +362,27 @@ export function Profile() {
                     onEdit={() => setIsModalOpen(true)}
                     onShare={() => setIsShareModalOpen(true)}
                 />
+
+                {/* Followers / Following count row */}
+                {user && (
+                    <div className="flex items-center gap-4 text-sm">
+                        <button
+                            onClick={() => setFollowModal({ open: true, tab: 'followers' })}
+                            className="flex items-center gap-1.5 text-text-secondary hover:text-text-primary transition-colors group"
+                        >
+                            <span className="font-bold text-text-primary">{profile?.followersCount ?? 0}</span>
+                            <span className="group-hover:underline">seguidores</span>
+                        </button>
+                        <span className="text-text-secondary/40">·</span>
+                        <button
+                            onClick={() => setFollowModal({ open: true, tab: 'following' })}
+                            className="flex items-center gap-1.5 text-text-secondary hover:text-text-primary transition-colors group"
+                        >
+                            <span className="font-bold text-text-primary">{profile?.followingCount ?? 0}</span>
+                            <span className="group-hover:underline">seguindo</span>
+                        </button>
+                    </div>
+                )}
 
                 <ProfileStats library={library} isLoading={false} />
 
@@ -580,6 +603,13 @@ export function Profile() {
                 profile={profile}
                 favorites={sortedFavorites}
                 library={library}
+            />
+
+            <FollowersModal
+                isOpen={followModal.open}
+                initialTab={followModal.tab}
+                onClose={() => setFollowModal(m => ({ ...m, open: false }))}
+                uid={user?.uid}
             />
 
         </>
