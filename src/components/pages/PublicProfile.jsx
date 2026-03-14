@@ -20,6 +20,8 @@ import { useCompatibility } from '@/hooks/useCompatibility';
 import { CompatibilityModal } from '@/components/profile/CompatibilityModal';
 import { motion } from 'framer-motion';
 import { notifyProfileView } from '@/services/notificationService';
+import { FollowButton } from '@/components/profile/FollowButton';
+import { FollowersModal } from '@/components/profile/FollowersModal';
 
 const DEFAULT_SECTION_ORDER = ['favorites', 'recent', 'achievements', 'heatmap'];
 
@@ -129,6 +131,7 @@ export function PublicProfile() {
         commonGenres, myAvgScore, pubAvgScore } =
         useCompatibility(!isOwnProfile ? library : []);
     const [isCompatModalOpen, setCompatModalOpen] = useState(false);
+    const [followModal, setFollowModal] = useState({ open: false, tab: 'followers' });
 
     usePageTitle(profile ? `Perfil de ${profile.displayName}` : 'Perfil Público');
 
@@ -220,7 +223,27 @@ export function PublicProfile() {
                         readOnly={true}
                         onCompatibility={!isOwnProfile && currentUser ? () => setCompatModalOpen(true) : undefined}
                         compatibilityScore={!isOwnProfile && currentUser ? compatScore : null}
+                        followButton={!isOwnProfile ? <FollowButton targetUid={uid} targetProfile={profile} /> : null}
                     />
+
+                    {/* Followers / Following count row */}
+                    <div className="flex items-center gap-4 text-sm">
+                        <button
+                            onClick={() => setFollowModal({ open: true, tab: 'followers' })}
+                            className="flex items-center gap-1.5 text-text-secondary hover:text-text-primary transition-colors group"
+                        >
+                            <span className="font-bold text-text-primary">{profile.followersCount ?? 0}</span>
+                            <span className="group-hover:underline">seguidores</span>
+                        </button>
+                        <span className="text-text-secondary/40">·</span>
+                        <button
+                            onClick={() => setFollowModal({ open: true, tab: 'following' })}
+                            className="flex items-center gap-1.5 text-text-secondary hover:text-text-primary transition-colors group"
+                        >
+                            <span className="font-bold text-text-primary">{profile.followingCount ?? 0}</span>
+                            <span className="group-hover:underline">seguindo</span>
+                        </button>
+                    </div>
 
                     <ProfileStats library={library} isLoading={loading} />
 
@@ -311,6 +334,13 @@ export function PublicProfile() {
                 myAvgScore={myAvgScore ?? 0}
                 pubAvgScore={pubAvgScore ?? 0}
                 otherName={profile?.displayName ?? 'este usuário'}
+            />
+
+            <FollowersModal
+                isOpen={followModal.open}
+                initialTab={followModal.tab}
+                onClose={() => setFollowModal(m => ({ ...m, open: false }))}
+                uid={uid}
             />
         </>
     );

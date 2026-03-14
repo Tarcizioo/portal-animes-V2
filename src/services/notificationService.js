@@ -123,3 +123,28 @@ export async function notifyCommentLike(commentOwnerUid, likerProfile, likerUid,
         animeTitle: animeTitle || '',
     });
 }
+
+// ─── Notificação: Novo Seguidor ───────────────────────────────────────────────
+/**
+ * Chama quando currentUser começa a seguir targetUid.
+ * Anti-spam: 1 notificação por seguidor a cada 24h.
+ */
+export async function notifyNewFollower(targetUid, followerProfile, followerUid) {
+    if (!targetUid || !followerUid || targetUid === followerUid) return;
+    if (!followerProfile) return;
+
+    const enabled = await isNotifEnabled(targetUid, 'new_follower');
+    if (!enabled) return;
+
+    const dup = await isDuplicate(targetUid, 'new_follower', followerUid, 24);
+    if (dup) return;
+
+    await createNotification(targetUid, {
+        type: 'new_follower',
+        actorUid: followerUid,
+        actorName: followerProfile.displayName || 'Alguém',
+        actorAvatar: followerProfile.photoURL || null,
+        content: `${followerProfile.displayName || 'Alguém'} começou a te seguir.`,
+        link: `/u/${followerUid}`,
+    });
+}

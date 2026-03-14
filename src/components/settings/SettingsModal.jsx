@@ -10,7 +10,7 @@ import { useNotificationPrefs } from '@/hooks/useNotificationPrefs';
 import {
     Moon, Sun, Palette, Monitor, Trash2, AlertTriangle, X,
     Download, FileJson, FileSpreadsheet, FileUp,
-    Loader2, CheckCircle2, AlertCircle, Settings, Bell, Eye, Heart,
+    Loader2, CheckCircle2, AlertCircle, Settings, Bell, Eye, Heart, UserPlus,
 } from 'lucide-react';
 
 // ── Theme data ────────────────────────────────────────────────────────────────
@@ -309,6 +309,15 @@ function NotificationsTab({ user }) {
                 description="Receba uma notificação quando alguém curtir um dos seus comentários."
                 checked={prefs.comment_like}
                 onChange={(val) => updatePref('comment_like', val)}
+                disabled={loading}
+            />
+
+            <PrefToggle
+                icon={UserPlus}
+                label="Novos seguidores"
+                description="Receba uma notificação quando alguém começar a te seguir."
+                checked={prefs.new_follower}
+                onChange={(val) => updatePref('new_follower', val)}
                 disabled={loading}
             />
         </div>

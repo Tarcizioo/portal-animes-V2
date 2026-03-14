@@ -100,6 +100,20 @@ service cloud.firestore {
         allow read, update, delete: if isOwner(userId);
       }
       
+      // 4. Following list (who this user follows)
+      // READ: public. WRITE: only the follower themselves can add/remove.
+      match /following/{targetUid} {
+        allow read: if true;
+        allow write: if isOwner(userId);
+      }
+
+      // 5. Followers list (who follows this user)
+      // READ: public. WRITE: only the follower (request.auth.uid == targetUid in the parent path)
+      match /followers/{followerUid} {
+        allow read: if true;
+        allow write: if isAuthenticated() && request.auth.uid == followerUid;
+      }
+
       // Default: Private
       match /{document=**} {
         allow read, write: if isOwner(userId);

@@ -10,7 +10,9 @@ import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 export const DEFAULT_NOTIFICATION_PREFS = {
     profile_view: true,
     comment_like: true,
+    new_follower:  true,
 };
+
 
 export function useNotificationPrefs() {
     const { user } = useAuth();
