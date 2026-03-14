@@ -15,29 +15,40 @@ async function getCroppedBlob(image, crop, circular = false) {
     const canvas = document.createElement('canvas');
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
-    canvas.width = crop.width;
-    canvas.height = crop.height;
+    
+    // Calcula o tamanho real baseado na imagem original
+    const pixelWidth = Math.floor(crop.width * scaleX);
+    const pixelHeight = Math.floor(crop.height * scaleY);
+    const pixelX = Math.floor(crop.x * scaleX);
+    const pixelY = Math.floor(crop.y * scaleY);
+
+    canvas.width = pixelWidth;
+    canvas.height = pixelHeight;
     const ctx = canvas.getContext('2d');
 
     if (circular) {
         ctx.beginPath();
-        ctx.arc(crop.width / 2, crop.height / 2, crop.width / 2, 0, Math.PI * 2);
+        ctx.arc(pixelWidth / 2, pixelHeight / 2, pixelWidth / 2, 0, Math.PI * 2);
         ctx.clip();
     }
 
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
     ctx.drawImage(
         image,
-        crop.x * scaleX,
-        crop.y * scaleY,
-        crop.width * scaleX,
-        crop.height * scaleY,
+        pixelX,
+        pixelY,
+        pixelWidth,
+        pixelHeight,
         0, 0,
-        crop.width,
-        crop.height
+        pixelWidth,
+        pixelHeight
     );
 
     return new Promise((resolve) => {
-        canvas.toBlob(resolve, 'image/jpeg', 0.92);
+        // Usa JPEG com qualidade máxima para não perder definição do banner
+        canvas.toBlob(resolve, 'image/jpeg', 1.00);
     });
 }
 
@@ -58,12 +69,12 @@ function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
  */
 export function ImageCropModal({ imageSrc, type, onConfirm, onCancel }) {
     const isAvatar = type === 'avatar';
-    const aspect   = isAvatar ? 1 : 16 / 5;
+    const aspect = isAvatar ? 1 : 16 / 5;
 
     const imgRef = useRef(null);
-    const [crop, setCrop]         = useState();
+    const [crop, setCrop] = useState();
     const [completedCrop, setCompletedCrop] = useState(null);
-    const [isProcessing, setIsProcessing]   = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const onImageLoad = useCallback((e) => {
         const { naturalWidth: width, naturalHeight: height } = e.currentTarget;

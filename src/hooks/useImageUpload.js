@@ -8,12 +8,16 @@ export function useImageUpload() {
     /**
      * Compresses an image and returns as Base64 string
      * @param {File} file 
+     * @param {boolean} isBanner
      * @returns {Promise<string>}
      */
-    const compressImage = (file) => {
+    const compressImage = (file, isBanner = false) => {
         return new Promise((resolve, reject) => {
-            const maxWidth = 800; // Reduzi um pouco para garantir string menor
-            const maxHeight = 800;
+            // Se for banner, usamos 1920px max e WebP para qualidade excelente abaixo de 1MB
+            const maxWidth = isBanner ? 1920 : 800;
+            const maxHeight = isBanner ? 800 : 800;
+            const quality = isBanner ? 0.95 : 0.85;
+            
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = (event) => {
@@ -41,8 +45,8 @@ export function useImageUpload() {
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Retorna Base64 direto (JPEG 70% quality)
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    // Retorna Base64 com WebP (muito menor que JPEG, sem perda visível)
+                    const dataUrl = canvas.toDataURL('image/webp', quality);
                     resolve(dataUrl);
                 };
                 img.onerror = (error) => reject(error);
@@ -55,14 +59,16 @@ export function useImageUpload() {
      * Processes image for profile (compression + base64)
      * Does NOT upload to Storage anymore to avoid CORS/Permissions issues.
      * @param {File} file
+     * @param {string} path - identifies if it's a banner or avatar
      * @returns {Promise<string>} Base64 string
      */
-    const uploadImage = async (file) => {
+    const uploadImage = async (file, path = '') => {
         if (!file) return null;
 
         setUploading(true);
         try {
-            const base64String = await compressImage(file);
+            const isBanner = path.includes('banner');
+            const base64String = await compressImage(file, isBanner);
             return base64String;
         } catch (error) {
             console.error("Erro ao processar imagem:", error);
