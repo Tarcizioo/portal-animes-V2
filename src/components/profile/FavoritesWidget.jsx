@@ -149,12 +149,12 @@ export function FavoritesWidget({
     const propItems = activeTab === 'anime' ? animeFavorites : characterFavorites;
     const type = activeTab;
 
-    // Local State (Slice to top 6)
-    const [localItems, setLocalItems] = useState(propItems.slice(0, 6));
+    // Local State (Slice to top 10)
+    const [localItems, setLocalItems] = useState(propItems.slice(0, 10));
 
     // Update local items when props change (and slice again to ensure limits)
     useEffect(() => {
-        setLocalItems(propItems.slice(0, 6));
+        setLocalItems(propItems.slice(0, 10));
     }, [propItems, activeTab]);
 
     // Dnd State
@@ -177,9 +177,9 @@ export function FavoritesWidget({
                 // Notify parent
                 const newOrderIds = newOrder.map(item => item.id);
 
-                // IMPORTANT: We must merge this "reordered top 6" with the "rest of the favorites" 
+                // IMPORTANT: We must merge this "reordered top 10" with the "rest of the favorites" 
                 // to preserve the full list order, otherwise we lose data.
-                const restOfItems = propItems.slice(6).map(i => i.id);
+                const restOfItems = propItems.slice(10).map(i => i.id);
                 const fullIds = [...newOrderIds, ...restOfItems];
 
                 if (activeTab === 'anime') {
@@ -232,7 +232,7 @@ export function FavoritesWidget({
 
                     {/* Count Badge */}
                     <span className="text-xs font-bold text-text-secondary bg-bg-tertiary px-3 py-1.5 rounded-full border border-border-color">
-                        {localItems.length} / 6
+                        {localItems.length} / 10
                     </span>
                 </div>
 
@@ -292,7 +292,7 @@ export function FavoritesWidget({
                     onDragStart={(e) => setActiveId(e.active.id)}
                     onDragEnd={handleDragEnd}
                 >
-                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 relative z-10">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 relative z-10">
                         <SortableContext items={localItems.map(i => i.id)} strategy={rectSortingStrategy}>
                             {localItems.map((item) => (
                                 <SortableFavoriteItem 
@@ -306,7 +306,7 @@ export function FavoritesWidget({
                         </SortableContext>
 
                         {/* Empty Slots */}
-                        {Array.from({ length: 6 - localItems.length }).map((_, i) => (
+                        {Array.from({ length: 10 - localItems.length }).map((_, i) => (
                             <div
                                 key={`empty-${i}`}
                                 className="aspect-[2/3] rounded-xl border-2 border-dashed border-border-color bg-bg-tertiary/30 flex flex-col items-center justify-center gap-3 text-text-secondary/50 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer group"

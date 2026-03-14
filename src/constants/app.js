@@ -3,7 +3,7 @@ export const APP_CONFIG = {
         MAX_ITEMS: 1000,
         COLLECTION_NAME: 'library',
         BATCH_SIZE: 500,
-        MAX_FAVORITES: 6
+        MAX_FAVORITES: 10
     },
     CATALOG: {
         ITEMS_PER_PAGE: 20,
