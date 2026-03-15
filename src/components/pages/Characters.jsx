@@ -66,7 +66,7 @@ export function Characters() {
                 {/* Content Area */}
                 {viewMode === 'grid' ? (
                     /* GRID VIEW */
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 lg:gap-8">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 md:gap-8 lg:gap-10">
                         {characters.map((char, index) => (
                             <CharacterCard
                                 key={char.mal_id}
