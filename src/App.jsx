@@ -25,6 +25,8 @@ const Stats = lazy(() => import('@/components/pages/Stats').then(module => ({ de
 const PublicProfile = lazy(() => import('@/components/pages/PublicProfile').then(module => ({ default: module.PublicProfile })));
 const PublicLibrary = lazy(() => import('@/components/pages/PublicLibrary').then(module => ({ default: module.PublicLibrary })));
 
+const GlobalSearch = lazy(() => import('@/components/pages/GlobalSearch').then(module => ({ default: module.GlobalSearch })));
+
 // Loading Component
 import { Loader } from '@/components/ui/Loader';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
@@ -49,6 +51,7 @@ const AnimatedRoutes = () => {
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<PageTransition><RouteErrorBoundary><Home /></RouteErrorBoundary></PageTransition>} />
             <Route path="/catalog" element={<PageTransition><RouteErrorBoundary><Catalog /></RouteErrorBoundary></PageTransition>} />
+            <Route path="/search" element={<PageTransition><RouteErrorBoundary><GlobalSearch /></RouteErrorBoundary></PageTransition>} />
             <Route path="/calendar" element={<PageTransition><RouteErrorBoundary><Calendar /></RouteErrorBoundary></PageTransition>} />
             <Route path="/characters" element={<PageTransition><RouteErrorBoundary><Characters /></RouteErrorBoundary></PageTransition>} />
             <Route path="/people" element={<PageTransition><RouteErrorBoundary><VoiceActors /></RouteErrorBoundary></PageTransition>} />

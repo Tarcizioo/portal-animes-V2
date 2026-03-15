@@ -3,7 +3,7 @@ import { jikanApi } from '@/services/api';
 
 export function useSearch() {
   const [query, setQuery] = useState('');
-  const [type, setType] = useState('all'); // Novo estado: 'all', 'anime', 'character', 'person'
+  const [type, setType] = useState('all'); // 'all', 'anime', 'character', 'person', 'studio'
   const [results, setResults] = useState([]);
 
   const [isSearching, setIsSearching] = useState(false);
@@ -52,8 +52,16 @@ export function useSearch() {
             image: person.images?.jpg?.image_url,
             kind: 'person' // Novo tipo
           }));
+        } else if (type === 'studio') {
+          const data = await jikanApi.searchStudios(query, 6, { signal });
+          results = (data.data || []).map(std => ({
+            id: std.mal_id,
+            title: std.titles?.[0]?.title || std.about?.split('\n')[0] || 'Estúdio',
+            image: std.images?.jpg?.image_url,
+            kind: 'studio'
+          }));
         } else {
-            // Default: Anime + Character + People mix
+            // Default: Anime + Character + People + Studio mix
             // Sequentially await with delays to prevent Jikan 429 Rate Limit
             const animeRes = await jikanApi.searchAnime(query, 3, { signal });
             if (signal.aborted) return;
@@ -63,7 +71,11 @@ export function useSearch() {
             if (signal.aborted) return;
             await new Promise(r => setTimeout(r, 400));
             
-            const peopleRes = await jikanApi.searchPeople(query, 2, { signal });
+            const peopleRes = await jikanApi.searchPeople(query, 1, { signal });
+            if (signal.aborted) return;
+            await new Promise(r => setTimeout(r, 400));
+            
+            const studioRes = await jikanApi.searchStudios(query, 1, { signal });
             if (signal.aborted) return;
 
             const animes = (animeRes?.data || []).map(anime => ({
@@ -90,7 +102,14 @@ export function useSearch() {
                 kind: 'person'
             }));
 
-            results = [...animes, ...chars, ...people];
+            const studios = (studioRes?.data || []).map(s => ({
+                id: s.mal_id,
+                title: s.titles?.[0]?.title || s.about?.split('\n')[0] || 'Estúdio',
+                image: s.images?.jpg?.image_url,
+                kind: 'studio'
+            }));
+
+            results = [...animes, ...chars, ...people, ...studios];
         }
 
         setResults(results);

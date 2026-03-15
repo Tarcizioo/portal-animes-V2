@@ -11,6 +11,21 @@ export function useCatalog() {
   const [filters, setFilters] = useState(() => {
     // 1. Check URL Params first (High Priority)
     const genreParam = searchParams.get('genre');
+    const qParam = searchParams.get('q');
+    
+    if (qParam) {
+        return {
+            q: qParam,
+            genres: [],
+            orderBy: 'ranking',
+            status: '',
+            year: '',
+            season: '',
+            type: '',
+            producers: '',
+        };
+    }
+    
     if (genreParam) {
       return {
         q: '',

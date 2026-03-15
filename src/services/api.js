@@ -101,4 +101,5 @@ export const jikanApi = {
     searchAnime: (query, limit=5, options={}) => apiFetch(`/anime?q=${encodeURIComponent(query)}&limit=${limit}&order_by=members&sort=desc`, options),
     searchCharacters: (query, limit=5, options={}) => apiFetch(`/characters?q=${encodeURIComponent(query)}&limit=${limit}&order_by=favorites&sort=desc`, options),
     searchPeople: (query, limit=5, options={}) => apiFetch(`/people?q=${encodeURIComponent(query)}&limit=${limit}&order_by=favorites&sort=desc`, options),
+    searchStudios: (query, limit=5, options={}) => apiFetch(`/producers?q=${encodeURIComponent(query)}&limit=${limit}&order_by=favorites&sort=desc`, options),
 };
