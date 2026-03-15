@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { OnboardingModal } from "@/components/profile/OnboardingModal";
 
 export function Layout({ children, showHeader = true, showFooter = true }) {
     const mainRef = useRef(null);
@@ -22,6 +23,9 @@ export function Layout({ children, showHeader = true, showFooter = true }) {
             <div className="hidden md:flex">
                 <Sidebar />
             </div>
+
+            {/* Global Modals */}
+            <OnboardingModal />
 
             {/* Main Content Area */}
             <main

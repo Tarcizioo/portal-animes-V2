@@ -34,6 +34,7 @@ export function AuthProvider({ children }) {
                     // email: user.email, // REMOVIDO por segurança (será lido via auth.currentUser)
                     photoURL: user.photoURL,
                     bannerURL: null,
+                    hasCompletedOnboarding: false,
                     createdAt: serverTimestamp(),
                     stats: {
                         watchedAnimes: 0,
