@@ -6,8 +6,9 @@ import { Loader } from '@/components/ui/Loader';
 import { Heart, Info, Mic2, ChevronDown, Trophy, Images } from 'lucide-react';
 import { RoleCard } from '@/components/ui/RoleCard';
 import { ImageModal } from '@/components/ui/ImageModal';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BackButton } from '@/components/ui/BackButton';
+import clsx from 'clsx';
 
 export function PersonDetails() {
   const { id } = useParams();
@@ -58,12 +59,13 @@ export function PersonDetails() {
           
           {/* Sidebar */}
           <aside className="lg:col-span-3 lg:sticky lg:top-24 self-start space-y-6 h-fit">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white/5 bg-bg-secondary aspect-[2/3]">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-bg-secondary aspect-[2/3] max-w-[280px] mx-auto lg:mx-0 group">
               <img 
                 src={person.images?.jpg?.image_url} 
                 alt={person.name} 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
               <div className="absolute top-3 left-3 px-3 py-1.5 bg-black/60 backdrop-blur-md rounded-xl text-xs font-bold text-white border border-white/10 shadow-lg flex items-center gap-1.5">
                   <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
                   {person.favorites?.toLocaleString() || 0}
@@ -135,140 +137,196 @@ export function PersonDetails() {
             </div>
 
             {/* Content Tabs */}
-            <div className="space-y-6">
-               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-1">
-                   <div className="flex items-center gap-6 overflow-x-auto pb-1 sm:pb-0">
-                      <button 
-                        onClick={() => setActiveTab('roles')}
-                        className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === 'roles' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
-                      >
-                        <Mic2 className="w-5 h-5" /> Dublagens <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{voices.length}</span>
-                      </button>
-                      <button 
-                        onClick={() => setActiveTab('staff')}
-                        className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === 'staff' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
-                      >
-                        <Trophy className="w-5 h-5" /> Produções <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{animePositions.length}</span>
-                      </button>
-                      <button 
-                        onClick={() => setActiveTab('photos')}
-                        className={`flex items-center gap-2 pb-3 text-lg font-bold transition-all border-b-2 whitespace-nowrap ${activeTab === 'photos' ? 'text-primary border-primary' : 'text-text-secondary border-transparent hover:text-text-primary'}`}
-                      >
-                        <Images className="w-5 h-5" /> Fotos <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full ml-1">{pictures.length}</span>
-                      </button>
-                   </div>
+            <div className="space-y-6 pt-6 border-t border-border-color">
+               <div className="flex flex-wrap items-center gap-3">
+                  <button 
+                    onClick={() => setActiveTab('roles')}
+                    className={clsx(
+                        "px-5 py-2.5 rounded-full text-sm sm:text-base font-bold flex items-center gap-2 transition-all duration-300 shadow-sm border",
+                        activeTab === 'roles' 
+                            ? "bg-primary text-white border-primary shadow-primary/20 scale-105" 
+                            : "bg-bg-secondary text-text-secondary border-border-color hover:bg-bg-tertiary hover:text-text-primary"
+                    )}
+                  >
+                    <Mic2 className="w-4 h-4 sm:w-5 sm:h-5" /> Dublagens 
+                    <span className={clsx(
+                        "text-xs px-2 py-0.5 rounded-full",
+                        activeTab === 'roles' ? "bg-white/20 text-white" : "bg-bg-tertiary text-text-secondary"
+                    )}>
+                        {voices.length}
+                    </span>
+                  </button>
+
+                  <button 
+                    onClick={() => setActiveTab('staff')}
+                    className={clsx(
+                        "px-5 py-2.5 rounded-full text-sm sm:text-base font-bold flex items-center gap-2 transition-all duration-300 shadow-sm border",
+                        activeTab === 'staff' 
+                            ? "bg-primary text-white border-primary shadow-primary/20 scale-105" 
+                            : "bg-bg-secondary text-text-secondary border-border-color hover:bg-bg-tertiary hover:text-text-primary"
+                    )}
+                  >
+                    <Trophy className="w-4 h-4 sm:w-5 sm:h-5" /> Produções 
+                    <span className={clsx(
+                        "text-xs px-2 py-0.5 rounded-full",
+                        activeTab === 'staff' ? "bg-white/20 text-white" : "bg-bg-tertiary text-text-secondary"
+                    )}>
+                        {animePositions.length}
+                    </span>
+                  </button>
+
+                  <button 
+                    onClick={() => setActiveTab('photos')}
+                    className={clsx(
+                        "px-5 py-2.5 rounded-full text-sm sm:text-base font-bold flex items-center gap-2 transition-all duration-300 shadow-sm border",
+                        activeTab === 'photos' 
+                            ? "bg-primary text-white border-primary shadow-primary/20 scale-105" 
+                            : "bg-bg-secondary text-text-secondary border-border-color hover:bg-bg-tertiary hover:text-text-primary"
+                    )}
+                  >
+                    <Images className="w-4 h-4 sm:w-5 sm:h-5" /> Fotos 
+                    <span className={clsx(
+                        "text-xs px-2 py-0.5 rounded-full",
+                        activeTab === 'photos' ? "bg-white/20 text-white" : "bg-bg-tertiary text-text-secondary"
+                    )}>
+                        {pictures.length}
+                    </span>
+                  </button>
                </div>
                 
-                {activeTab === 'roles' && (
-                  <>
-                    {voices.length > 0 ? (
-                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                        {displayedVoices.map((role, idx) => (
-                          <motion.div
-                            key={`${role.anime.mal_id}-${role.character.mal_id}-${idx}`}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.3 }}
-                          >
-                             <RoleCard role={role} />
-                          </motion.div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-text-secondary italic">Nenhum registro de dublagem encontrado.</p>
-                    )}
+                <div className="min-h-[400px]">
+                    <AnimatePresence mode="wait">
+                        {activeTab === 'roles' && (
+                            <motion.div
+                                key="roles"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {voices.length > 0 ? (
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                                    {displayedVoices.map((role, idx) => (
+                                    <motion.div
+                                        key={`${role.anime.mal_id}-${role.character.mal_id}-${idx}`}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <RoleCard role={role} />
+                                    </motion.div>
+                                    ))}
+                                </div>
+                                ) : (
+                                <p className="text-text-secondary italic">Nenhum registro de dublagem encontrado.</p>
+                                )}
 
-                    {voices.length > visibleVoices && (
-                      <div className="flex justify-center pt-4">
-                        <button 
-                          onClick={handleShowMoreVoices}
-                          className="px-6 py-3 bg-bg-secondary border border-primary/30 text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all flex items-center gap-2"
-                        >
-                          Carregar Mais <ChevronDown className="w-5 h-5" />
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
+                                {voices.length > visibleVoices && (
+                                <div className="flex justify-center pt-4">
+                                    <button 
+                                    onClick={handleShowMoreVoices}
+                                    className="px-6 py-3 bg-bg-secondary border border-primary/30 text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all flex items-center gap-2 shadow-sm hover:shadow-primary/30 hover:-translate-y-1"
+                                    >
+                                    Carregar Mais <ChevronDown className="w-5 h-5" />
+                                    </button>
+                                </div>
+                                )}
+                            </motion.div>
+                        )}
 
-                {activeTab === 'staff' && (
-                  <>
-                    {animePositions.length > 0 ? (
-                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                        {displayedPositions.map((pos, idx) => (
-                          <motion.div
-                            key={`${pos.anime.mal_id}-${idx}`}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.3 }}
-                            className="flex bg-bg-secondary rounded-xl overflow-hidden border border-border-color hover:border-primary/50 transition-all duration-300 group h-24 relative"
-                          >
-                            {/* Anime Image */}
-                            <Link to={`/anime/${pos.anime.mal_id}`} className="w-20 shrink-0 relative overflow-hidden">
-                                <img 
-                                src={pos.anime.images?.jpg?.image_url} 
-                                alt={pos.anime.title}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                loading="lazy"
-                                />
-                            </Link>
-                            
-                            {/* Info */}
-                            <div className="flex-1 p-3 flex flex-col justify-center min-w-0">
-                                <Link to={`/anime/${pos.anime.mal_id}`} className="text-sm font-bold text-text-primary hover:text-primary transition-colors line-clamp-1 mb-1">
-                                {pos.anime.title}
-                                </Link>
-                                <span className="text-xs text-text-secondary">
-                                Cargo: <span className="text-primary font-medium">{pos.position}</span>
-                                </span>
-                            </div>
+                        {activeTab === 'staff' && (
+                            <motion.div
+                                key="staff"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {animePositions.length > 0 ? (
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                                    {displayedPositions.map((pos, idx) => (
+                                    <motion.div
+                                        key={`${pos.anime.mal_id}-${idx}`}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 0.3 }}
+                                        className="flex bg-bg-secondary rounded-xl overflow-hidden border border-border-color hover:border-primary/50 transition-all duration-300 group h-24 relative shadow-sm hover:shadow-md hover:-translate-y-1"
+                                    >
+                                        {/* Anime Image */}
+                                        <Link to={`/anime/${pos.anime.mal_id}`} className="w-20 shrink-0 relative overflow-hidden">
+                                            <img 
+                                            src={pos.anime.images?.jpg?.image_url} 
+                                            alt={pos.anime.title}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            loading="lazy"
+                                            />
+                                        </Link>
+                                        
+                                        {/* Info */}
+                                        <div className="flex-1 p-3 flex flex-col justify-center min-w-0">
+                                            <Link to={`/anime/${pos.anime.mal_id}`} className="text-sm font-bold text-text-primary hover:text-primary transition-colors line-clamp-1 mb-1">
+                                            {pos.anime.title}
+                                            </Link>
+                                            <span className="text-xs text-text-secondary">
+                                            Cargo: <span className="text-primary font-medium">{pos.position}</span>
+                                            </span>
+                                        </div>
 
-                          </motion.div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-text-secondary italic">Nenhum registro de produção encontrado.</p>
-                    )}
+                                    </motion.div>
+                                    ))}
+                                </div>
+                                ) : (
+                                <p className="text-text-secondary italic">Nenhum registro de produção encontrado.</p>
+                                )}
 
-                    {animePositions.length > visiblePositions && (
-                      <div className="flex justify-center pt-4">
-                        <button 
-                          onClick={handleShowMorePositions}
-                          className="px-6 py-3 bg-bg-secondary border border-primary/30 text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all flex items-center gap-2"
-                        >
-                          Carregar Mais <ChevronDown className="w-5 h-5" />
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
+                                {animePositions.length > visiblePositions && (
+                                <div className="flex justify-center pt-4">
+                                    <button 
+                                    onClick={handleShowMorePositions}
+                                    className="px-6 py-3 bg-bg-secondary border border-primary/30 text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all flex items-center gap-2 shadow-sm hover:shadow-primary/30 hover:-translate-y-1"
+                                    >
+                                    Carregar Mais <ChevronDown className="w-5 h-5" />
+                                    </button>
+                                </div>
+                                )}
+                            </motion.div>
+                        )}
 
-                {activeTab === 'photos' && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    {pictures.map((pic, idx) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: idx * 0.05 }}
-                        className="aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-white/5 hover:border-primary/50 transition-all group relative cursor-pointer"
-                        onClick={() => setSelectedImage(pic.jpg.image_url)}
-                      >
-                         <img 
-                            src={pic.jpg.image_url} 
-                            alt={`Foto ${idx + 1}`} 
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                         />
-                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <Info className="w-8 h-8 text-white" />
-                         </div>
-                      </motion.div>
-                    ))}
-                    {pictures.length === 0 && <p className="text-text-secondary col-span-full italic">Nenhuma foto extra encontrada.</p>}
-                  </div>
-                )}
+                        {activeTab === 'photos' && (
+                            <motion.div
+                                key="photos"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+                            >
+                                {pictures.map((pic, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.3, delay: idx * 0.05 }}
+                                    className="aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-white/5 hover:border-primary/50 transition-all group relative cursor-pointer hover:shadow-primary/20 hover:-translate-y-1"
+                                    onClick={() => setSelectedImage(pic.jpg.image_url)}
+                                >
+                                    <img 
+                                        src={pic.jpg.image_url} 
+                                        alt={`Foto ${idx + 1}`} 
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    />
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <Info className="w-8 h-8 text-white" />
+                                    </div>
+                                </motion.div>
+                                ))}
+                                {pictures.length === 0 && <p className="text-text-secondary col-span-full italic">Nenhuma foto extra encontrada.</p>}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
             </div>
 
           </div>

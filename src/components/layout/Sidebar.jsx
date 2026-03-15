@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Home, Compass, Heart, Settings, ChevronLeft, ChevronRight, LogOut, X, Users, Tv, Menu, Zap, LogIn, Library, Globe, BarChart3 } from 'lucide-react'; // [Modified]
+import { Home, Compass, Heart, Settings, ChevronLeft, ChevronRight, LogOut, X, Users, Tv, Menu, Zap, LogIn, Library, Globe, BarChart3, User, Star } from 'lucide-react'; // [Modified]
 import clsx from 'clsx';
 import { SettingsModal } from '@/components/settings/SettingsModal';
 import { UserSearchModal } from '@/components/profile/UserSearchModal'; // [NEW]
@@ -44,7 +44,8 @@ export function Sidebar() {
     { icon: Tv, label: 'Calendário', path: '/calendar' },
     { icon: Library, label: 'Minha Biblioteca', path: '/library' },
     { icon: BarChart3, label: 'Estat. Pessoais', path: '/stats' },
-    { icon: Users, label: 'Personagens', path: '/characters' },
+    { icon: Star, label: 'Personagens', path: '/characters' },
+    { icon: Users, label: 'Pessoas', path: '/people' },
   ];
 
   // Link Base Styles

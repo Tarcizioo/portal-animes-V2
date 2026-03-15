@@ -100,8 +100,8 @@ export function CharacterDetails() {
 
                         {/* --- LEFT COLUMN (Sidebar) --- */}
                         <aside className="lg:col-span-3 lg:sticky lg:top-24 h-fit space-y-6">
-                            {/* Character Portrait */}
-                            <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white/5 bg-bg-secondary aspect-[2/3] group">
+                            {/* Character Portrait (Shrinked & Premium) */}
+                            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-bg-secondary aspect-[2/3] group max-w-[280px] mx-auto lg:mx-0">
                                 <img
                                     src={character.image}
                                     alt={character.name}
@@ -190,57 +190,63 @@ export function CharacterDetails() {
                                 </div>
                             </div>
 
-                            {/* Dubladores (Voice Actors) */}
-                            <div>
-                                <div className="flex items-center justify-between mb-6">
-                                    <h3 className="text-2xl font-bold flex items-center gap-3">
-                                        <Mic2 className="w-6 h-6 text-primary" /> Dubladores
-                                    </h3>
-                                    <Link to="/people" className="text-sm font-bold text-primary hover:text-white hover:bg-primary px-4 py-2 rounded-xl transition-all border border-primary/20 hover:border-transparent">
-                                        Ver Top Pessoas
-                                    </Link>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                                    {displayVoiceActors.map((va, idx) => (
-                                        <Link to={`/person/${va.person.mal_id}`} key={`${va.person.mal_id}-${idx}`} className="flex items-center gap-4 p-4 rounded-2xl bg-bg-secondary border border-border-color hover:border-primary/50 hover:bg-bg-tertiary transition-all group">
-                                            <div
-                                                className="w-16 h-16 rounded-full bg-cover bg-center shrink-0 border-2 border-white/10 group-hover:border-primary transition-all shadow-md"
-                                                style={{ backgroundImage: `url('${va.person.images?.jpg?.image_url}')` }}
-                                            />
-                                            <div className="min-w-0">
-                                                <h4 className="text-base font-bold text-text-primary truncate group-hover:text-primary transition-colors">{va.person.name}</h4>
-                                                <span className="text-xs font-bold text-text-secondary uppercase tracking-wider bg-black/20 px-2 py-0.5 rounded-full">{va.language}</span>
-                                            </div>
-                                        </Link>
-                                    ))}
-                                    {voiceActors.length === 0 && <span className="text-gray-500 italic">Nenhum dublador registrado.</span>}
-                                </div>
-                            </div>
+                            {/* TABS Navigation & Content */}
+                            <div className="space-y-6 pt-6 border-t border-border-color">
+                                {/* Tab Navigation (Modern Pills) */}
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <button
+                                        onClick={() => setActiveTab('anime')}
+                                        className={clsx(
+                                            "px-5 py-2.5 rounded-full text-sm sm:text-base font-bold flex items-center gap-2 transition-all duration-300 shadow-sm border",
+                                            activeTab === 'anime' 
+                                                ? "bg-primary text-white border-primary shadow-primary/20 scale-105" 
+                                                : "bg-bg-secondary text-text-secondary border-border-color hover:bg-bg-tertiary hover:text-text-primary"
+                                        )}
+                                    >
+                                        <Film className="w-4 h-4 sm:w-5 sm:h-5" /> Filmografia
+                                        <span className={clsx(
+                                            "text-xs px-2 py-0.5 rounded-full",
+                                            activeTab === 'anime' ? "bg-white/20 text-white" : "bg-bg-tertiary text-text-secondary"
+                                        )}>
+                                            {animeography.length}
+                                        </span>
+                                    </button>
 
-                            {/* TABS: Filmography & Gallery */}
-                            <div className="space-y-6">
-                                {/* Tab Navigation */}
-                                <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-2 border-b border-white/10 pb-2">
-                                    <div className="flex items-center gap-3">
-                                        <button
-                                            onClick={() => setActiveTab('anime')}
-                                            className={clsx(
-                                                "text-lg font-bold flex items-center gap-2 transition-colors pb-2 -mb-2.5 border-b-2",
-                                                activeTab === 'anime' ? "text-primary border-primary" : "text-text-secondary border-transparent hover:text-white"
-                                            )}
-                                        >
-                                            <Film className="w-5 h-5" /> Filmografia <span className="text-xs bg-bg-secondary px-2 py-0.5 rounded-full text-text-secondary">{animeography.length}</span>
-                                        </button>
-                                        <button
-                                            onClick={() => setActiveTab('gallery')}
-                                            className={clsx(
-                                                "text-lg font-bold flex items-center gap-2 transition-colors pb-2 -mb-2.5 border-b-2",
-                                                activeTab === 'gallery' ? "text-primary border-primary" : "text-text-secondary border-transparent hover:text-white"
-                                            )}
-                                        >
-                                            <ImageIcon className="w-5 h-5" /> Galeria <span className="text-xs bg-bg-secondary px-2 py-0.5 rounded-full text-text-secondary">{pictures.length}</span>
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={() => setActiveTab('voice_actors')}
+                                        className={clsx(
+                                            "px-5 py-2.5 rounded-full text-sm sm:text-base font-bold flex items-center gap-2 transition-all duration-300 shadow-sm border",
+                                            activeTab === 'voice_actors' 
+                                                ? "bg-primary text-white border-primary shadow-primary/20 scale-105" 
+                                                : "bg-bg-secondary text-text-secondary border-border-color hover:bg-bg-tertiary hover:text-text-primary"
+                                        )}
+                                    >
+                                        <Mic2 className="w-4 h-4 sm:w-5 sm:h-5" /> Dubladores
+                                        <span className={clsx(
+                                            "text-xs px-2 py-0.5 rounded-full",
+                                            activeTab === 'voice_actors' ? "bg-white/20 text-white" : "bg-bg-tertiary text-text-secondary"
+                                        )}>
+                                            {voiceActors.length}
+                                        </span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => setActiveTab('gallery')}
+                                        className={clsx(
+                                            "px-5 py-2.5 rounded-full text-sm sm:text-base font-bold flex items-center gap-2 transition-all duration-300 shadow-sm border",
+                                            activeTab === 'gallery' 
+                                                ? "bg-primary text-white border-primary shadow-primary/20 scale-105" 
+                                                : "bg-bg-secondary text-text-secondary border-border-color hover:bg-bg-tertiary hover:text-text-primary"
+                                        )}
+                                    >
+                                        <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5" /> Galeria
+                                        <span className={clsx(
+                                            "text-xs px-2 py-0.5 rounded-full",
+                                            activeTab === 'gallery' ? "bg-white/20 text-white" : "bg-bg-tertiary text-text-secondary"
+                                        )}>
+                                            {pictures.length}
+                                        </span>
+                                    </button>
                                 </div>
 
                                 {/* Tab Content */}
@@ -285,6 +291,39 @@ export function CharacterDetails() {
                                                                 <h4 className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors line-clamp-2 mt-3 leading-tight">
                                                                     {entry.anime.title}
                                                                 </h4>
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </motion.div>
+                                        ) : activeTab === 'voice_actors' ? (
+                                            <motion.div
+                                                key="voice_actors"
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -10 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                {voiceActors.length === 0 ? (
+                                                    <p className="text-text-secondary text-center py-20 italic">Ops! Lembrete mudo: Nenhum dublador registrado.</p>
+                                                ) : (
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                                        {voiceActors.map((va, idx) => (
+                                                            <Link 
+                                                                to={`/person/${va.person.mal_id}`} 
+                                                                key={`${va.person.mal_id}-${idx}`} 
+                                                                className="flex items-center gap-4 p-4 rounded-2xl bg-bg-secondary border border-border-color hover:border-primary/50 hover:bg-bg-tertiary transition-all group shadow-sm hover:shadow-md hover:-translate-y-1"
+                                                            >
+                                                                <div
+                                                                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-cover bg-center shrink-0 border border-border-color group-hover:border-primary transition-all shadow-inner"
+                                                                    style={{ backgroundImage: `url('${va.person.images?.jpg?.image_url}')` }}
+                                                                />
+                                                                <div className="min-w-0 pr-2">
+                                                                    <h4 className="text-sm sm:text-base font-bold text-text-primary truncate group-hover:text-primary transition-colors">{va.person.name}</h4>
+                                                                    <span className="inline-block mt-1 text-[10px] md:text-xs font-bold text-text-secondary uppercase tracking-wider bg-bg-primary border border-border-color px-2 py-0.5 rounded-md">
+                                                                        {va.language}
+                                                                    </span>
+                                                                </div>
                                                             </Link>
                                                         ))}
                                                     </div>
