@@ -5,10 +5,14 @@ import { BottomNav } from "@/components/layout/BottomNav";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { OnboardingModal } from "@/components/profile/OnboardingModal";
+import { usePresence } from "@/hooks/usePresence";
 
 export function Layout({ children, showHeader = true, showFooter = true }) {
     const mainRef = useRef(null);
     const { pathname } = useLocation();
+
+    // Initialize global presence tracker for the user
+    usePresence();
 
     // Reset scroll when route changes
     useEffect(() => {

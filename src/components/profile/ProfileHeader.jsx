@@ -7,7 +7,21 @@ export function ProfileHeader({ user, profile, onEdit, onShare, readOnly = false
     const banner = profile?.bannerURL || user?.bannerURL || "https://placehold.co/1200x400/1a1a1a/FFF?text=Banner+Anime";
     const photo  = profile?.photoURL  || user?.photoURL  || "https://placehold.co/200x200/6366f1/FFF?text=User";
     const name   = profile?.displayName || user?.displayName || "Usuário";
-    const isOnline = true;
+    
+    const checkIsOnline = () => {
+        if (!profile?.isOnline) return false;
+        if (profile?.lastActive?.seconds) {
+            const lastActiveMs = profile.lastActive.seconds * 1000;
+            const nowMs = Date.now();
+            // Consider offline if last ping was more than 6 minutes ago
+            // (5 min ping interval + 1 min grace period)
+            if (nowMs - lastActiveMs > (6 * 60 * 1000)) {
+                return false;
+            }
+        }
+        return true;
+    };
+    const isOnline = checkIsOnline();
 
     const [lightbox, setLightbox] = useState({ open: false, url: '', alt: '' });
     const openLightbox = (url, alt) => setLightbox({ open: true, url, alt });
