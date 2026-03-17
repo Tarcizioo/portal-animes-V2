@@ -1,5 +1,5 @@
 import { useMemo, useRef, useEffect, useState } from 'react';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, ChevronDown } from 'lucide-react';
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
 
@@ -15,14 +15,15 @@ const WEEKDAY_LABELS = ['Dom', '', 'Ter', '', 'Qui', '', 'Sáb'];
  * Build a calendar aligned to real weeks (Sun→Sat).
  * Returns an array of 7-element arrays (columns = weeks).
  * Entries can be a Date or null (gap padding before first real day, or future).
+ * @param {number} numWeeks - how many weeks to display (26 or 52)
  */
-function buildWeeks() {
+function buildWeeks(numWeeks = 52) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Start of the week (Sunday) that was ≈ 52 weeks ago
+    // Start of the week (Sunday) that was ≈ numWeeks weeks ago
     const startDay = new Date(today);
-    startDay.setDate(today.getDate() - 52 * 7 + 1);          // 52 weeks back
+    startDay.setDate(today.getDate() - numWeeks * 7 + 1);
     startDay.setDate(startDay.getDate() - startDay.getDay()); // rewind to Sunday
 
     const weeks = [];
@@ -57,7 +58,10 @@ function level(count) {
  * @param {{ activityLog?: Record<string, number> }} props
  */
 export function ActivityHeatmap({ activityLog = {} }) {
-    const weeks = useMemo(() => buildWeeks(), []);
+    // 26 = 6 months, 52 = 12 months
+    const [weeksCount, setWeeksCount] = useState(52);
+
+    const weeks = useMemo(() => buildWeeks(weeksCount), [weeksCount]);
 
     const totalEps = useMemo(
         () => Object.values(activityLog).reduce((s, v) => s + v, 0),
@@ -95,15 +99,40 @@ export function ActivityHeatmap({ activityLog = {} }) {
     const STEP = cellSize + GAP;
 
     return (
-        <div className="bg-bg-secondary border border-border-color rounded-2xl p-5 md:p-6 select-none overflow-hidden">
+        <div className="bg-bg-secondary border border-border-color rounded-2xl p-4 md:p-6 select-none overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between mb-4 gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
                 <h3 className="font-bold text-text-primary text-sm md:text-base flex items-center gap-2 shrink-0">
                     <CalendarDays className="w-4 h-4 text-button-accent" /> Atividade de Episódios
                 </h3>
-                <span className="text-xs text-text-secondary font-medium text-right">
-                    {totalEps} eps nos últimos 12 meses
-                </span>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                    {/* Period toggle */}
+                    <div className="flex items-center gap-1 bg-bg-tertiary border border-border-color rounded-lg p-0.5">
+                        <button
+                            onClick={() => setWeeksCount(26)}
+                            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all ${weeksCount === 26
+                                ? 'bg-button-accent text-white shadow-sm'
+                                : 'text-text-secondary hover:text-text-primary'
+                            }`}
+                        >
+                            6 meses
+                        </button>
+                        <button
+                            onClick={() => setWeeksCount(52)}
+                            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all ${weeksCount === 52
+                                ? 'bg-button-accent text-white shadow-sm'
+                                : 'text-text-secondary hover:text-text-primary'
+                            }`}
+                        >
+                            12 meses
+                        </button>
+                    </div>
+
+                    <span className="text-xs text-text-secondary font-medium whitespace-nowrap">
+                        {totalEps} eps
+                    </span>
+                </div>
             </div>
 
             {/* Outer wrapper: overflow-hidden prevents pixel-based labels from blowing out viewport */}

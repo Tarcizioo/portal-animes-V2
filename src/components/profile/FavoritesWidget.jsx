@@ -9,6 +9,7 @@ import {
     closestCenter,
     KeyboardSensor,
     PointerSensor,
+    TouchSensor,
     useSensor,
     useSensors,
     DragOverlay
@@ -136,7 +137,7 @@ export function FavoritesWidget({
 }) {
     const [activeTab, setActiveTab] = useState(preferredView || 'anime');
     const [isEditing, setIsEditing] = useState(false);
-    
+
     // State para o Modal de Trocar Imagem do Card
     const [imageModalState, setImageModalState] = useState({ open: false, itemId: null });
 
@@ -162,6 +163,7 @@ export function FavoritesWidget({
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+        useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
         useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
     );
 
@@ -217,7 +219,7 @@ export function FavoritesWidget({
             </div>
 
             {/* Controls row */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-6 mb-4 md:mb-8 relative z-10">
+            <div className="flex flex-row flex-wrap items-center justify-between gap-2 mb-4 md:mb-6 relative z-10">
 
                 <div className="flex items-center gap-2 md:gap-4">
                     {/* Modern Tab Switcher */}
@@ -273,7 +275,7 @@ export function FavoritesWidget({
             {/* Grid Area */}
             {readOnly ? (
                 // Static View
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 relative z-10">
+                <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 relative z-10">
                     {localItems.map((item) => (
                         <FavoriteCard key={item.id} item={item} type={type} />
                     ))}
@@ -285,21 +287,21 @@ export function FavoritesWidget({
                     )}
                 </div>
             ) : (
-                // Interactive View
+                // Interactive View — grid-cols-3 on mobile for better proportions
                 <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
                     onDragStart={(e) => setActiveId(e.active.id)}
                     onDragEnd={handleDragEnd}
                 >
-                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 relative z-10">
+                    <div className="grid grid-cols-5 sm:grid-cols-4 lg:grid-cols-5 gap-3 relative z-10">
                         <SortableContext items={localItems.map(i => i.id)} strategy={rectSortingStrategy}>
                             {localItems.map((item) => (
-                                <SortableFavoriteItem 
-                                    key={item.id} 
-                                    item={item} 
-                                    type={type} 
-                                    isEditing={isEditing} 
+                                <SortableFavoriteItem
+                                    key={item.id}
+                                    item={item}
+                                    type={type}
+                                    isEditing={isEditing}
                                     onOpenImageModal={(id) => setImageModalState({ open: true, itemId: id })}
                                 />
                             ))}
